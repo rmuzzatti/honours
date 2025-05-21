@@ -55,7 +55,7 @@ first_time_df <- add_new_cells(
 ```
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
 ```{r eval=FALSE}
-# will not run if there is nothing new
+# will not run if there is nothing new in "raw_eEPSC_df.csv" so if you put new data directly into that, won't run
 add_new_cells(
   new_raw_data_csv = "Data/raw_eEPSC_df.csv",
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
