@@ -14,3 +14,9 @@ Category 1: Naive, looking at glutamate synapses
 Category 2: 30 minute single restraint, looking at glutamate synapses
 
 -Treatment: "Control" (aCSF + 50 uM picrotoxin)
+
+## Letter/CellID Meaning
+RMA#
+-RM: collected by Ruby Muzzatti
+-A: acute restraint stress (1 x 30 minutes)
+-#: number of cell in sequence for this category
