@@ -25,10 +25,10 @@ library(ggforce)
 library(ggpubr)
 library(here)
 ```
-Cell Characteristics
+Importing Cell Characteristics
 ```{r}
-#cell_characteristics <- import_cell_characteristics_df("data/Cell-Characteristics.csv")
+cell_characteristics <- import_cell_characteristics_df("Data/Cell-Characteristics.csv")
 
-#cell_characteristics
+cell_characteristics
 ```
 
