@@ -32,9 +32,9 @@ cell_characteristics <- import_cell_characteristics_df("Data/Cell-Characteristic
 cell_characteristics
 ```
 
-Importing Raw Evoked Current Data
-```{r}
-eEPSC_data <- read.csv("Data/raw.csv")
+Importing NEW Raw Evoked Current Data
+```{r eval=FALSE}
+eEPSC_data <- read.csv("Data/new_raw.csv")
 
 eEPSC_data
 ```
@@ -42,7 +42,7 @@ eEPSC_data
 Merging Raw Evoked Current Data with Cell Characteristics FOR THE FIRST TIME
 ```{r eval=FALSE}
 first_time_df <- add_new_cells(
-  new_raw_data_csv = "Data/raw.csv", #eEPSC raw data just imported
+  new_raw_data_csv = "Data/new_raw.csv", #eEPSC raw data just imported
   cell_characteristics_csv = "Data/Cell-Characteristics.csv", #just imported
   old_raw_data_csv = "Data/merged.csv", #blank except for letter
   data_type = "eEPSC",
@@ -55,9 +55,9 @@ first_time_df <- add_new_cells(
 ```
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
 ```{r eval=FALSE}
-# will not run if there is nothing new in "raw_eEPSC_df.csv" so if you put new data directly into that, won't run
+# will not run if there is nothing new in "new_raw.csv" so if you put new data directly into "raw_eEPSC_df.csv", it won't run
 add_new_cells(
-  new_raw_data_csv = "Data/raw_eEPSC_df.csv",
+  new_raw_data_csv = "Data/new_raw.csv", # should ONLY have the new data you want
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
   old_raw_data_csv = "Data/raw_eEPSC_df.csv",
   data_type = "eEPSC",
@@ -65,5 +65,13 @@ add_new_cells(
   new_file_name = "Data/raw_eEPSC_df.csv", # will overwrite the current version of this file
   decimal_places = 2
 )
+
+#once successful, go delete the data from "new_raw.csv" so that you don't get a duplication error the next time you are adding data to the raw_eEPSC_df.
+```
+Look at the data frame
+```{r}
+raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) #puts it in the environment
+
+raw_eEPSC_df #prints it
 ```
 
