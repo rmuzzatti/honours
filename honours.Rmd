@@ -70,8 +70,91 @@ add_new_cells(
 ```
 Look at the data frame
 ```{r}
-raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) #puts it in the environment
+raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
 
-raw_eEPSC_df #prints it
+raw_eEPSC_df # prints it
 ```
 
+Normalizing Data:
+```{r}
+normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
+  filename = "Data/raw_eEPSC_df.csv",
+  current_type = "eEPSC",
+  min_time_value = 0,
+  max_time_value = 30,
+  interval_length = 5,
+  baseline_length = 5,
+  negative_transform_currents = "yes" # because the raw amplitudes are negative
+)
+```
+
+defining my colour theme
+```{r}
+my_theme_colours <- data.frame(
+  category = c(1, 2),
+    treatment = c("Control", "Control"),
+  display_names = c("Naive", "Acute"),
+  colours = c("#eb647e", "#005b96"),
+  very_pale_colours = c("#f19cac", "#6497b1")
+)
+```
+
+editing my theme options
+```{r}
+library(tibble)
+
+my_custom_theme_options <- read.csv("Data/my_custom_theme_options.csv") %>%
+  remove_rownames() %>%
+  column_to_rownames(var = "option")
+```
+
+
+Raw Plots for each cell:
+```{r}
+raw_eEPSC_acute_plots <- plot_raw_current_data(
+ data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4")), # why are RMA3 and RMA4 not showing up
+  plot_treatment = "Control",
+  plot_category = 2, # 2 is acute restraint, 1 is naive
+  current_type = "eEPSC",
+  y_variable = "P1",
+  pruned = "no",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_custom_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+ raw_eEPSC_acute_plots
+
+```
+
+Raw Naive Plots for each cell:
+```{r eval=FALSE}
+raw_eEPSC_naive_plots <- plot_raw_current_data(
+ data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
+  plot_treatment = "Control",
+  plot_category = 1,
+  current_type = "eEPSC",
+  y_variable = "P1",
+  pruned = "no",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_custom_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+ raw_eEPSC_naive_plots
+
+# remove the title ("Recording LS10") and subtitle ("Treatment: Control Sex: Female")
+# LS10_plot <- raw_eEPSC_naive_plots$LS10 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+
+# LS10_plot
+
+#fixing the y-axis
+# LS10_final_plot <- LS10_plot + ylim(0,550)
+
+# LS10_final_plot
+
+# saving as png to figure folder
+#ggsave(LS10_final_plot, path = here("Figures"), file = "LS10_final_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
