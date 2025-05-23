@@ -387,3 +387,93 @@ acute_summary_plot
 # saving as png to figure folder
 # ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
+Make PPR Dataset
+```{r}
+female_PPR_df <- make_PPR_data(
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"),
+  include_all_treatments = "no",
+  list_of_treatments = c("Control"),
+  PPR_min = 0,
+  PPR_max = 5,
+  baseline_interval = "t0to5",
+  treatment_colour_theme = my_theme_colours
+)
+female_PPR_df
+```
+
+testing assumptions for comparing PPR during baseline
+```{r}
+female_PPR_plot_df <- female_PPR_df %>% # making the data frame so that we have mean PPR
+  filter(state == "Baseline") %>%
+  group_by(category, letter) %>%
+  summarize(mean_PPR = mean(PPR),
+            n = n())
+
+shapiro.test(female_PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
+
+# p value is greater than 0.05, data is normal
+```
+Baseline PPR Plot
+```{r}
+female_baseline_PPR_plot <- female_PPR_plot_df %>%
+ 
+# factor so it is treated as a discrete variable
+ggplot(aes(x = factor(category), y = mean_PPR)) + 
+  
+
+
+# the boxes
+  geom_boxplot(aes(fill = factor(category)), 
+               alpha = 0.6, 
+               outlier.shape = NA, 
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               color = "black", 
+               width = 0.5, 
+               show.legend = FALSE) +  
+  
+# the dots/scatter plot
+  geom_sina(aes(x = factor(category), color = factor(category)), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +  
+  
+# t-test
+  stat_compare_means(
+    method = "t.test", # just tested assumptions in the last chunk
+    comparisons = list(c("1", "2")),
+    label = "p.format", # p.signif does the stars, p.format shows the p-value
+    label.y = 1.9, 
+    size = 5
+  ) +
+ 
+# mean as a point 
+   stat_summary(fun = mean, geom = "point", 
+               shape = 16, size = 4, color = "black") +
+
+# colours
+  scale_fill_manual(values = c("1" = "#f5e0b3", "2" = "#f19cac")) +
+  scale_color_manual(values = c("1" = "#ecc479", "2" = "#eb647e")) +
+
+# x-axis labels
+  scale_x_discrete(labels = c("Naive", "Acute")) +
+  
+# x-axis subtitles  
+  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + # manually adding the sample size
+  annotate("text", x = 2, y = -0.2, label = "n = 4", size = 4, hjust = 0.5) + 
+  
+
+  guides(fill = "none", color = "none") +
+  
+# axis labels
+  scale_y_continuous(limits = c(0, 2.3)) +  # making the y-axis larger so the p-values are not cut off
+  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
+  patchclampplotteR_theme() +
+  theme(legend.position = "none")
+
+female_baseline_PPR_plot
+
+# saving as png to figure folder
+# ggsave(baseline_PPR_plot, path = here("Figures"), file = "baseline_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
