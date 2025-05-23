@@ -78,11 +78,11 @@ raw_eEPSC_df # prints it
 defining my colour theme
 ```{r}
 my_theme_colours <- data.frame(
-  category = c(1, 2),
-    treatment = c("Control", "Control"),
-  display_names = c("Naive", "Acute"),
-  colours = c("#eb647e", "#005b96"),
-  very_pale_colours = c("#f19cac", "#6497b1")
+  category = c(1, 2, 3),
+    treatment = c("Control", "Control", "Control"),
+  display_names = c("Naive", "Acute", "Repeated"),
+  colours = c("#ecc479", "#eb647e", "#005b96"),
+  very_pale_colours = c("#f5e0b3", "#f19cac", "#6497b1")
 )
 ```
 
@@ -158,3 +158,4 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
 # saving as png to figure folder
 #ggsave(LS10_final_plot, path = here("Figures"), file = "LS10_final_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
