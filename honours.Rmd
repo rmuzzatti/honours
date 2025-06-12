@@ -112,7 +112,7 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4")), # why are RMA3 and RMA4 not showing up
+ data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")), # why are RMA3 and RMA4 not showing up
   plot_treatment = "Control", #RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female"
   plot_category = 2, # 2 is acute restraint, 1 is naive
   current_type = "eEPSC",
@@ -163,7 +163,7 @@ Prune full (30 minute) cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_female_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
   current_type = "eEPSC",
   min_time_value = 0,
   max_time_value = 30,
@@ -219,6 +219,10 @@ pruned_eEPSC_acute_plots$RMA1
 pruned_eEPSC_acute_plots$RMA2
 pruned_eEPSC_acute_plots$RMA3
 pruned_eEPSC_acute_plots$RMA4
+pruned_eEPSC_acute_plots$RMA5
+pruned_eEPSC_acute_plots$RMA6
+pruned_eEPSC_acute_plots$RMA7
+pruned_eEPSC_acute_plots$RMA8
 ```
 female summary DATA
 ```{r}
@@ -234,6 +238,8 @@ summary_female_eEPSC_df # what I will use in my summary data stuff and plots fro
 # gives percent change, mean, and SE
 
 # Summary Plots (use PRUNED data, for visual ease, but t-tests are done with the SUMMARY data)
+
+# Catergory 1 is naive, 2 is acute
 ```
 CELL GROUPS for Summary Plots
 ```{r}
@@ -270,7 +276,7 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 testing assumptions for ACUTE summary data
 ```{r}
 acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4")) %>%
+  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")) %>%
   mutate(
     acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -317,7 +323,7 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4")), # don't actual need to filter these letters
+  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")), # don't actual need to filter these letters
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
