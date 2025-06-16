@@ -285,7 +285,7 @@ acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
     acute_difference0to5_vs_5to10 = t5to10 - t0to5,
          )
 
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_25to30) # normal
+shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_25to30) # not showing up
 qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
 qqline(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
 
