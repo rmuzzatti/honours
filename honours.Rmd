@@ -39,20 +39,6 @@ eEPSC_data <- read.csv("Data/new_raw.csv")
 eEPSC_data
 ```
 
-Merging Raw Evoked Current Data with Cell Characteristics FOR THE FIRST TIME
-```{r eval=FALSE}
-first_time_df <- add_new_cells(
-  new_raw_data_csv = "Data/new_raw.csv", #eEPSC raw data just imported
-  cell_characteristics_csv = "Data/Cell-Characteristics.csv", #just imported
-  old_raw_data_csv = "Data/merged.csv", #blank except for letter
-  data_type = "eEPSC",
-  # files merged without any issue, now going to change it to yes for write_new_csv
-  write_new_csv = "yes",
-  new_file_name = "Data/raw_eEPSC_df.csv",
-  decimal_places = 2
-)
-# successfully made new document where all the merged data will live from now on, making this chunk not run again since it will never be the first time for this project again
-```
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
 ```{r eval=FALSE}
 # will not run if there is nothing new in "new_raw.csv" so if you put new data directly into "raw_eEPSC_df.csv", it won't run
