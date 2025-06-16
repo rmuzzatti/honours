@@ -227,7 +227,7 @@ pruned_eEPSC_acute_plots$RMA8
 female summary DATA
 ```{r}
 summary_female_eEPSC_df <- make_summary_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # not pruned data
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # not pruned data. NEED TO FILTER OUT RMA5 AND RMA7
   current_type = "eEPSC",
   save_output_as_RDS = "no",
   baseline_interval = "t0to5",
