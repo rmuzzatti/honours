@@ -112,8 +112,8 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")), # why are RMA3 and RMA4 not showing up
-  plot_treatment = "Control", #RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female"
+ data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")), # why are RMA3 and RMA4 not showing up (May 2025)
+  plot_treatment = "Control", #RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
   plot_category = 2, # 2 is acute restraint, 1 is naive
   current_type = "eEPSC",
   y_variable = "P1",
