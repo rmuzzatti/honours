@@ -276,7 +276,7 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 testing assumptions for ACUTE summary data
 ```{r}
 acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")) %>%
+  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8")) %>%
   mutate(
     acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -285,7 +285,7 @@ acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
     acute_difference0to5_vs_5to10 = t5to10 - t0to5,
          )
 
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_25to30) # NOT normal
+shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_25to30) # normal
 qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
 qqline(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
 
@@ -323,7 +323,7 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA5", "RMA6", "RMA7", "RMA8")), # don't actual need to filter these letters
+  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8")), # need to filter out the bad cells (RMA5 and RMA7 as of 2025/6/16)
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -374,7 +374,7 @@ naive_summary_plot
 Acute FEMALE Summary:
 ```{r}
 acute_summary_plot <- plot_summary_current_data(
-  data = pruned_female_eEPSC_df$all_cells,
+  data = pruned_female_eEPSC_df$all_cells, # take out RMA5 and RMA7
   plot_category = 2,
   plot_treatment = "Control",
   current_type = "eEPSC",
@@ -387,7 +387,7 @@ acute_summary_plot <- plot_summary_current_data(
   y_axis_limit = 230,
   signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_acute,
+  t_test_df = t_test_female_acute, # proper t-test
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -404,7 +404,7 @@ acute_summary_plot
 Make PPR Dataset
 ```{r}
 female_PPR_df <- make_PPR_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"),
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # need to filter RMA5 and RMA7 out
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
   PPR_min = 0,
