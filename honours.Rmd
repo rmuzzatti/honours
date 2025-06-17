@@ -651,7 +651,7 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
   stat_compare_means(
     method = "t.test", # using t-test because it did pass assumptions
     label = "p.signif", # p.signif does the stars, p.format shows the p-value
-    label.y = 150, # where I want the star, could also be "c(270, 300)" if I had multiple (when I add repeated), 
+    label.y = 125, # where I want the star, could also be "c(270, 300)" if I had multiple (when I add repeated), 
     comparisons = list(c("1", "2")),
     size = 5
 ) +
@@ -659,6 +659,7 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
   guides(fill = "none", color = "none") +
   
 # axis labels
+  scale_y_continuous(limits = c(0, 150)) +  # making the y-axis larger so the p-values are not cut off
   labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
   patchclampplotteR_theme() +
   theme(legend.position = "none")
