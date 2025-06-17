@@ -599,3 +599,88 @@ female_baseline_PPR_plot
 # saving as png to figure folder
 # ggsave(baseline_PPR_plot, path = here("Figures"), file = "baseline_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
+Violin Plot Comparing Baselines:
+```{r eval=FALSE}
+summary_female_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female") %>%
+  filter(treatment == "Control") %>%
+  filter(category %in% c(1,2)) %>%
+  ggplot(aes(x = category, y = t0to5, color = category )) +
+  geom_violin(aes(fill = factor(category)), alpha = 0.5) +  
+  scale_fill_manual(values = c("1" = "#f5e0b3", "2" = "#f19cac")) +
+  geom_sina(max_width = 0.2, shape = 16) +
+  scale_x_discrete(labels = c("Naive", "Cold")) +
+  stat_summary(fun = "mean", geom = "pointrange", colour = "black") +
+  scale_colour_manual(breaks = my_theme_colours$category, values = my_theme_colours$colours) +
+  guides(fill = "none", color = "none") +
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+  patchclampplotteR_theme()
+#still no mean_se line
+```
+
+box plot baselines:
+```{r}
+# making data frame
+female_baseline_amp_plot_df <- summary_female_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female") %>%
+  filter(treatment == "Control") %>%
+  filter(category %in% c(1,2))
+
+# testing assumptions
+shapiro.test(female_baseline_amp_plot_df$t0to5)
+# p value is larger than 0.05, data is normal
+
+
+female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
+  ggplot(aes(x = factor(category), y = t0to5)) +  
+
+# the boxes
+  geom_boxplot(aes(fill = factor(category), color = factor(category),fatten = NULL), 
+               alpha = 0.6, 
+               color = "black",
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE) +  
+
+# the dots/scatter plot
+  geom_sina(aes(x = factor(category), color = factor(category)), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +  
+  
+# mean as a point
+  stat_summary(fun = mean, geom = "point", 
+               shape = 16, size = 4, color = "black") +
+  
+# colours
+  scale_fill_manual(values = c("1" = "#f5e0b3", "2" = "#f19cac")) +
+  scale_color_manual(values = c("1" = "#ecc479", "2" = "#eb647e")) +
+  
+# x-axis labels  
+  scale_x_discrete(labels = c("Naive", "Acute")) +
+  
+# x-axis subtitles  
+  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
+  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  
+# t-test
+  stat_compare_means(
+    method = "t.test", # using wilcox because did not pass assumptions
+    label = "p.signif", # p.signif does the stars, p.format shows the p-value
+    label.y = 150, # where I want the star, could also be "c(270, 300)" if I had multiple (when I add repeated), 
+    comparisons = list(c("1", "2")),
+    size = 5
+) +
+
+  guides(fill = "none", color = "none") +
+  
+# axis labels
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+  patchclampplotteR_theme() +
+  theme(legend.position = "none")
+
+female_baseline_amp_plot
+```
