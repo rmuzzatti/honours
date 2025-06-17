@@ -556,7 +556,6 @@ ggplot(aes(x = factor(category), y = mean_PPR)) +
   
 # the dots/scatter plot
   geom_sina(aes(x = factor(category), color = factor(category)), 
-            max_width = 0.2, 
             shape = 16, 
             size = 2, 
             show.legend = FALSE) +  
@@ -627,7 +626,6 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
 
 # the dots/scatter plot
   geom_sina(aes(x = factor(category), color = factor(category)), 
-            max_width = 0.2, 
             shape = 16, 
             size = 2, 
             show.legend = FALSE) +  
