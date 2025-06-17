@@ -98,7 +98,7 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw ACUTE Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "MA1", "MA2", "MA3")), # why are RMA3 and RMA4 not showing up (May 2025)
+ data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "MA1", "MA2", "MA3")), # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   plot_treatment = "Control", #RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
   plot_category = 2, # 2 is acute restraint, 1 is naive
@@ -150,7 +150,7 @@ Prune full FEMALE (30 minute) cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_female_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
   # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   current_type = "eEPSC",
   min_time_value = 0,
@@ -228,6 +228,8 @@ pruned_eEPSC_acute_plots$RMA5
 pruned_eEPSC_acute_plots$RMA6
 pruned_eEPSC_acute_plots$RMA7
 pruned_eEPSC_acute_plots$RMA8
+pruned_eEPSC_acute_plots$RMA9
+pruned_eEPSC_acute_plots$RMA10
 ```
 Plot Pruned MALE ACUTE Data
 ```{r}
@@ -388,7 +390,7 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8")), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
+  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
