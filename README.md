@@ -17,6 +17,7 @@ Category 1: Naive, looking at glutamate synapses before and after HFS
 Category 2: 30 minute single restraint, looking at glutamate synapses before and after HFS
 
 -Treatment: "Control" (aCSF + 50 uM picrotoxin)
+-Treatment: "AM251" (aCSF + 50 uM picrotoxin + 5uM AM251)
 
 ## Letter/CellID Meaning
 RMA#
@@ -26,6 +27,8 @@ RMA#
 -A: acute restraint stress (1 x 30 minutes)
 
 -#: number of cell in sequence for this category
+
+-(optional) A: for AM251
 
 
 LS#
