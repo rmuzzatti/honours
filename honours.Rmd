@@ -40,7 +40,7 @@ eEPSC_data
 ```
 
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
-```{r eval=FALSE}
+```{r}
 # will not run if there is nothing new in "new_raw.csv" so if you put new data directly into "raw_eEPSC_df.csv", it won't run
 add_new_cells(
   new_raw_data_csv = "Data/new_raw.csv", # should ONLY have the new data you want
@@ -98,9 +98,9 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw ACUTE Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "MA1", "MA2", "MA3")), # why are RMA3 and RMA4 not showing up (May 2025)
+ data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "MA1", "MA2", "MA3", "RMA1A")), # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
-  plot_treatment = "Control", #RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
+  plot_treatment = "Control", # RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
   plot_category = 2, # 2 is acute restraint, 1 is naive
   current_type = "eEPSC",
   y_variable = "P1",
@@ -150,7 +150,7 @@ Prune full FEMALE (30 minute) cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_female_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
   # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   current_type = "eEPSC",
   min_time_value = 0,
@@ -230,6 +230,7 @@ pruned_eEPSC_acute_plots$RMA7
 pruned_eEPSC_acute_plots$RMA8
 pruned_eEPSC_acute_plots$RMA9
 pruned_eEPSC_acute_plots$RMA10
+pruned_eEPSC_acute_plots$RMA1A
 ```
 Plot Pruned MALE ACUTE Data
 ```{r}
@@ -321,7 +322,7 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 testing assumptions for ACUTE FEMALE summary data
 ```{r}
 acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8")) %>%
+  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")) %>%
   mutate(
     acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -483,6 +484,7 @@ acute_summary_plot
 # saving as png to figure folder
 # ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 Acute MALE Summary:
 ```{r}
 male_acute_summary_plot <- plot_summary_current_data(
