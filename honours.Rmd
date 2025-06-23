@@ -369,6 +369,31 @@ qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 
 # the 5 to 10 minute and 25 to 30 minute periods have p-values less than 0.05 are are not normal
 ```
+testing assumptions for ACUTE FEMALE summary data with AM251
+```{r}
+am251_acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
+  filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")) %>%
+  mutate(
+    am251_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
+    am251_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
+    am251_acute_difference0to5_vs_15to20 = t15to20 - t0to5,
+    am251_acute_difference0to5_vs_10to15 = t10to15 - t0to5,
+    am251_acute_difference0to5_vs_5to10 = t5to10 - t0to5,
+         )
+
+shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_25to30) # normal
+
+shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_20to25) # normal
+
+shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_15to20) # normal
+
+shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_10to15) # normal
+
+shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to10) # NOT normal
+
+# the 5 to 10 minute have p-values less than 0.05 are are not normal
+```
+
 testing assumptions for ACUTE MALE summary data
 ```{r}
 male_acute_difference_evoked_df <- summary_male_eEPSC_df$percent_change_data %>%
@@ -419,6 +444,19 @@ t_test_female_acute <-perform_t_tests_for_summary_plot(
   save_output_as_RDS = "no"
 )
 
+t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
+  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")), 
+  test_category = 2,
+  include_all_treatments = "no",
+  list_of_treatments = c("AM251"),
+  current_type = "eEPSC",
+  parameter = "amplitude",
+  baseline_interval = "t0to5",
+  interval_length = 5,
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
+
 t_test_male_acute <-perform_t_tests_for_summary_plot(
   data = summary_male_eEPSC_df$summary_data %>% filter(letter %in% c("MA1", "MA2", "MA3")), 
   test_category = 2,
@@ -435,6 +473,7 @@ t_test_male_acute <-perform_t_tests_for_summary_plot(
 
 t_test_female_naive
 t_test_female_acute
+t_test_female_acute_am251
 t_test_male_acute
 ```
 
@@ -499,6 +538,33 @@ acute_summary_plot
 
 # saving as png to figure folder
 # ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+Acute FEMALE Summary with AM251:
+```{r}
+am251_acute_summary_plot <- plot_summary_current_data(
+  data = pruned_female_eEPSC_df$all_cells, 
+  plot_category = 2,
+  plot_treatment = "AM251",
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  included_sexes = "both",
+  include_representative_trace = "no",
+  representative_trace_filename = import_ext_data("Control-trace.png"),
+  y_axis_limit = 230,
+  signif_stars = "yes",
+  geom_signif_text_size = 8,
+  t_test_df = t_test_female_acute_am251, 
+  large_axis_text = "no",
+  legend_position = "inside",
+  shade_intervals = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_custom_theme_options
+) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
+
+am251_acute_summary_plot
 ```
 
 Acute MALE Summary:
