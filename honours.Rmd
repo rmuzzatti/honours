@@ -54,6 +54,22 @@ add_new_cells(
 
 # once successful, go delete the data from "new_raw.csv" so that you don't get a duplication error the next time you are adding data to the raw_eEPSC_df.
 ```
+Importing AP Count Data
+```{r eval=FALSE}
+add_new_cells(
+  new_raw_data_csv = "Data/AP_count.csv",
+  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
+  old_raw_data_csv = "Data/AP_count.csv",
+  data_type = "AP_count",
+  write_new_csv = "no",
+  new_file_name = "AP_count.csv",
+  decimal_places = 2,
+  injection_start_time = 265.4,
+  length_of_current_injection = 0.5
+)
+```
+
+
 Look at the data frame
 ```{r}
 raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
