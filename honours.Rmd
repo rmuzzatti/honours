@@ -275,7 +275,7 @@ CELL GROUPS for Summary Plots
 ```{r}
 # Summary Plots use PRUNED data, for visual ease, but t-tests are done with the SUMMARY data
 
-pruned_naive_female_long <- pruned_female_eEPSC_df$individual_cells %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10"))
+pruned_naive_female_long <- pruned_eEPSC_df$individual_cells %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10"))
 ```
 
 testing assumptions for naive FEMALE summary data
@@ -485,7 +485,7 @@ acute_summary_plot <- plot_summary_current_data(
   y_variable = "amplitude",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  included_sexes = "both",
+  included_sexes = "female",
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
@@ -542,7 +542,7 @@ male_acute_summary_plot <- plot_summary_current_data(
   y_variable = "amplitude",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  included_sexes = "both",
+  included_sexes = "male",
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
@@ -573,7 +573,7 @@ plot_percent_change_comparisons(
 ```
 
 
-Make PPR Dataset
+Make FEMALE PPR Dataset
 ```{r}
 female_PPR_df <- make_PPR_data(
   data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
@@ -593,10 +593,10 @@ plot_PPR_data_multiple_treatments(
   data = female_PPR_df,
   include_all_treatments = "yes",
   plot_category = 2,
-  baseline_label = "B",
+  baseline_label = "Baseline",
   post_hormone_label = "HFS",
  # facet_by_treatment = "yes",
- # not spliting the treatments like it does on the website
+ # HELP not spliting the treatments like it does on the website
   test_type = "t.test",
   theme_options = my_custom_theme_options,
   treatment_colour_theme = sample_treatment_names_and_colours # wont let me use my own
