@@ -587,7 +587,7 @@ female_PPR_df <- make_PPR_data(
 female_PPR_df
 ```
 
-PPR multiple treatments for acute females
+PPR multiple treatments for acute FEMALES
 ```{r}
 plot_PPR_data_multiple_treatments(
   data = female_PPR_df,
@@ -595,11 +595,9 @@ plot_PPR_data_multiple_treatments(
   plot_category = 2,
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
- # facet_by_treatment = "yes",
- # HELP not spliting the treatments like it does on the website
   test_type = "t.test",
   theme_options = my_custom_theme_options,
-  treatment_colour_theme = sample_treatment_names_and_colours # wont let me use my own
+  treatment_colour_theme = my_theme_colours
 )
 ```
 
