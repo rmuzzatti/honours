@@ -593,13 +593,27 @@ male_acute_summary_plot <- plot_summary_current_data(
 
 male_acute_summary_plot
 ```
+percent change in amplitude during starting interval (baseline) vs ending
+```{r}
+# is ending the 25-30?
+plot_percent_change_comparisons(
+  data = summary_female_eEPSC_df$percent_change_data,
+  plot_category = 2,
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_custom_theme_options,
+  save_plot_png = "no"
+)
+```
+
 
 Make PPR Dataset
 ```{r}
 female_PPR_df <- make_PPR_data(
   data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
   PPR_min = 0,
   PPR_max = 5,
   baseline_interval = "t0to5",
@@ -607,6 +621,23 @@ female_PPR_df <- make_PPR_data(
 )
 female_PPR_df
 ```
+
+PPR multiple treatments for acute females
+```{r}
+plot_PPR_data_multiple_treatments(
+  data = female_PPR_df,
+  include_all_treatments = "yes",
+  plot_category = 2,
+  baseline_label = "B",
+  post_hormone_label = "HFS",
+ # facet_by_treatment = "yes",
+ # not spliting the treatments like it does on the website
+  test_type = "t.test",
+  theme_options = my_custom_theme_options,
+  treatment_colour_theme = sample_treatment_names_and_colours # need to make my own
+)
+```
+
 
 testing assumptions for comparing PPR during baseline
 ```{r}
