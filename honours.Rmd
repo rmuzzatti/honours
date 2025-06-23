@@ -69,6 +69,10 @@ add_new_cells(
 )
 ```
 
+```{r}
+AP_count_data <- read.csv(here("Data/AP_count_data.csv")) # puts it in the environment
+```
+
 
 Look at the data frame
 ```{r}
@@ -639,19 +643,19 @@ plot_PPR_data_single_treatment(
 
 testing assumptions for comparing PPR during baseline
 ```{r}
-female_PPR_plot_df <- female_PPR_df %>% # making the data frame so that we have mean PPR
+PPR_plot_df <- PPR_df %>% # making the data frame so that we have mean PPR
   filter(state == "Baseline") %>%
   group_by(category, letter) %>%
   summarize(mean_PPR = mean(PPR),
             n = n())
 
-shapiro.test(female_PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
+shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 
 # p value is greater than 0.05, data is normal
 ```
 Baseline PPR Plot
 ```{r}
-female_baseline_PPR_plot <- female_PPR_plot_df %>%
+female_baseline_PPR_plot <- PPR_plot_df %>%
  
 # factor so it is treated as a discrete variable
 ggplot(aes(x = factor(category), y = mean_PPR)) + 
@@ -777,3 +781,22 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
 
 female_baseline_amp_plot
 ```
+
+```{r}
+plot_AP_frequencies_single_treatment(
+  data = AP_count_data,
+  plot_treatment = "Control",
+  plot_category = 2,
+  baseline_label = "Baseline",
+  hormone_added = "HFS",
+  significance_display_method = "stars",
+  treatment_colour_theme = my_theme_colours,
+  large_axis_text = "no",
+  test_type = "wilcox.test",
+  theme_options = my_custom_theme_options,
+  save_plot_png = "no"
+)
+
+# idk
+```
+
