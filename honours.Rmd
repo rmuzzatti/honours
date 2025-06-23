@@ -57,12 +57,12 @@ add_new_cells(
 Importing AP Count Data
 ```{r eval=FALSE}
 add_new_cells(
-  new_raw_data_csv = "Data/AP_count.csv",
+  new_raw_data_csv = "Data/new_AP_count.csv", # should ONLY have the new data you want
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
-  old_raw_data_csv = "Data/AP_count.csv",
+  old_raw_data_csv = "Data/AP_count_data.csv", # current data
   data_type = "AP_count",
   write_new_csv = "no",
-  new_file_name = "AP_count.csv",
+  new_file_name = "AP_count_data.csv", # will add to this and overwrite the current version of this file
   decimal_places = 2,
   injection_start_time = 265.4,
   length_of_current_injection = 0.5
