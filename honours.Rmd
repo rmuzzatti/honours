@@ -40,7 +40,7 @@ eEPSC_data
 ```
 
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
-```{r}
+```{r eval=FALSE}
 # will not run if there is nothing new in "new_raw.csv" so if you put new data directly into "raw_eEPSC_df.csv", it won't run
 add_new_cells(
   new_raw_data_csv = "Data/new_raw.csv", # should ONLY have the new data you want
@@ -168,7 +168,7 @@ Prune full FEMALE (30 minute) cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_female_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
+  data = normalized_raw_eEPSC_df %>% filter(sex == "Female")%>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),  
   # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   current_type = "eEPSC",
   min_time_value = 0,
