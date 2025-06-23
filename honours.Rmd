@@ -573,10 +573,10 @@ plot_percent_change_comparisons(
 ```
 
 
-Make FEMALE PPR Dataset
+Make PPR Dataset
 ```{r}
-female_PPR_df <- make_PPR_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
+PPR_df <- make_PPR_data(
+  data = normalized_raw_eEPSC_df,
   include_all_treatments = "yes",
   list_of_treatments = NULL,
   PPR_min = 0,
@@ -584,13 +584,13 @@ female_PPR_df <- make_PPR_data(
   baseline_interval = "t0to5",
   treatment_colour_theme = my_theme_colours
 )
-female_PPR_df
+PPR_df
 ```
 
 PPR multiple treatments for acute FEMALES
 ```{r}
 plot_PPR_data_multiple_treatments(
-  data = female_PPR_df,
+  data = PPR_df %>% filter(sex == "Female"),
   include_all_treatments = "yes",
   plot_category = 2,
   baseline_label = "Baseline",
@@ -599,6 +599,25 @@ plot_PPR_data_multiple_treatments(
   theme_options = my_custom_theme_options,
   treatment_colour_theme = my_theme_colours
 )
+```
+female vs male acute PPR HFS
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 2,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+  facet_by_sex = "yes",
+  test_type = "t.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_custom_theme_options,
+  save_plot_png = "no"
+)
+
+# sig increase in the PPR after HFS
+# higher PPR means lower probability of release
 ```
 
 
