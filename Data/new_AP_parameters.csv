@@ -1,0 +1,5 @@
+letter,state,time_of_threshold,t_x,t11,ID,first_sweep_with_APs,trace_start,peak_amplitude,time_to_peak,antipeak_amplitude,time_of_antipeak,half_width,ap_notes
+RMA6A,baseline,484.4500122,-22.82714844,21.97802162,25620042.abf,7,6021,56.61010742,-19.68383789,485.1000061,-14.34326172,486.3500061,0.903492689
+RMA6A,HFS,435.2999878,-33.69140625,12.81269073,25620051.abf,6,5021,46.23413086,-35.24780273,436.1499939,-6.256103516,437.3999939,0.978848219
+RMA1A,baseline,,,,,,,,,,,,
+RMA6,HFS,,,,,,,,,,,,

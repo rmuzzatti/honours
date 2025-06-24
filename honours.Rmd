@@ -73,6 +73,24 @@ add_new_cells(
 AP_count_data <- read.csv(here("Data/AP_count_data.csv")) # puts it in the environment
 ```
 
+Importing AP Parameter Data
+```{r}
+add_new_cells(
+  new_raw_data_csv = "Data/new_AP_parameters.csv", # should ONLY have the new data you want
+  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
+  old_raw_data_csv = "Data/AP_parameters.csv", # current data
+  data_type = "AP_parameter",
+  write_new_csv = "yes",
+  new_file_name = "Data/AP_parameters.csv", # will add to this and overwrite the current version of this file
+  decimal_places = 2,
+  injection_start_time = 265.4,
+  length_of_current_injection = 0.5
+)
+```
+
+```{r}
+AP_parameters <- read.csv(here("Data/AP_parameters.csv")) # puts it in the environment
+```
 
 Look at the data frame
 ```{r}
@@ -782,7 +800,7 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
 female_baseline_amp_plot
 ```
 
-```{r}
+```{r eval=FALSE}
 plot_AP_frequencies_single_treatment(
   data = AP_count_data,
   plot_treatment = "Control",
