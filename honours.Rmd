@@ -74,7 +74,8 @@ AP_count_data <- read.csv(here("Data/AP_count_data.csv")) # puts it in the envir
 ```
 
 Importing AP Parameter Data
-```{r eval=FALSE}
+```{r}
+# HELP
 add_new_cells(
   new_raw_data_csv = "Data/new_AP_parameters.csv", # should ONLY have the new data you want
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
