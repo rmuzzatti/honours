@@ -274,33 +274,16 @@ pruned_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 pruned_eEPSC_acute_plots_AM251
 ```
 
-female summary DATA
+Summary DATA
 ```{r}
-summary_female_eEPSC_df <- make_summary_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Female"), # not pruned
+summary_eEPSC_df <- make_summary_EPSC_data(
+  data = normalized_raw_eEPSC_df, # not pruned
   current_type = "eEPSC",
   save_output_as_RDS = "no",
   baseline_interval = "t0to5",
   ending_interval = "t25to30"
 )
-summary_female_eEPSC_df # what I will use in my summary data stuff and plots from now on
-
-# gives percent change, mean, and SE
-
-# Summary Plots (use PRUNED data, for visual ease, but t-tests are done with the SUMMARY data)
-
-# Category 1 is naive, 2 is acute
-```
-male summary DATA
-```{r}
-summary_male_eEPSC_df <- make_summary_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(sex == "Male"), # not pruned
-  current_type = "eEPSC",
-  save_output_as_RDS = "no",
-  baseline_interval = "t0to5",
-  ending_interval = "t25to30"
-)
-summary_male_eEPSC_df # what I will use in my summary data stuff and plots from now on
+summary_eEPSC_df # what I will use in my summary data stuff and plots from now on
 
 # gives percent change, mean, and SE
 
@@ -318,7 +301,7 @@ pruned_naive_female_long <- pruned_eEPSC_df$individual_cells %>% filter(letter %
 
 testing assumptions for naive FEMALE summary data
 ```{r}
-naive_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
+naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
   filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")) %>%
   mutate(
     naive_difference0to5_vs_25to30 = t25to30 - t0to5,
@@ -343,7 +326,7 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 
 testing assumptions for ACUTE FEMALE summary data
 ```{r}
-acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
+acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
   filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")) %>%
   mutate(
     acute_difference0to5_vs_25to30 = t25to30 - t0to5,
@@ -377,7 +360,7 @@ qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 ```
 testing assumptions for ACUTE FEMALE summary data with AM251
 ```{r}
-am251_acute_difference_evoked_df <- summary_female_eEPSC_df$percent_change_data %>%
+am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
   filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")) %>%
   mutate(
     am251_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
@@ -402,7 +385,7 @@ shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to1
 
 testing assumptions for ACUTE MALE summary data
 ```{r}
-male_acute_difference_evoked_df <- summary_male_eEPSC_df$percent_change_data %>%
+male_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
   filter(letter %in% c("SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")) %>%
   mutate(
     male_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
@@ -422,7 +405,7 @@ shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10)
 t-test for summary plots
 ```{r}
 t_test_female_naive <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
+  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
   test_category = 1,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -435,7 +418,7 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
+  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -448,7 +431,7 @@ t_test_female_acute <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
-  data = summary_female_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")), 
+  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")), 
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("AM251"),
@@ -461,7 +444,7 @@ t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
 )
 
 t_test_male_acute <-perform_t_tests_for_summary_plot(
-  data = summary_male_eEPSC_df$summary_data %>% filter(letter %in% c("SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")), 
+  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")), 
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -493,7 +476,7 @@ naive_summary_plot <- plot_summary_current_data(
   y_variable = "amplitude",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  included_sexes = "both",
+  included_sexes = "female",
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
@@ -553,7 +536,7 @@ am251_acute_summary_plot <- plot_summary_current_data(
   y_variable = "amplitude",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  included_sexes = "both",
+  included_sexes = "female",
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
@@ -600,13 +583,13 @@ percent change in amplitude during starting interval (baseline) vs ending
 ```{r}
 # is ending the 25-30?
 plot_percent_change_comparisons(
-  data = summary_female_eEPSC_df$percent_change_data,
+  data = summary_eEPSC_df$percent_change_data,
   plot_category = 2,
   current_type = "eEPSC",
   y_variable = "amplitude",
   include_all_treatments = "yes",
   list_of_treatments = NULL,
-  included_sexes = "both",
+  included_sexes = "female",
   male_label = "Male",
   female_label = "Female",
   treatment_colour_theme = my_theme_colours,
@@ -633,8 +616,9 @@ PPR_df
 PPR multiple treatments for acute FEMALES
 ```{r}
 plot_PPR_data_multiple_treatments(
-  data = PPR_df %>% filter(sex == "Female"),
+  data = PPR_df,
   include_all_treatments = "yes",
+  included_sexes = "female",
   plot_category = 2,
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
@@ -651,6 +635,7 @@ plot_PPR_data_single_treatment(
   plot_category = 2,
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
+  included_sexes = "both",
   facet_by_sex = "yes",
   test_type = "t.test",
   large_axis_text = "no",
@@ -677,7 +662,7 @@ shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 # p value is greater than 0.05, data is normal
 ```
 Baseline PPR Plot
-```{r}
+```{r eval=FALSE}
 female_baseline_PPR_plot <- PPR_plot_df %>%
  
 # factor so it is treated as a discrete variable
@@ -740,9 +725,9 @@ female_baseline_PPR_plot
 ```
 
 box plot baselines:
-```{r}
+```{r eval=FALSE}
 # making data frame
-female_baseline_amp_plot_df <- summary_female_eEPSC_df$percent_change_data %>%
+female_baseline_amp_plot_df <- summary_eEPSC_df$percent_change_data %>%
   filter(sex == "Female") %>%
   filter(treatment == "Control") %>%
   filter(category %in% c(1,2))
