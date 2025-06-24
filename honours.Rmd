@@ -581,7 +581,8 @@ male_acute_summary_plot
 ```
 percent change in amplitude during starting interval (baseline) vs ending
 ```{r}
-# is ending the 25-30?
+# already a sina plot, want to add violin plot aspect to this
+
 plot_percent_change_comparisons(
   data = summary_eEPSC_df$percent_change_data,
   plot_category = 2,
@@ -623,6 +624,8 @@ plot_PPR_data_multiple_treatments(
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
   test_type = "t.test",
+  # significance_display_method = "stars",
+  geom_signif_family = "",
   theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
