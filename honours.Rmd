@@ -114,7 +114,7 @@ editing my theme options
 ```{r}
 library(tibble)
 
-my_custom_theme_options <- read.csv("Data/my_custom_theme_options.csv") %>%
+my_theme_options <- read.csv("Data/my_custom_theme_options.csv") %>%
   remove_rownames() %>%
   column_to_rownames(var = "option")
 ```
@@ -145,7 +145,7 @@ raw_eEPSC_acute_plots <- plot_raw_current_data(
   pruned = "no",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -162,7 +162,7 @@ raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
   pruned = "no",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -181,7 +181,7 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
   pruned = "no",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -230,7 +230,7 @@ pruned_eEPSC_naive_plots <- plot_raw_current_data(
   pruned = "yes",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -248,7 +248,7 @@ pruned_eEPSC_acute_plots <- plot_raw_current_data(
   pruned = "yes",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -267,7 +267,7 @@ pruned_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
   pruned = "yes",
   hormone_added = "HFS",
   hormone_or_HFS_start_time = 5,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 
@@ -504,7 +504,7 @@ naive_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options
+  theme_options = my_theme_options
 ) #+ theme(legend.position = "none")
 
 naive_summary_plot
@@ -534,7 +534,7 @@ acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options
+  theme_options = my_theme_options
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 acute_summary_plot
@@ -564,7 +564,7 @@ am251_acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options
+  theme_options = my_theme_options
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 am251_acute_summary_plot
@@ -591,7 +591,7 @@ male_acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options
+  theme_options = my_theme_options
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 male_acute_summary_plot
@@ -604,8 +604,13 @@ plot_percent_change_comparisons(
   plot_category = 2,
   current_type = "eEPSC",
   y_variable = "amplitude",
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
+  included_sexes = "both",
+  male_label = "Male",
+  female_label = "Female",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   save_plot_png = "no"
 )
 ```
@@ -634,7 +639,7 @@ plot_PPR_data_multiple_treatments(
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
   test_type = "t.test",
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours
 )
 ```
@@ -650,7 +655,7 @@ plot_PPR_data_single_treatment(
   test_type = "t.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   save_plot_png = "no"
 )
 
@@ -800,21 +805,36 @@ female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
 female_baseline_amp_plot
 ```
 
-```{r eval=FALSE}
-plot_AP_frequencies_single_treatment(
+
+AP Frequencies for Multiple Treatments
+```{r}
+plot_AP_frequencies_multiple_treatments(
   data = AP_count_data,
+  included_sexes = "female",
+  male_label = "Male",
+  female_label = "Female",
+  include_all_treatments = "yes",
+  plot_category = 2,
+  treatment_colour_theme = my_theme_colours
+)
+```
+
+```{r}
+plot_AP_frequencies_single_treatment(
+  data = sample_AP_count_data, # won't work with my data
   plot_treatment = "Control",
   plot_category = 2,
+  included_sexes = "both",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars",
+  significance_display_method = "stars", # could also be "p-values"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test",
-  theme_options = my_custom_theme_options,
+  theme_options = my_theme_options,
   save_plot_png = "no"
 )
-
-# idk
 ```
+
+
 
