@@ -808,5 +808,106 @@ plot_AP_frequencies_single_treatment(
 )
 ```
 
+Creating Variance dataset for variance analysis
+```{r}
+variance_df <- make_variance_data(
+  data = summary_eEPSC_df$summary_data,
+  df_category = 2,
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
 
+variance_df
 
+# VARIANCE
+
+# The strength of synaptic transmission onto a neuron depends on the number of functional vesicle release sites (N), the probability of vesicle release (Pr), and the quantal size (Q)
+
+# 1/CV2 depends on N and Pr, but not on Q
+# VMR depends on Pr and Q, but not on N
+```
+
+Variance Comparisons for ACUTE (Control)
+```{r}
+cv_comparison_control_plot <- plot_variance_comparison_data(
+  data = variance_df,
+  plot_category = 2, # acute
+  plot_treatment = "Control", # only picro
+  variance_measure = "cv",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+vmr_comparison_control_plot <- plot_variance_comparison_data(
+  data = variance_df,
+  plot_category = 2, # acute
+  plot_treatment = "Control", # only picro
+  variance_measure = "VMR",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+cv_comparison_control_plot
+vmr_comparison_control_plot
+
+# With the almost significant decrease in VMR in males: 
+# if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
+```
+Variance Comparisons for ACUTE (AM251)
+```{r}
+cv_comparison_AM251_plot <- plot_variance_comparison_data(
+  data = variance_df,
+  plot_category = 2, # acute
+  plot_treatment = "AM251",
+  variance_measure = "cv",
+  included_sexes = "female",
+  facet_by_sex = "no",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+vmr_comparison_AM251_plot <- plot_variance_comparison_data(
+  data = variance_df,
+  plot_category = 2, # acute
+  plot_treatment = "AM251",
+  variance_measure = "VMR",
+  included_sexes = "female",
+  facet_by_sex = "no",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+cv_comparison_AM251_plot
+vmr_comparison_AM251_plot
+
+# With the almost significant decrease in VMR in males: 
+# if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
+```
