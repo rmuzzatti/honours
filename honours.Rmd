@@ -783,12 +783,12 @@ plot_AP_frequencies_multiple_treatments(
   data = AP_count_data,
   include_all_treatments = "yes",
   list_of_treatments = NULL,
-  plot_category = 2, # THERE IS NO NAIVE IN CATERGORY 2
+  plot_category = 2,
   included_sexes = "female",
   treatment_colour_theme = my_theme_colours
 )
 
-# category 2, so its not naive its control
+# the display name for Category 1 + Treatment Control is "Naive" and that is being displayed here for no reason because this should only be category 2 (acute)
 ```
 
 ```{r}
