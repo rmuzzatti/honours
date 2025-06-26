@@ -67,18 +67,15 @@ add_new_cells(
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
   old_raw_data_csv = "Data/AP_count_data.csv", # current data
   data_type = "AP_count",
-  write_new_csv = "no",
-  new_file_name = "AP_count_data.csv", # will add to this and overwrite the current version of this file
+  write_new_csv = "yes",
+  new_file_name = "Data/AP_count_data.csv", # will add to this and overwrite the current version of this file
   decimal_places = 2,
   injection_start_time = 265.4,
   length_of_current_injection = 0.5
 )
 ```
-
 ```{r}
-AP_count_data <- read.csv(here("Data/AP_count_data.csv")) # puts it in the environment
-
-AP_count_data # prints it
+AP_count_data <- read.csv(here("Data/AP_count_data.csv"))
 ```
 
 
@@ -781,8 +778,8 @@ AP Frequencies for Multiple Treatments
 ```{r}
 plot_AP_frequencies_multiple_treatments(
   data = AP_count_data,
-  include_all_treatments = "yes",
-  list_of_treatments = NULL,
+  include_all_treatments = "no",
+  list_of_treatments = c("Control", "AM251"),
   plot_category = 2,
   included_sexes = "female",
   treatment_colour_theme = my_theme_colours
@@ -793,16 +790,32 @@ plot_AP_frequencies_multiple_treatments(
 
 ```{r}
 plot_AP_frequencies_single_treatment(
-  data = sample_AP_count_data, # won't work with my data
+  data = AP_count_data, # 
   plot_treatment = "Control",
   plot_category = 2, # Acute with only picro
-  included_sexes = "both",
+  included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
   significance_display_method = "stars", # could also be "p-values"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
-  test_type = "wilcox.test",
+  test_type = "wilcox.test", # need to test assumptions
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+```
+```{r}
+plot_AP_frequencies_single_treatment(
+  data = AP_count_data, 
+  plot_treatment = "AM251",
+  plot_category = 2,
+  included_sexes = "female",
+  baseline_label = "Baseline",
+  hormone_added = "HFS",
+  significance_display_method = "stars", # could also be "p-values"
+  treatment_colour_theme = my_theme_colours,
+  large_axis_text = "no",
+  test_type = "wilcox.test", # need to test assumptions
   theme_options = my_theme_options,
   save_plot_png = "no"
 )
