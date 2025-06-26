@@ -144,7 +144,7 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw ACUTE Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")), # why are RMA3 and RMA4 not showing up (May 2025)
+ data = normalized_raw_eEPSC_df, # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   plot_treatment = "Control", # RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
   plot_category = 2, # 2 is acute restraint, 1 is naive
@@ -181,7 +181,7 @@ raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 Raw Naive Plots for each cell:
 ```{r}
 raw_eEPSC_naive_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(sex == "Female") %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
+ data = normalized_raw_eEPSC_df %>% filter(sex == "Female"),
   plot_treatment = "Control",
   plot_category = 1,
   current_type = "eEPSC",
@@ -214,8 +214,7 @@ Prune full cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")),  
-  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
+  data = normalized_raw_eEPSC_df,
   current_type = "eEPSC",
   min_time_value = 0,
   max_time_value = 30,
@@ -248,7 +247,6 @@ Plot Pruned ACUTE Data
 ```{r}
 pruned_eEPSC_acute_plots <- plot_raw_current_data(
   data = pruned_eEPSC_df$individual_cells,
-  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   plot_treatment = "Control",
   plot_category = 2,
   current_type = "eEPSC",
@@ -303,8 +301,7 @@ summary_eEPSC_df # what I will use in my summary data stuff and plots from now o
 
 testing assumptions for naive FEMALE summary data
 ```{r}
-naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")) %>%
+naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
   mutate(
     naive_difference0to5_vs_25to30 = t25to30 - t0to5,
     naive_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -328,8 +325,7 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 
 testing assumptions for ACUTE FEMALE summary data
 ```{r}
-acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")) %>%
+acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "2") %>% filter(treatment == "Control") %>%
   mutate(
     acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -362,8 +358,7 @@ qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 ```
 testing assumptions for ACUTE FEMALE summary data with AM251
 ```{r}
-am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")) %>%
+am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "2") %>% filter(treatment == "AM251") %>%
   mutate(
     am251_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     am251_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -387,8 +382,7 @@ shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to1
 
 testing assumptions for ACUTE MALE summary data
 ```{r}
-male_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")) %>%
+male_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "2") %>% filter(treatment == "Control") %>%
   mutate(
     male_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     male_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -407,7 +401,7 @@ shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10)
 t-test for summary plots
 ```{r}
 t_test_female_naive <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10")),
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
   test_category = 1,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -420,7 +414,7 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")), # no longer including bad cells RMA5 and RMA7 (2025/6/16)
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -433,7 +427,7 @@ t_test_female_acute <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")), 
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("AM251"),
@@ -446,7 +440,7 @@ t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
 )
 
 t_test_male_acute <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")), 
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Male"), 
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("Control"),
@@ -501,7 +495,6 @@ Acute FEMALE Summary:
 ```{r}
 acute_summary_plot <- plot_summary_current_data(
   data = pruned_eEPSC_df$all_cells, 
-  # no longer including bad cells RMA5 and RMA7 (2025/6/16)
   plot_category = 2,
   plot_treatment = "Control",
   current_type = "eEPSC",
@@ -666,135 +659,6 @@ shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 
 # p value is greater than 0.05, data is normal
 ```
-Baseline PPR Plot
-```{r eval=FALSE}
-female_baseline_PPR_plot <- PPR_plot_df %>%
- 
-# factor so it is treated as a discrete variable
-ggplot(aes(x = factor(category), y = mean_PPR)) + 
-  
-
-
-# the boxes
-  geom_boxplot(aes(fill = factor(category)), 
-               alpha = 0.6, 
-               outlier.shape = NA, 
-# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
-               color = "black", 
-               width = 0.5, 
-               show.legend = FALSE) +  
-  
-# the dots/scatter plot
-  geom_sina(aes(x = factor(category), color = factor(category)), 
-            shape = 16, 
-            size = 2, 
-            show.legend = FALSE) +  
-  
-# t-test
-  stat_compare_means(
-    method = "t.test", # just tested assumptions in the last chunk
-    comparisons = list(c("1", "2")),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    label.y = 1.9, 
-    size = 5
-  ) +
- 
-# mean as a point 
-   stat_summary(fun = mean, geom = "point", 
-               shape = 16, size = 4, color = "black") +
-
-# colours
-  scale_fill_manual(values = c("1" = "#f5e0b3", "2" = "#f19cac")) +
-  scale_color_manual(values = c("1" = "#ecc479", "2" = "#eb647e")) +
-
-# x-axis labels
-  scale_x_discrete(labels = c("Naive", "Acute")) +
-  
-# x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + # manually adding the sample size
-  annotate("text", x = 2, y = -0.2, label = "n = 4", size = 4, hjust = 0.5) + 
-  
-
-  guides(fill = "none", color = "none") +
-  
-# axis labels
-  scale_y_continuous(limits = c(0, 2.3)) +  # making the y-axis larger so the p-values are not cut off
-  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
-  patchclampplotteR_theme() +
-  theme(legend.position = "none")
-
-female_baseline_PPR_plot
-
-# saving as png to figure folder
-# ggsave(baseline_PPR_plot, path = here("Figures"), file = "baseline_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-```
-
-box plot baselines:
-```{r eval=FALSE}
-# making data frame
-female_baseline_amp_plot_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female") %>%
-  filter(treatment == "Control") %>%
-  filter(category %in% c(1,2))
-
-# testing assumptions
-shapiro.test(female_baseline_amp_plot_df$t0to5)
-# p value is larger than 0.05, data is normal
-
-
-female_baseline_amp_plot <- female_baseline_amp_plot_df %>%
-  ggplot(aes(x = factor(category), y = t0to5)) +  
-
-# the boxes
-  geom_boxplot(aes(fill = factor(category), color = factor(category),fatten = NULL), 
-               alpha = 0.6, 
-               color = "black",
-# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
-               outlier.shape = NA, 
-               width = 0.5, 
-               show.legend = FALSE) +  
-
-# the dots/scatter plot
-  geom_sina(aes(x = factor(category), color = factor(category)), 
-            shape = 16, 
-            size = 2, 
-            show.legend = FALSE) +  
-  
-# mean as a point
-  stat_summary(fun = mean, geom = "point", 
-               shape = 16, size = 4, color = "black") +
-  
-# colours
-  scale_fill_manual(values = c("1" = "#f5e0b3", "2" = "#f19cac")) +
-  scale_color_manual(values = c("1" = "#ecc479", "2" = "#eb647e")) +
-  
-# x-axis labels  
-  scale_x_discrete(labels = c("Naive", "Acute")) +
-  
-# x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
-  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
-  
-# t-test
-  stat_compare_means(
-    method = "t.test", # using t-test because it did pass assumptions
-    label = "p.signif", # p.signif does the stars, p.format shows the p-value
-    label.y = 125, # where I want the star, could also be "c(270, 300)" if I had multiple (when I add repeated), 
-    comparisons = list(c("1", "2")),
-    size = 5
-) +
-
-  guides(fill = "none", color = "none") +
-  
-# axis labels
-  scale_y_continuous(limits = c(0, 150)) +  # making the y-axis larger so the p-values are not cut off
-  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
-  patchclampplotteR_theme() +
-  theme(legend.position = "none")
-
-female_baseline_amp_plot
-```
-
 
 AP Frequencies for Multiple Treatments
 ```{r}
@@ -843,9 +707,9 @@ plot_AP_frequencies_single_treatment(
 )
 ```
 
-Creating Variance dataset for variance analysis
+Creating Variance dataset for variance analysis (category 2)
 ```{r}
-variance_df <- make_variance_data(
+variance_2_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
   df_category = 2,
   include_all_treatments = "yes",
@@ -856,7 +720,7 @@ variance_df <- make_variance_data(
   save_output_as_RDS = "no"
 )
 
-variance_df
+variance_2_df
 
 # VARIANCE
 
@@ -865,11 +729,26 @@ variance_df
 # 1/CV2 depends on N and Pr, but not on Q
 # VMR depends on Pr and Q, but not on N
 ```
+```{r}
+variance_1_df <- make_variance_data(
+  data = summary_eEPSC_df$summary_data,
+  df_category = 1,
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
+
+variance_1_df
+```
+
 
 Variance Comparisons for ACUTE (Control)
 ```{r}
 cv_comparison_control_plot <- plot_variance_comparison_data(
-  data = variance_df,
+  data = variance_2_df,
   plot_category = 2, # acute
   plot_treatment = "Control", # only picro
   variance_measure = "cv",
@@ -885,7 +764,7 @@ cv_comparison_control_plot <- plot_variance_comparison_data(
 )
 
 vmr_comparison_control_plot <- plot_variance_comparison_data(
-  data = variance_df,
+  data = variance_2_df,
   plot_category = 2, # acute
   plot_treatment = "Control", # only picro
   variance_measure = "VMR",
@@ -909,7 +788,7 @@ vmr_comparison_control_plot
 Variance Comparisons for ACUTE (AM251)
 ```{r}
 cv_comparison_AM251_plot <- plot_variance_comparison_data(
-  data = variance_df,
+  data = variance_2_df,
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "cv",
@@ -925,7 +804,7 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
 )
 
 vmr_comparison_AM251_plot <- plot_variance_comparison_data(
-  data = variance_df,
+  data = variance_2_df,
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "VMR",
@@ -945,4 +824,44 @@ vmr_comparison_AM251_plot
 
 # With the almost significant decrease in VMR in males: 
 # if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
+```
+
+Variance Comparisons for NAIVE
+```{r}
+cv_comparison_naive_plot <- plot_variance_comparison_data(
+  data = variance_1_df,
+  plot_category = 1, 
+  plot_treatment = "Control",
+  variance_measure = "cv",
+  included_sexes = "female",
+  facet_by_sex = "no",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+vmr_comparison_naive_plot <- plot_variance_comparison_data(
+  data = variance_1_df,
+  plot_category = 1, 
+  plot_treatment = "Control",
+  variance_measure = "VMR",
+  included_sexes = "female",
+  facet_by_sex = "no",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+cv_comparison_naive_plot
+vmr_comparison_naive_plot
+
+# is there any value to variance analysis in naive animals?
 ```
