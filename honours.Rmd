@@ -781,15 +781,14 @@ AP Frequencies for Multiple Treatments
 ```{r}
 plot_AP_frequencies_multiple_treatments(
   data = AP_count_data,
-  included_sexes = "female",
-  male_label = "Male",
-  female_label = "Female",
   include_all_treatments = "yes",
-  plot_category = 2,
+  list_of_treatments = NULL,
+  plot_category = 2, # THERE IS NO NAIVE IN CATERGORY 2
+  included_sexes = "female",
   treatment_colour_theme = my_theme_colours
 )
 
-# caterogry 2, so its not naive its control
+# category 2, so its not naive its control
 ```
 
 ```{r}
