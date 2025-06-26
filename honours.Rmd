@@ -682,7 +682,7 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars", # could also be "p-values"
+  significance_display_method = "p-values", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
@@ -698,7 +698,7 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars", # could also be "p-values"
+  significance_display_method = "p-values", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
