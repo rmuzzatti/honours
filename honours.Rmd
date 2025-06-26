@@ -788,6 +788,8 @@ plot_AP_frequencies_multiple_treatments(
   plot_category = 2,
   treatment_colour_theme = my_theme_colours
 )
+
+# caterogry 2, so its not naive its control
 ```
 
 ```{r}
