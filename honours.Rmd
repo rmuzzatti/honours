@@ -795,7 +795,7 @@ plot_AP_frequencies_multiple_treatments(
 plot_AP_frequencies_single_treatment(
   data = sample_AP_count_data, # won't work with my data
   plot_treatment = "Control",
-  plot_category = 2,
+  plot_category = 2, # Acute with only picro
   included_sexes = "both",
   baseline_label = "Baseline",
   hormone_added = "HFS",
