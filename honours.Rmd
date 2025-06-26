@@ -61,7 +61,7 @@ raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environ
 raw_eEPSC_df # prints it
 ```
 Importing NEW Action Potential Count Data
-```{r}
+```{r eval=FALSE}
 add_new_cells(
   new_raw_data_csv = "Data/new_AP_count.csv", # should ONLY have the new data you want
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
@@ -119,7 +119,7 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 Raw ACUTE Plots for each cell:
 ```{r}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")), # why are RMA3 and RMA4 not showing up (May 2025)
+ data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4","RMA6", "RMA8", "RMA9", "RMA10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")), # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   plot_treatment = "Control", # RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
   plot_category = 2, # 2 is acute restraint, 1 is naive
@@ -189,7 +189,7 @@ Prune full cells from the normalized raw data:
 # pruning averages data per minute
 
 pruned_eEPSC_df <- make_pruned_EPSC_data(
-  data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")),  
+  data = normalized_raw_eEPSC_df %>% filter(letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10", "RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A", "LS1", "LS2", "LS3", "LS4", "LS5", "LS6", "LS7", "LS8", "LS9", "LS10", "SW1_MA1", "SW2_MA2", "SW3_MA3", "SW4_MA4", "SW5_MA5", "TW1_MA6", "TW2_MA7", "TW3_MA8")),  
   # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
   current_type = "eEPSC",
   min_time_value = 0,
@@ -344,7 +344,7 @@ qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 testing assumptions for ACUTE FEMALE summary data with AM251
 ```{r}
 am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")) %>%
+  filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")) %>%
   mutate(
     am251_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
     am251_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
@@ -414,7 +414,7 @@ t_test_female_acute <-perform_t_tests_for_summary_plot(
 )
 
 t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A")), 
+  data = summary_eEPSC_df$summary_data %>% filter(letter %in% c("RMA1A", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA7A", "RMA8A")), 
   test_category = 2,
   include_all_treatments = "no",
   list_of_treatments = c("AM251"),
