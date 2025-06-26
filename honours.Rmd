@@ -54,8 +54,14 @@ add_new_cells(
 
 # once successful, go delete the data from "new_raw.csv" so that you don't get a duplication error the next time you are adding data to the raw_eEPSC_df.
 ```
-Importing AP Count Data
-```{r eval=FALSE}
+Look at the data frame
+```{r}
+raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
+
+raw_eEPSC_df # prints it
+```
+Importing NEW Action Potential Count Data
+```{r}
 add_new_cells(
   new_raw_data_csv = "Data/new_AP_count.csv", # should ONLY have the new data you want
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
@@ -71,34 +77,10 @@ add_new_cells(
 
 ```{r}
 AP_count_data <- read.csv(here("Data/AP_count_data.csv")) # puts it in the environment
+
+AP_count_data # prints it
 ```
 
-Importing AP Parameter Data
-```{r}
-# HELP
-add_new_cells(
-  new_raw_data_csv = "Data/new_AP_parameters.csv", # should ONLY have the new data you want
-  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
-  old_raw_data_csv = "Data/AP_parameters.csv", # current data
-  data_type = "AP_parameter",
-  write_new_csv = "yes",
-  new_file_name = "Data/AP_parameters.csv", # will add to this and overwrite the current version of this file
-  decimal_places = 2,
-  injection_start_time = 265.4,
-  length_of_current_injection = 0.5
-)
-```
-
-```{r}
-AP_parameters <- read.csv(here("Data/AP_parameters.csv")) # puts it in the environment
-```
-
-Look at the data frame
-```{r}
-raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
-
-raw_eEPSC_df # prints it
-```
 
 defining my colour theme
 ```{r}
