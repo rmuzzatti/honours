@@ -108,8 +108,6 @@ raw_eEPSC_df %>%
   group_by(treatment) %>%
   count(sex) %>%
   arrange(treatment, sex)
-
-# says 10 female acute control, but I am excluding 2 of those so it's really 8
 ```
 How many cells?
 ```{r}
