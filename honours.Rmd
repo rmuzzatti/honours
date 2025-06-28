@@ -489,7 +489,7 @@ naive_summary_plot <- plot_summary_current_data(
 naive_summary_plot
 
 # saving as png to figure folder
-# ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 Acute FEMALE Summary:
 ```{r}
@@ -518,7 +518,7 @@ acute_summary_plot <- plot_summary_current_data(
 acute_summary_plot
 
 # saving as png to figure folder
-# ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(acute_summary_plot, path = here("Figures"), file = "acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Acute FEMALE Summary with AM251:
@@ -546,6 +546,8 @@ am251_acute_summary_plot <- plot_summary_current_data(
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 am251_acute_summary_plot
+
+ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Acute MALE Summary:
@@ -573,6 +575,8 @@ male_acute_summary_plot <- plot_summary_current_data(
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 male_acute_summary_plot
+
+ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 percent change in amplitude during starting interval (baseline) vs ending
 ```{r}
@@ -622,7 +626,8 @@ plot_PPR_data_multiple_treatments(
   # significance_display_method = "stars",
   geom_signif_family = "",
   theme_options = my_theme_options,
-  treatment_colour_theme = my_theme_colours
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "yes"
 )
 ```
 female vs male acute PPR HFS
@@ -639,7 +644,7 @@ plot_PPR_data_single_treatment(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "no"
+  save_plot_png = "yes"
 )
 
 # sig increase in the PPR after HFS
@@ -682,12 +687,12 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "p-values", # could be "p-values" or "stars"
+  significance_display_method = "stars", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
   theme_options = my_theme_options,
-  save_plot_png = "no"
+  save_plot_png = "yes"
 )
 ```
 ```{r}
@@ -698,12 +703,12 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "p-values", # could be "p-values" or "stars"
+  significance_display_method = "stars", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
   theme_options = my_theme_options,
-  save_plot_png = "no"
+  save_plot_png = "yes"
 )
 ```
 
@@ -760,7 +765,8 @@ cv_comparison_control_plot <- plot_variance_comparison_data(
   test_type = "wilcox.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
 )
 
 vmr_comparison_control_plot <- plot_variance_comparison_data(
@@ -776,7 +782,8 @@ vmr_comparison_control_plot <- plot_variance_comparison_data(
   test_type = "wilcox.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
 )
 
 cv_comparison_control_plot
@@ -800,7 +807,8 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
   test_type = "wilcox.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
 )
 
 vmr_comparison_AM251_plot <- plot_variance_comparison_data(
@@ -816,7 +824,8 @@ vmr_comparison_AM251_plot <- plot_variance_comparison_data(
   test_type = "wilcox.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
 )
 
 cv_comparison_AM251_plot
