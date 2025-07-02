@@ -232,6 +232,25 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
 #ggsave(LS10_final_plot, path = here("Figures"), file = "LS10_final_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
+Raw REPEATED Plots for each cell:
+```{r}
+raw_eEPSC_repeated_plots <- plot_raw_current_data(
+ data = normalized_raw_eEPSC_df, # why are RMA3 and RMA4 not showing up (May 2025)
+ # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
+  plot_treatment = "Control", # RMA3 and RMA4 were not showing up because they had "control" instead of "Control" and "female" instead of "Female" (May 2025)
+  plot_category = 3, # 3 is repeated, 2 is acute restraint, 1 is naive
+  current_type = "eEPSC",
+  y_variable = "P1",
+  pruned = "no",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+ raw_eEPSC_repeated_plots
+```
+
 Prune full cells from the normalized raw data:
 ```{r}
 # pruning averages data per minute
@@ -301,6 +320,23 @@ pruned_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 )
 
 pruned_eEPSC_acute_plots_AM251
+```
+Plot Pruned REPEATED Data
+```{r}
+pruned_eEPSC_repeated_plots <- plot_raw_current_data(
+  data = pruned_eEPSC_df$individual_cells,
+  plot_treatment = "Control",
+  plot_category = 3,
+  current_type = "eEPSC",
+  y_variable = "mean_P1",
+  pruned = "yes",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+pruned_eEPSC_repeated_plots
 ```
 
 Summary DATA
@@ -573,6 +609,34 @@ am251_acute_summary_plot
 ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
+REPEATED FEMALE Summary:
+```{r}
+repeated_summary_plot <- plot_summary_current_data(
+  data = pruned_eEPSC_df$all_cells, 
+  plot_category = 3,
+  plot_treatment = "Control",
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  included_sexes = "female",
+  include_representative_trace = "no",
+  representative_trace_filename = import_ext_data("Control-trace.png"),
+  y_axis_limit = 230,
+  signif_stars = "yes",
+  geom_signif_text_size = 8,
+  t_test_df = t_test_female_acute_am251, # need an actual one
+  large_axis_text = "no",
+  legend_position = "inside",
+  shade_intervals = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  # save_plot_png = "yes"
+) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
+
+repeated_summary_plot
+```
+
 Acute MALE Summary:
 ```{r}
 male_acute_summary_plot <- plot_summary_current_data(
@@ -820,7 +884,7 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "cv",
-  included_sexes = "both", # no male data
+  included_sexes = "female", # no male data
   facet_by_sex = "no",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -837,7 +901,7 @@ vmr_comparison_AM251_plot <- plot_variance_comparison_data(
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "VMR",
-  included_sexes = "both", # no male data
+  included_sexes = "female", # no male data
   facet_by_sex = "no",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
