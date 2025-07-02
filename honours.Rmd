@@ -83,6 +83,24 @@ add_new_cells(
 AP_count_data <- read.csv(here("Data/AP_count_data.csv"))
 ```
 
+Importing NEW Action Potential Parameter Data
+```{r eval=FALSE}
+add_new_cells(
+  new_raw_data_csv = "Data/new_AP_parameters.csv", # should ONLY have the new data you want,
+  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
+  old_raw_data_csv = "Data/AP_parameters.csv", # current data
+  data_type = "AP_parameter",
+  write_new_csv = "yes",
+  new_file_name = "Data/AP_parameters.csv", # will add to this and overwrite the current version of this file (same as current data)
+  decimal_places = 2,
+  injection_start_time = 265.4,
+  length_of_current_injection = 0.5
+)
+```
+```{r}
+AP_data <- read.csv(here("Data/AP_parameters.csv"))
+```
+
 
 defining my colour theme
 ```{r}
@@ -877,3 +895,41 @@ vmr_comparison_naive_plot
 
 # is there any value to variance analysis in naive animals?
 ```
+
+AP Amplitude: Acute Females 
+```{r}
+plot_AP_comparison(
+  AP_data,
+  plot_treatment = "Control",
+  plot_category = 2,
+  included_sexes = "female",
+  facet_by_sex = "no",
+  y_variable = "peak_amplitude",
+  y_axis_title = "Peak Amplitude (pA)",
+  theme_options = my_theme_options,
+  baseline_label = "Baseline",
+  test_type = "wilcox.test",
+  post_hormone_label = "HFS",
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "no"
+)
+```
+AP Amplitude: Acute Females with AM251
+```{r}
+plot_AP_comparison(
+  AP_data,
+  plot_treatment = "AM251",
+  plot_category = 2,
+  included_sexes = "female",
+  facet_by_sex = "no",
+  y_variable = "peak_amplitude",
+  y_axis_title = "Peak Amplitude (pA)",
+  theme_options = my_theme_options,
+  baseline_label = "Baseline",
+  test_type = "wilcox.test",
+  post_hormone_label = "HFS",
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "no"
+)
+```
+

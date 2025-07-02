@@ -319,3 +319,20 @@
 "RMA8A","HFS",8,3,6,"","Female",234.17,572.72,30,8,"Glutamate","AM251",2,"1.5, 1.5, 1.4, 1.4, 2.0, 1.9","currents go down before Ra increases","0",NA
 "RMA8A","HFS",9,4,8,"","Female",234.17,572.72,30,8,"Glutamate","AM251",2,"1.5, 1.5, 1.4, 1.4, 2.0, 1.9","currents go down before Ra increases","0",NA
 "RMA8A","HFS",10,5,10,"","Female",234.17,572.72,30,8,"Glutamate","AM251",2,"1.5, 1.5, 1.4, 1.4, 2.0, 1.9","currents go down before Ra increases","0",NA
+"RMR1","Baseline",4,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",5,2,4,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",6,3,6,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",7,7,14,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",8,10,20,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",9,13,26,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","Baseline",10,16,32,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",1,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",2,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",3,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",4,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",5,0,0,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",6,4,8,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",7,8,16,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",8,11,22,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",9,13,26,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
+"RMR1","HFS",10,15,30,"1.1.6","Female",89.46,552.54,32,1,"Glutamate","Control",3,"2.3, 2.1, 2.1, 2.2, 2.4, 2.4","currents go down before Ra increases","5 (on purpose)",NA
