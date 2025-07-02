@@ -842,6 +842,7 @@ cv_comparison_control_plot <- plot_variance_comparison_data(
   plot_treatment = "Control", # only picro
   variance_measure = "cv",
   included_sexes = "both",
+  left_sex = "Female",
   facet_by_sex = "yes",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -860,6 +861,7 @@ vmr_comparison_control_plot <- plot_variance_comparison_data(
   variance_measure = "VMR",
   included_sexes = "both",
   facet_by_sex = "yes",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
