@@ -8,16 +8,11 @@ date: "2025-05-07"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r}
+```{r eval=FALSE}
 pak::pak("christelinda-laureijs/patchclampplotteR")
 ```
-
+## Libraries
 libraries I might need
 ```{r}
 library(patchclampplotteR)
@@ -29,6 +24,7 @@ library(ggforce)
 library(ggpubr)
 library(here)
 ```
+## Importing Data
 Importing Cell Characteristics
 ```{r}
 cell_characteristics <- import_cell_characteristics_df("Data/Cell-Characteristics.csv")
@@ -58,6 +54,7 @@ add_new_cells(
 
 # once successful, go delete the data from "new_raw.csv" so that you don't get a duplication error the next time you are adding data to the raw_eEPSC_df.
 ```
+
 Look at the data frame
 ```{r}
 raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
@@ -100,7 +97,7 @@ add_new_cells(
 AP_data <- read.csv(here("Data/AP_parameters.csv"))
 ```
 
-
+## Theme and Colour Options
 defining my colour theme
 ```{r}
 my_theme_colours <- data.frame(
@@ -121,7 +118,7 @@ my_theme_options <- read.csv("Data/my_custom_theme_options.csv") %>%
   column_to_rownames(var = "option")
 ```
 
-How many cells?
+## How many cells, and how long are they?
 ```{r}
 # acute
 raw_eEPSC_df %>%
@@ -131,7 +128,6 @@ raw_eEPSC_df %>%
   count(sex) %>%
   arrange(treatment, sex)
 ```
-How many cells?
 ```{r}
 # naive
 raw_eEPSC_df %>%
@@ -141,7 +137,6 @@ raw_eEPSC_df %>%
   count(sex) %>%
   arrange(treatment, sex)
 ```
-How many cells?
 ```{r}
 # repeated
 raw_eEPSC_df %>%
@@ -159,7 +154,7 @@ raw_eEPSC_df %>%
   summarize(max_time = max(time))
 ```
 
-
+## Raw Plots per Cell
 Normalizing Data:
 ```{r}
 normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
@@ -259,7 +254,7 @@ raw_eEPSC_repeated_plots <- plot_raw_current_data(
 
  raw_eEPSC_repeated_plots
 ```
-
+## Pruned Plots per Cell
 Prune full cells from the normalized raw data:
 ```{r}
 # pruning averages data per minute
@@ -347,7 +342,7 @@ pruned_eEPSC_repeated_plots <- plot_raw_current_data(
 
 pruned_eEPSC_repeated_plots
 ```
-
+## Summary Plots
 Summary DATA
 ```{r}
 summary_eEPSC_df <- make_summary_EPSC_data(
@@ -366,7 +361,7 @@ summary_eEPSC_df # what I will use in my summary data stuff and plots from now o
 # Category 1 is naive, 2 is acute
 ```
 
-
+### testing assumptions
 testing assumptions for naive FEMALE summary data
 ```{r}
 naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
@@ -466,7 +461,7 @@ shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_10to15
 shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10) # not normal
 ```
 
-t-test for summary plots
+### t-test for summary plots
 ```{r}
 t_test_female_naive <-perform_t_tests_for_summary_plot(
   data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
@@ -543,7 +538,7 @@ t_test_male_acute
 
 
 Summary Plots (use PRUNED data, for visual ease, but t-tests are done with the SUMMARY data)
-
+### plots
 Naive FEMALE Summary:
 ```{r}
 naive_summary_plot <- plot_summary_current_data(
@@ -692,10 +687,10 @@ male_acute_summary_plot
 
 ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+## Evoked Analysis
+### Percent Change
 percent change in amplitude during starting interval (baseline) vs ending
 ```{r}
-# already a sina plot, want to add violin plot aspect to this
-
 plot_percent_change_comparisons(
   data = summary_eEPSC_df$percent_change_data,
   plot_category = 2,
@@ -712,7 +707,7 @@ plot_percent_change_comparisons(
 )
 ```
 
-
+### PPR
 Make PPR Dataset
 ```{r}
 PPR_df <- make_PPR_data(
@@ -726,7 +721,6 @@ PPR_df <- make_PPR_data(
 )
 PPR_df
 ```
-
 PPR multiple treatments for acute FEMALES
 ```{r}
 plot_PPR_data_multiple_treatments(
@@ -741,7 +735,7 @@ plot_PPR_data_multiple_treatments(
   geom_signif_family = "",
   theme_options = my_theme_options,
   treatment_colour_theme = my_theme_colours,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 ```
 female vs male acute PPR HFS
@@ -759,13 +753,12 @@ plot_PPR_data_single_treatment(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 
 # sig increase in the PPR after HFS
 # higher PPR means lower probability of release
 ```
-
 
 testing assumptions for comparing PPR during baseline
 ```{r}
@@ -779,7 +772,7 @@ shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 
 # p value is greater than 0.05, data is normal
 ```
-
+### AP Frequency
 AP Frequencies for Multiple Treatments
 ```{r}
 plot_AP_frequencies_multiple_treatments(
@@ -805,7 +798,7 @@ plot_AP_frequencies_single_treatment(
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 ```
 ```{r}
@@ -821,10 +814,50 @@ plot_AP_frequencies_single_treatment(
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
+)
+```
+### AP Amplitude
+AP Amplitude: Acute Females 
+```{r}
+plot_AP_comparison(
+  AP_data,
+  plot_treatment = "Control",
+  plot_category = 2,
+  included_sexes = "female",
+  facet_by_sex = "no",
+  left_sex = "Female",
+  y_variable = "peak_amplitude",
+  y_axis_title = "Peak Amplitude (pA)",
+  theme_options = my_theme_options,
+  baseline_label = "Baseline",
+  test_type = "wilcox.test",
+  post_hormone_label = "HFS",
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "no"
+)
+```
+AP Amplitude: Acute Females with AM251
+```{r}
+plot_AP_comparison(
+  AP_data,
+  plot_treatment = "AM251",
+  plot_category = 2,
+  included_sexes = "female",
+  facet_by_sex = "no",
+  left_sex = "Female",
+  y_variable = "peak_amplitude",
+  y_axis_title = "Peak Amplitude (pA)",
+  theme_options = my_theme_options,
+  baseline_label = "Baseline",
+  test_type = "wilcox.test",
+  post_hormone_label = "HFS",
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "no"
 )
 ```
 
+### Variance Analysis
 Creating Variance dataset for variance analysis (category 2)
 ```{r}
 variance_2_df <- make_variance_data(
@@ -880,7 +913,7 @@ cv_comparison_control_plot <- plot_variance_comparison_data(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 
 vmr_comparison_control_plot <- plot_variance_comparison_data(
@@ -898,7 +931,7 @@ vmr_comparison_control_plot <- plot_variance_comparison_data(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 
 cv_comparison_control_plot
@@ -924,7 +957,7 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 
 vmr_comparison_AM251_plot <- plot_variance_comparison_data(
@@ -942,7 +975,7 @@ vmr_comparison_AM251_plot <- plot_variance_comparison_data(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 
 cv_comparison_AM251_plot
@@ -994,42 +1027,4 @@ vmr_comparison_naive_plot
 # is there any value to variance analysis in naive animals?
 ```
 
-AP Amplitude: Acute Females 
-```{r}
-plot_AP_comparison(
-  AP_data,
-  plot_treatment = "Control",
-  plot_category = 2,
-  included_sexes = "female",
-  facet_by_sex = "no",
-  left_sex = "Female",
-  y_variable = "peak_amplitude",
-  y_axis_title = "Peak Amplitude (pA)",
-  theme_options = my_theme_options,
-  baseline_label = "Baseline",
-  test_type = "wilcox.test",
-  post_hormone_label = "HFS",
-  treatment_colour_theme = my_theme_colours,
-  save_plot_png = "yes"
-)
-```
-AP Amplitude: Acute Females with AM251
-```{r}
-plot_AP_comparison(
-  AP_data,
-  plot_treatment = "AM251",
-  plot_category = 2,
-  included_sexes = "female",
-  facet_by_sex = "no",
-  left_sex = "Female",
-  y_variable = "peak_amplitude",
-  y_axis_title = "Peak Amplitude (pA)",
-  theme_options = my_theme_options,
-  baseline_label = "Baseline",
-  test_type = "wilcox.test",
-  post_hormone_label = "HFS",
-  treatment_colour_theme = my_theme_colours,
-  save_plot_png = "yes"
-)
-```
 
