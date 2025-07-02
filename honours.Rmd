@@ -15,7 +15,6 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r eval=FALSE}
-# only when there is a major update
 pak::pak("christelinda-laureijs/patchclampplotteR")
 ```
 
@@ -975,7 +974,7 @@ plot_AP_comparison(
   test_type = "wilcox.test",
   post_hormone_label = "HFS",
   treatment_colour_theme = my_theme_colours,
-  save_plot_png = "no"
+  save_plot_png = "yes"
 )
 ```
 AP Amplitude: Acute Females with AM251
@@ -993,7 +992,7 @@ plot_AP_comparison(
   test_type = "wilcox.test",
   post_hormone_label = "HFS",
   treatment_colour_theme = my_theme_colours,
-  save_plot_png = "no"
+  save_plot_png = "yes"
 )
 ```
 
