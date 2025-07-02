@@ -1127,6 +1127,8 @@ cv_comparison_naive_plot
 vmr_comparison_naive_plot
 
 # is there any value to variance analysis in naive animals?
+
+# why traingles for females they were circles before
 ```
 
 
