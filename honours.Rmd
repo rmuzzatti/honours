@@ -208,7 +208,7 @@ raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 Raw Naive Plots for each cell:
 ```{r}
 raw_eEPSC_naive_plots <- plot_raw_current_data(
- data = normalized_raw_eEPSC_df %>% filter(sex == "Female"),
+ data = normalized_raw_eEPSC_df,
   plot_treatment = "Control",
   plot_category = 1,
   current_type = "eEPSC",
@@ -385,6 +385,29 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 
 # all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
 ```
+testing assumptions for naive MALE summary data
+```{r}
+male_naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
+  mutate(
+    male_naive_difference0to5_vs_25to30 = t25to30 - t0to5,
+    male_naive_difference0to5_vs_20to25 = t20to25 - t0to5,
+    male_naive_difference0to5_vs_15to20 = t15to20 - t0to5,
+    male_naive_difference0to5_vs_10to15 = t10to15 - t0to5,
+    male_naive_difference0to5_vs_5to10 = t5to10 - t0to5,
+         )
+
+shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_25to30)
+
+shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_20to25)
+
+shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_15to20)
+
+shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_10to15)
+
+shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_5to10)
+
+# all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
+```
 
 testing assumptions for ACUTE FEMALE summary data
 ```{r}
@@ -476,6 +499,19 @@ t_test_female_naive <-perform_t_tests_for_summary_plot(
   save_output_as_RDS = "no"
 )
 
+t_test_male_naive <-perform_t_tests_for_summary_plot(
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Male"),
+  test_category = 1,
+  include_all_treatments = "no",
+  list_of_treatments = c("Control"),
+  current_type = "eEPSC",
+  parameter = "amplitude",
+  baseline_interval = "t0to5",
+  interval_length = 5,
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
+
 t_test_female_acute <-perform_t_tests_for_summary_plot(
   data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
   test_category = 2,
@@ -530,6 +566,7 @@ t_test_male_acute <-perform_t_tests_for_summary_plot(
 
 
 t_test_female_naive
+t_test_male_naive
 t_test_female_acute
 t_test_female_acute_am251
 t_test_male_acute
@@ -569,6 +606,36 @@ naive_summary_plot
 # saving as png to figure folder
 ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+Naive MALE Summary:
+```{r}
+male_naive_summary_plot <- plot_summary_current_data(
+  data = pruned_eEPSC_df$all_cells,
+  plot_category = 1,
+  plot_treatment = "Control",
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  included_sexes = "male",
+  include_representative_trace = "no",
+  representative_trace_filename = import_ext_data("Control-trace.png"),
+  y_axis_limit = 230,
+  signif_stars = "yes",
+  geom_signif_text_size = 8,
+  t_test_df = t_test_male_naive,
+  large_axis_text = "no",
+  legend_position = "inside",
+  shade_intervals = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+) #+ theme(legend.position = "none")
+
+male_naive_summary_plot
+
+ggsave(male_naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
 Acute FEMALE Summary:
 ```{r}
 acute_summary_plot <- plot_summary_current_data(
@@ -706,6 +773,23 @@ plot_percent_change_comparisons(
   save_plot_png = "no"
 )
 ```
+```{r}
+plot_percent_change_comparisons(
+  data = summary_eEPSC_df$percent_change_data,
+  plot_category = 1,
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
+  included_sexes = "both",
+  # facet_by_sex = "yes",
+  male_label = "Male",
+  female_label = "Female",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+```
 
 ### PPR
 Make PPR Dataset
@@ -758,6 +842,24 @@ plot_PPR_data_single_treatment(
 
 # sig increase in the PPR after HFS
 # higher PPR means lower probability of release
+```
+female vs male naive PPR HFS
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 1,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  left_sex = "Female",
+  test_type = "t.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
 ```
 
 testing assumptions for comparing PPR during baseline
@@ -992,8 +1094,8 @@ cv_comparison_naive_plot <- plot_variance_comparison_data(
   plot_category = 1, 
   plot_treatment = "Control",
   variance_measure = "cv",
-  included_sexes = "female",
-  facet_by_sex = "no",
+  included_sexes = "both",
+  facet_by_sex = "yes",
   left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -1009,8 +1111,8 @@ vmr_comparison_naive_plot <- plot_variance_comparison_data(
   plot_category = 1, 
   plot_treatment = "Control",
   variance_measure = "VMR",
-  included_sexes = "female",
-  facet_by_sex = "no",
+  included_sexes = "both",
+  facet_by_sex = "yes",
   left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
