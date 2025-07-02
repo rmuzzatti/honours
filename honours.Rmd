@@ -14,7 +14,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r eval=FALSE}
+```{r}
 pak::pak("christelinda-laureijs/patchclampplotteR")
 ```
 
@@ -136,6 +136,16 @@ How many cells?
 # naive
 raw_eEPSC_df %>%
   filter(category == 1) %>%
+  filter(time == 0) %>%
+  group_by(treatment) %>%
+  count(sex) %>%
+  arrange(treatment, sex)
+```
+How many cells?
+```{r}
+# repeated
+raw_eEPSC_df %>%
+  filter(category == 3) %>%
   filter(time == 0) %>%
   group_by(treatment) %>%
   count(sex) %>%
@@ -510,11 +520,25 @@ t_test_male_acute <-perform_t_tests_for_summary_plot(
   save_output_as_RDS = "no"
 )
 
+#t_test_female_repeated <-perform_t_tests_for_summary_plot(
+  #data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
+  #test_category = 3,
+  #include_all_treatments = "no",
+  #list_of_treatments = c("Control"),
+  #current_type = "eEPSC",
+  #parameter = "amplitude",
+  #baseline_interval = "t0to5",
+  #interval_length = 5,
+  #treatment_colour_theme = my_theme_colours,
+  #save_output_as_RDS = "no"
+#)
+
 
 t_test_female_naive
 t_test_female_acute
 t_test_female_acute_am251
 t_test_male_acute
+#t_test_female_repeated
 ```
 
 
@@ -541,7 +565,8 @@ naive_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "no"
 ) #+ theme(legend.position = "none")
 
 naive_summary_plot
@@ -570,7 +595,8 @@ acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "no"
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 acute_summary_plot
@@ -600,7 +626,8 @@ am251_acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "no"
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 am251_acute_summary_plot
@@ -630,7 +657,7 @@ repeated_summary_plot <- plot_summary_current_data(
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  # save_plot_png = "yes"
+  save_plot_png = "no"
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 repeated_summary_plot
@@ -657,7 +684,8 @@ male_acute_summary_plot <- plot_summary_current_data(
   legend_position = "inside",
   shade_intervals = "no",
   treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options
+  theme_options = my_theme_options,
+  save_plot_png = "no"
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 male_acute_summary_plot
@@ -726,6 +754,7 @@ plot_PPR_data_single_treatment(
   post_hormone_label = "HFS",
   included_sexes = "both",
   facet_by_sex = "yes",
+  left_sex = "Female",
   test_type = "t.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
@@ -842,8 +871,8 @@ cv_comparison_control_plot <- plot_variance_comparison_data(
   plot_treatment = "Control", # only picro
   variance_measure = "cv",
   included_sexes = "both",
-  left_sex = "Female",
   facet_by_sex = "yes",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
@@ -887,6 +916,7 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
   variance_measure = "cv",
   included_sexes = "female", # no male data
   facet_by_sex = "no",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
@@ -904,6 +934,7 @@ vmr_comparison_AM251_plot <- plot_variance_comparison_data(
   variance_measure = "VMR",
   included_sexes = "female", # no male data
   facet_by_sex = "no",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
@@ -930,6 +961,7 @@ cv_comparison_naive_plot <- plot_variance_comparison_data(
   variance_measure = "cv",
   included_sexes = "female",
   facet_by_sex = "no",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
@@ -946,6 +978,7 @@ vmr_comparison_naive_plot <- plot_variance_comparison_data(
   variance_measure = "VMR",
   included_sexes = "female",
   facet_by_sex = "no",
+  left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
   post_hormone_label = "HFS",
@@ -969,6 +1002,7 @@ plot_AP_comparison(
   plot_category = 2,
   included_sexes = "female",
   facet_by_sex = "no",
+  left_sex = "Female",
   y_variable = "peak_amplitude",
   y_axis_title = "Peak Amplitude (pA)",
   theme_options = my_theme_options,
@@ -987,6 +1021,7 @@ plot_AP_comparison(
   plot_category = 2,
   included_sexes = "female",
   facet_by_sex = "no",
+  left_sex = "Female",
   y_variable = "peak_amplitude",
   y_axis_title = "Peak Amplitude (pA)",
   theme_options = my_theme_options,
