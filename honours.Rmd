@@ -820,7 +820,7 @@ cv_comparison_AM251_plot <- plot_variance_comparison_data(
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "cv",
-  included_sexes = "female",
+  included_sexes = "both", # no male data
   facet_by_sex = "no",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -837,7 +837,7 @@ vmr_comparison_AM251_plot <- plot_variance_comparison_data(
   plot_category = 2, # acute
   plot_treatment = "AM251",
   variance_measure = "VMR",
-  included_sexes = "female",
+  included_sexes = "both", # no male data
   facet_by_sex = "no",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
