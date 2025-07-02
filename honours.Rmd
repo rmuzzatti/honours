@@ -14,6 +14,11 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
+```{r eval=FALSE}
+# only when there is a major update
+pak::pak("christelinda-laureijs/patchclampplotteR")
+```
+
 libraries I might need
 ```{r}
 library(patchclampplotteR)
@@ -675,8 +680,6 @@ plot_AP_frequencies_multiple_treatments(
   included_sexes = "female",
   treatment_colour_theme = my_theme_colours
 )
-
-# the display name for Category 1 + Treatment Control is "Naive" and that is being displayed here for no reason because this should only be category 2 (acute)
 ```
 
 ```{r}
