@@ -604,7 +604,7 @@ naive_summary_plot <- plot_summary_current_data(
 naive_summary_plot
 
 # saving as png to figure folder
-ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 Naive MALE Summary:
 ```{r}
@@ -633,7 +633,7 @@ male_naive_summary_plot <- plot_summary_current_data(
 
 male_naive_summary_plot
 
-ggsave(male_naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(male_naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Acute FEMALE Summary:
@@ -664,7 +664,7 @@ acute_summary_plot <- plot_summary_current_data(
 acute_summary_plot
 
 # saving as png to figure folder
-ggsave(acute_summary_plot, path = here("Figures"), file = "acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(acute_summary_plot, path = here("Figures"), file = "acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Acute FEMALE Summary with AM251:
@@ -694,7 +694,7 @@ am251_acute_summary_plot <- plot_summary_current_data(
 
 am251_acute_summary_plot
 
-ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 REPEATED FEMALE Summary:
@@ -752,7 +752,7 @@ male_acute_summary_plot <- plot_summary_current_data(
 
 male_acute_summary_plot
 
-ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 ## Evoked Analysis
 ### Percent Change
