@@ -1125,8 +1125,6 @@ vmr_comparison_naive_plot <- plot_variance_comparison_data(
 
 cv_comparison_naive_plot
 vmr_comparison_naive_plot
-
-# why traingles for females they were circles before
 ```
 
 
