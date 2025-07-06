@@ -604,7 +604,7 @@ naive_summary_plot <- plot_summary_current_data(
 naive_summary_plot
 
 # saving as png to figure folder
-# ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 Naive MALE Summary:
 ```{r}
