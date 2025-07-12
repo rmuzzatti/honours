@@ -551,18 +551,18 @@ t_test_male_acute <-perform_t_tests_for_summary_plot(
   save_output_as_RDS = "no"
 )
 
-#t_test_female_repeated <-perform_t_tests_for_summary_plot(
-  #data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
-  #test_category = 3,
-  #include_all_treatments = "no",
-  #list_of_treatments = c("Control"),
-  #current_type = "eEPSC",
-  #parameter = "amplitude",
-  #baseline_interval = "t0to5",
-  #interval_length = 5,
-  #treatment_colour_theme = my_theme_colours,
-  #save_output_as_RDS = "no"
-#)
+t_test_female_repeated <-perform_t_tests_for_summary_plot(
+  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
+  test_category = 3,
+  include_all_treatments = "no",
+  list_of_treatments = c("Control"),
+  current_type = "eEPSC",
+  parameter = "amplitude",
+  baseline_interval = "t0to5",
+  interval_length = 5,
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
 
 
 t_test_female_naive
@@ -570,7 +570,7 @@ t_test_male_naive
 t_test_female_acute
 t_test_female_acute_am251
 t_test_male_acute
-#t_test_female_repeated
+t_test_female_repeated
 ```
 
 
@@ -713,7 +713,7 @@ repeated_summary_plot <- plot_summary_current_data(
   y_axis_limit = 230,
   signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_acute_am251, # need an actual one
+  t_test_df = t_test_female_repeated, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
