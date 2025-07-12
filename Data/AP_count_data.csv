@@ -376,3 +376,43 @@
 "RMR3","HFS",8,2,4,"","Female",NA,NA,NA,NA,"Glutamate","Control",3,"1.9, 1.9, 2.0, 2.0, 2.0, 2.0, 2.0","","",NA
 "RMR3","HFS",9,6,12,"","Female",NA,NA,NA,NA,"Glutamate","Control",3,"1.9, 1.9, 2.0, 2.0, 2.0, 2.0, 2.0","","",NA
 "RMR3","HFS",10,4,8,"","Female",NA,NA,NA,NA,"Glutamate","Control",3,"1.9, 1.9, 2.0, 2.0, 2.0, 2.0, 2.0","","",NA
+"RMR4","Baseline",1,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",2,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",3,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",4,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",5,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",6,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",7,3,6,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",8,5,10,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",9,6,12,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","Baseline",10,7,14,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",1,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",2,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",3,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",4,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",5,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",6,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",7,0,0,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",8,1,2,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",9,3,6,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR4","HFS",10,4,8,"3.2.2","Female",240.34,713.92,30,NA,"Glutamate","Control",3,"1.9, 2.0, 2.1, 2.1, 2.1, 2.3","","",NA
+"RMR5","Baseline",1,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",2,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",3,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",4,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",5,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",6,1,2,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",7,4,8,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",8,5,10,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",9,6,12,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","Baseline",10,7,14,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",1,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",2,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",3,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",4,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",5,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",6,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",7,0,0,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",8,1,2,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",9,2,4,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
+"RMR5","HFS",10,3,6,"3.3.1","Female",124.54,352.66,30,NA,"Glutamate","Control",3,"1.2, 1.3, 1.3, 1.4, 1.4","","",NA
