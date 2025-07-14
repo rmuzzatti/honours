@@ -511,6 +511,31 @@ bartlett.test(list(male_acute_difference_evoked_df$male_acute_difference0to5_vs_
 # p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
 
+testing assumptions for REPEATED female summary data
+```{r}
+rr_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "3") %>% filter(treatment == "Control") %>%
+  mutate(
+    rr_difference0to5_vs_25to30 = t25to30 - t0to5,
+    rr_difference0to5_vs_20to25 = t20to25 - t0to5,
+    rr_difference0to5_vs_15to20 = t15to20 - t0to5,
+    rr_difference0to5_vs_10to15 = t10to15 - t0to5,
+    rr_difference0to5_vs_5to10 = t5to10 - t0to5,
+         )
+
+shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_25to30) 
+shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_20to25) 
+shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_15to20) 
+shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_10to15) 
+shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_5to10) 
+
+# all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
+
+
+bartlett.test(list(rr_difference_evoked_df$rr_difference0to5_vs_25to30, rr_difference_evoked_df$rr_difference0to5_vs_20to25, rr_difference_evoked_df$rr_difference0to5_vs_15to20, rr_difference_evoked_df$rr_difference0to5_vs_10to15, rr_difference_evoked_df$rr_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
+```
+
 ### t-test for summary plots
 ```{r}
 t_test_female_naive <-perform_t_tests_for_summary_plot(
