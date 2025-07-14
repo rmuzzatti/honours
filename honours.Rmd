@@ -384,7 +384,14 @@ shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_10to15)
 shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
 
 # all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
+
+
+bartlett.test(list(naive_difference_evoked_df$naive_difference0to5_vs_25to30, naive_difference_evoked_df$naive_difference0to5_vs_20to25, naive_difference_evoked_df$naive_difference0to5_vs_15to20, naive_difference_evoked_df$naive_difference0to5_vs_10to15, naive_difference_evoked_df$naive_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
+
+
 testing assumptions for naive MALE summary data
 ```{r}
 male_naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
@@ -407,6 +414,10 @@ shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_10to15
 shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_5to10)
 
 # all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
+
+bartlett.test(list(male_naive_difference_evoked_df$male_naive_difference0to5_vs_25to30, male_naive_difference_evoked_df$male_naive_difference0to5_vs_20to25, male_naive_difference_evoked_df$male_naive_difference0to5_vs_15to20, male_naive_difference_evoked_df$male_naive_difference0to5_vs_10to15, male_naive_difference_evoked_df$male_naive_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
 
 testing assumptions for ACUTE FEMALE summary data
@@ -441,7 +452,13 @@ qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
 
 # the 5 to 10 minute and 25 to 30 minute periods have p-values less than 0.05 are are not normal
+
+
+bartlett.test(list(acute_difference_evoked_df$acute_difference0to5_vs_25to30, acute_difference_evoked_df$acute_difference0to5_vs_20to25, acute_difference_evoked_df$acute_difference0to5_vs_15to20, acute_difference_evoked_df$acute_difference0to5_vs_10to15, acute_difference_evoked_df$acute_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
+
 testing assumptions for ACUTE FEMALE summary data with AM251
 ```{r}
 am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "2") %>% filter(treatment == "AM251") %>%
@@ -464,6 +481,11 @@ shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_10to
 shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to10) # NOT normal
 
 # the 5 to 10 minute have p-values less than 0.05 are are not normal
+
+
+bartlett.test(list(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_25to30, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_20to25, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_15to20, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_10to15, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to10))
+
+  # p-value is LESS than 0.05 -> variances are NOT equal
 ```
 
 testing assumptions for ACUTE MALE summary data
@@ -482,6 +504,11 @@ shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_20to25
 shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_15to20) # normal
 shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_10to15) # normal
 shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10) # not normal
+
+
+bartlett.test(list(male_acute_difference_evoked_df$male_acute_difference0to5_vs_25to30, male_acute_difference_evoked_df$male_acute_difference0to5_vs_20to25, male_acute_difference_evoked_df$male_acute_difference0to5_vs_15to20, male_acute_difference_evoked_df$male_acute_difference0to5_vs_10to15, male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
 
 ### t-test for summary plots
@@ -606,6 +633,7 @@ naive_summary_plot
 # saving as png to figure folder
 ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 Naive MALE Summary:
 ```{r}
 male_naive_summary_plot <- plot_summary_current_data(
