@@ -926,6 +926,8 @@ PPR_plot_df <- PPR_df %>% # making the data frame so that we have mean PPR
 shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 
 # p value is greater than 0.05, data is normal
+
+# need to do bartlett's test
 ```
 ### AP Frequency
 AP Frequencies for Multiple Treatments
