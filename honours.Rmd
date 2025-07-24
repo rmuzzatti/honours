@@ -39,6 +39,7 @@ eEPSC_data <- read.csv("Data/new_raw_eEPSC.csv")
 eEPSC_data
 ```
 
+### Raw eEPSC
 To Append New Data onto the EXISTING SHEET (raw_eEPSC_df.csv) after first time
 ```{r eval=FALSE}
 # will not run if there is nothing new in "new_raw_eEPSC.csv" so if you put new data directly into "raw_eEPSC_df.csv", it won't run
@@ -61,6 +62,8 @@ raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environ
 
 raw_eEPSC_df # prints it
 ```
+
+### AP Count
 Importing NEW Action Potential Count Data
 ```{r eval=FALSE}
 add_new_cells(
@@ -79,8 +82,9 @@ add_new_cells(
 AP_count_data <- read.csv(here("Data/AP_count_data.csv"))
 ```
 
+### AP Parameters
 Importing NEW Action Potential Parameter Data
-```{r eval=FALSE}
+```{r}
 add_new_cells(
   new_raw_data_csv = "Data/new_AP_parameters.csv", # should ONLY have the new data you want,
   cell_characteristics_csv = "Data/Cell-Characteristics.csv",
