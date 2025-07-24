@@ -918,6 +918,24 @@ plot_PPR_data_single_treatment(
   save_plot_png = "no"
 )
 ```
+female REPEATED
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 3,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+  included_sexes = "female",
+  #facet_by_sex = "yes",
+  #left_sex = "Female",
+  test_type = "t.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+```
 
 testing assumptions for comparing PPR during baseline
 ```{r}
@@ -931,7 +949,7 @@ shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
 
 # p value is greater than 0.05, data is normal
 
-# need to do bartlett's test
+# need to do bartlett's test ?
 ```
 ### AP Frequency
 AP Frequencies for Multiple Treatments
@@ -973,11 +991,30 @@ plot_AP_frequencies_single_treatment(
   significance_display_method = "stars", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
-  test_type = "wilcox.test", # need to test assumptions
+  test_type = "wilcox.test", # need to test assumptions, can be "wilcox.test", "t.test", or "none"
   theme_options = my_theme_options,
   save_plot_png = "no"
 )
 ```
+```{r}
+plot_AP_frequencies_single_treatment(
+  data = AP_count_data, 
+  plot_treatment = "Control",
+  plot_category = 3,
+  included_sexes = "female",
+  baseline_label = "Baseline",
+  hormone_added = "HFS",
+  significance_display_method = "stars", # could be "p-values" or "stars"
+  treatment_colour_theme = my_theme_colours,
+  large_axis_text = "no",
+  test_type = "none", # need to test assumptions, can be "wilcox.test", "t.test", or "none"
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+
+# SHOULD BE 6 BL AND 6 HFS
+```
+
 ### AP Amplitude
 AP Amplitude: Acute Females 
 ```{r}
@@ -1004,6 +1041,26 @@ plot_AP_comparison(
   AP_data,
   plot_treatment = "AM251",
   plot_category = 2,
+  included_sexes = "female",
+  facet_by_sex = "no",
+  left_sex = "Female",
+  y_variable = "peak_amplitude",
+  y_axis_title = "Peak Amplitude (pA)",
+  theme_options = my_theme_options,
+  baseline_label = "Baseline",
+  test_type = "wilcox.test",
+  post_hormone_label = "HFS",
+  treatment_colour_theme = my_theme_colours,
+  save_plot_png = "no"
+)
+```
+
+AP Amplitude: Repeated Females 
+```{r}
+plot_AP_comparison(
+  AP_data,
+  plot_treatment = "Control",
+  plot_category = 3,
   included_sexes = "female",
   facet_by_sex = "no",
   left_sex = "Female",
@@ -1054,6 +1111,20 @@ variance_1_df <- make_variance_data(
 )
 
 variance_1_df
+```
+```{r}
+variance_3_df <- make_variance_data(
+  data = summary_eEPSC_df$summary_data,
+  df_category = 3,
+  include_all_treatments = "yes",
+  list_of_treatments = NULL,
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  treatment_colour_theme = my_theme_colours,
+  save_output_as_RDS = "no"
+)
+
+variance_3_df
 ```
 
 
@@ -1144,6 +1215,49 @@ vmr_comparison_AM251_plot
 
 # With the almost significant decrease in VMR in males: 
 # if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
+```
+Variance Comparisons for REPEATED (Control)
+```{r}
+cv_comparison_repeated_plot <- plot_variance_comparison_data(
+  data = variance_3_df,
+  plot_category = 3, # repeated
+  plot_treatment = "Control",
+  variance_measure = "cv",
+  included_sexes = "female", # no male data
+  facet_by_sex = "no",
+  left_sex = "Female",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+
+vmr_comparison_repeated_plot <- plot_variance_comparison_data(
+  data = variance_3_df,
+  plot_category = 3, # repeated
+  plot_treatment = "Control",
+  variance_measure = "VMR",
+  included_sexes = "female", # no male data
+  facet_by_sex = "no",
+  left_sex = "Female",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+
+cv_comparison_repeated_plot
+vmr_comparison_repeated_plot
+
+# RMR6 VMR after is the suddenly high one 
 ```
 
 Variance Comparisons for NAIVE
