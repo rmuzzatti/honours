@@ -539,6 +539,30 @@ bartlett.test(list(rr_difference_evoked_df$rr_difference0to5_vs_25to30, rr_diffe
 
 # p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
 ```
+testing assumptions for REPEATED male summary data
+```{r}
+male_rr_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "3") %>% filter(treatment == "Control") %>%
+  mutate(
+    male_rr_difference0to5_vs_25to30 = t25to30 - t0to5,
+    male_rr_difference0to5_vs_20to25 = t20to25 - t0to5,
+    male_rr_difference0to5_vs_15to20 = t15to20 - t0to5,
+    male_rr_difference0to5_vs_10to15 = t10to15 - t0to5,
+    male_rr_difference0to5_vs_5to10 = t5to10 - t0to5,
+         )
+
+shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_25to30) 
+shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_20to25) 
+shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_15to20) 
+shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_10to15) 
+shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_5to10) 
+
+# NONE of p-values are less than 0.05 -> reject the null hypothesis that they are normally distributed -> the data is NOT normally distributed
+
+
+bartlett.test(list(male_rr_difference_evoked_df$male_rr_difference0to5_vs_25to30, male_rr_difference_evoked_df$male_rr_difference0to5_vs_20to25, male_rr_difference_evoked_df$male_rr_difference0to5_vs_15to20, male_rr_difference_evoked_df$male_rr_difference0to5_vs_10to15, male_rr_difference_evoked_df$male_rr_difference0to5_vs_5to10))
+
+# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
+```
 
 ### t-test for summary plots
 ```{r}
@@ -781,6 +805,34 @@ repeated_summary_plot <- plot_summary_current_data(
 
 repeated_summary_plot
 ```
+REPEATED MALE Summary:
+```{r}
+male_repeated_summary_plot <- plot_summary_current_data(
+  data = pruned_eEPSC_df$all_cells, 
+  plot_category = 3,
+  plot_treatment = "Control",
+  current_type = "eEPSC",
+  y_variable = "amplitude",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  included_sexes = "male",
+  include_representative_trace = "no",
+  representative_trace_filename = import_ext_data("Control-trace.png"),
+  y_axis_limit = 230,
+  signif_stars = "yes",
+  geom_signif_text_size = 8,
+  t_test_df = t_test_female_repeated, # need own t-test but doesn't pass assumptions
+  large_axis_text = "no",
+  legend_position = "inside",
+  shade_intervals = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
+
+male_repeated_summary_plot
+```
+
 
 Acute MALE Summary:
 ```{r}
@@ -918,7 +970,7 @@ plot_PPR_data_single_treatment(
   save_plot_png = "no"
 )
 ```
-female REPEATED
+female vs male repeated PPR HFS
 ```{r}
 plot_PPR_data_single_treatment(
   data = PPR_df,
@@ -926,9 +978,9 @@ plot_PPR_data_single_treatment(
   plot_category = 3,
   baseline_label = "Baseline",
   post_hormone_label = "HFS",
-  included_sexes = "female",
-  #facet_by_sex = "yes",
-  #left_sex = "Female",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  left_sex = "Female",
   test_type = "t.test",
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
@@ -1223,8 +1275,8 @@ cv_comparison_repeated_plot <- plot_variance_comparison_data(
   plot_category = 3, # repeated
   plot_treatment = "Control",
   variance_measure = "cv",
-  included_sexes = "female", # no male data
-  facet_by_sex = "no",
+  included_sexes = "both",
+  facet_by_sex = "yes",
   left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -1241,8 +1293,8 @@ vmr_comparison_repeated_plot <- plot_variance_comparison_data(
   plot_category = 3, # repeated
   plot_treatment = "Control",
   variance_measure = "VMR",
-  included_sexes = "female", # no male data
-  facet_by_sex = "no",
+  included_sexes = "both", 
+  facet_by_sex = "yes",
   left_sex = "Female",
   baseline_interval = "t0to5",
   post_hormone_interval = "t25to30",
@@ -1258,6 +1310,8 @@ cv_comparison_repeated_plot
 vmr_comparison_repeated_plot
 
 # RMR6 VMR after is the suddenly high one 
+
+# With the significant decrease in VMR in repeated males, since there is no change in 1/CV2, it is a presynaptic change in Q
 ```
 
 Variance Comparisons for NAIVE
