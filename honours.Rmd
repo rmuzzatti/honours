@@ -345,6 +345,8 @@ pruned_eEPSC_repeated_plots <- plot_raw_current_data(
 )
 
 pruned_eEPSC_repeated_plots
+
+# MR11, MR12, maybe MR7 baselines might be questionable
 ```
 ## Summary Plots
 Summary DATA
