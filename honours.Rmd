@@ -1401,6 +1401,12 @@ female_baseline_PPR_plot <- female_PPR_plot_df %>%
   theme(legend.position = "none")
 
 female_baseline_PPR_plot
+
+# how to make the label so that it just says acute once for the treatments in that category that are next to each other 
+
+# t-test
+
+# get rid of the NA
 ```
 
 
