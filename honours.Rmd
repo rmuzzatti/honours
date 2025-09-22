@@ -806,6 +806,8 @@ repeated_summary_plot <- plot_summary_current_data(
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 repeated_summary_plot
+
+# ggsave(repeated_summary_plot, path = here("Figures"), file = "repeated_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 REPEATED MALE Summary:
 ```{r}
@@ -1355,58 +1357,60 @@ vmr_comparison_naive_plot <- plot_variance_comparison_data(
 cv_comparison_naive_plot
 vmr_comparison_naive_plot
 ```
-```{r}
-female_PPR_plot_df <- female_PPR_plot_df %>%
-  mutate(cat_treat = case_when(
-    category == 1 & treatment == "Control" ~ "1.Control",
-    category == 2 & treatment == "Control" ~ "2.Control",
-    category == 2 & treatment == "AM251"   ~ "2.AM251",
-  ),
-  cat_treat = factor(cat_treat, 
-                     levels = c("1.Control", "2.Control", "2.AM251")))
 
-shapiro.test(female_PPR_plot_df$mean_PPR)
-# p value is greater than 0.05, data is normal
+
+PPR FOR POSTER
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 2,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+    included_sexes = "female",
+  #facet_by_sex = "yes",
+  #left_sex = "Female",
+  test_type = "t.test",
+  map_signif_level_values = T,
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
+)
 ```
 ```{r}
-female_baseline_PPR_plot <- female_PPR_plot_df %>%
-  ggplot(aes(x = cat_treat, 
-             y = mean_PPR, 
-             fill = factor(category))) + 
-  
-  geom_boxplot(alpha = 0.6,
-               outlier.shape = NA,
-               color = "black",
-               width = 0.5,
-               show.legend = FALSE) +
-  
-  geom_sina(aes(color = factor(category)),
-            maxwidth = 0.2,
-            shape = 16,
-            size = 2,
-            show.legend = FALSE) +
-  
-  stat_summary(fun = mean, geom = "point",
-               shape = 16, size = 4, color = "black") +
-  
-  scale_fill_manual(values = c("1" = "#f19cac", "2" = "#6497b1")) +
-  scale_color_manual(values = c("1" = "#eb647e", "2" = "#005b96")) +
-  
-  scale_x_discrete(labels = c("1.Control" = "Naive\nControl",
-                              "2.Control" = "Acute\nControl",
-                              "2.AM251"  = "Acute\nAM251")) +
-  
-  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
-  patchclampplotteR_theme() +
-  theme(legend.position = "none")
-
-female_baseline_PPR_plot
-
-# how to make the label so that it just says acute once for the treatments in that category that are next to each other 
-
-# t-test
-
-# get rid of the NA
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 1,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+    included_sexes = "female",
+  #facet_by_sex = "yes",
+  #left_sex = "Female",
+  test_type = "t.test",
+  map_signif_level_values = T,
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
+)
 ```
-
-
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "AM251",
+  plot_category = 2,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+    included_sexes = "female",
+  #facet_by_sex = "yes",
+  #left_sex = "Female",
+  test_type = "t.test",
+  map_signif_level_values = T,
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
+)
+```
