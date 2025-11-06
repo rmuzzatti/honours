@@ -755,17 +755,136 @@ female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
   filter(sex == "Female" & category %in% c(1,2) & treatment == "Control") %>%
   ggplot(aes(x = time, y = mean_P1_all_cells, ymin = mean_P1_all_cells - se_P1_all_cells, ymax = mean_P1_all_cells + se_P1_all_cells, colour = category)) +
   geom_pointrange(size = 0.9, shape = 16) +
-  labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)") +
+  ylim(0,230) +
+  labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) + # NULL for legend heading
   geom_hline(yintercept = 100, linetype = "dashed") +
-  scale_colour_manual(values = c("#f5e0b3", "#f19cac"), labels = c("Naive", "Acute")) +
-  patchclampplotteR_theme()
+  scale_colour_manual(values = c("lightgrey", "#f19cac"), labels = c("Naive, n = 10", "Acute, n = 8")) + 
+  
+  # add naive t-test
+  geom_text(
+    data = t_test_female_naive,
+    aes(
+      x = asterisk_time,
+      y = 50,
+      label = significance_stars
+    ),
+    inherit.aes = FALSE,
+    size = 8,
+    colour = "lightgrey"
+  ) +
 
-# want to add t-test
-# want to add n = in the bottom corner
+  # add acute t-test
+  geom_text(
+    data = t_test_female_acute,
+    aes(
+      x = asterisk_time,
+      y = 170,
+      label = significance_stars
+    ),
+    inherit.aes = FALSE,
+    size = 8,
+    colour = "#eb647e"
+  ) +
+  
+  # add HFS text
+  annotate(
+        geom = "text",
+        x = 5,
+        y = 220,
+        label = "HFS",
+        size = 4,
+        hjust = 0.5
+      ) +
+  
+  # add arrow
+   annotate(
+        geom = "segment",
+        x = 5,
+        y = 210,
+        xend = 5,
+        yend = 190,
+        arrow = grid::arrow(type = "closed", length = grid::unit(0.02, "npc"))
+      ) +
+  patchclampplotteR_theme() +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.025, 0.05),
+    legend.justification = c(0, 0)
+  )
 
 female_treatment1_plot
+
+# ggsave(female_treatment1_plot, path = here("Figures"), file = "female_treatment1_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
+MALE TREATMENT 1 COMBINED
+```{r}
+male_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
+  filter(sex == "Male" & category %in% c(1,2) & treatment == "Control") %>%
+  
+  ggplot(aes(x = time, y = mean_P1_all_cells, ymin = mean_P1_all_cells - se_P1_all_cells, ymax = mean_P1_all_cells + se_P1_all_cells, colour = category)) +
+  geom_pointrange(size = 0.9, shape = 17) +
+  ylim(0,230) +
+  labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) + # NULL for legend heading
+  geom_hline(yintercept = 100, linetype = "dashed") +
+  scale_colour_manual(values = c("lightgrey", "#f19cac"), labels = c("Naive, n = 13", "Acute, n = 8")) +
+  
+  # add naive t-test
+  geom_text(
+    data = t_test_male_naive,
+    aes(x = asterisk_time,
+      y = 170,
+      label = significance_stars
+    ),
+    inherit.aes = FALSE,
+    size = 8,
+    colour = "grey"
+  ) +
+
+  # add acute t-test
+  geom_text(
+    data = t_test_male_acute,
+    aes(
+      x = asterisk_time,
+      y = 50,
+      label = significance_stars
+    ),
+    inherit.aes = FALSE,
+    size = 8,
+    colour = "#eb647e"
+  ) +
+  
+  # add HFS text
+  annotate(
+        geom = "text",
+        x = 5,
+        y = 220,
+        label = "HFS",
+        size = 4,
+        hjust = 0.5
+      ) +
+  
+  # add arrow  
+  annotate(
+        geom = "segment",
+        x = 5,
+        y = 210,
+        xend = 5,
+        yend = 190,
+        arrow = grid::arrow(type = "closed", length = grid::unit(0.02, "npc"))
+      ) +
+  
+  patchclampplotteR_theme() +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.025, 0.05),
+    legend.justification = c(0, 0)
+  )
+
+male_treatment1_plot
+
+# ggsave(male_treatment1_plot, path = here("Figures"), file = "male_treatment1_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
 
 
 Acute FEMALE Summary with AM251:
@@ -920,8 +1039,8 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
             show.legend = FALSE) +
   
   # mean as a point
-  stat_summary(fun = mean, geom = "point", 
-               shape = 16, size = 4, color = "black") +
+  #stat_summary(fun = mean, geom = "point", 
+               #shape = 16, size = 4, color = "black") +
   
   # colours
   scale_fill_manual(values = c("1.Control" = "#f5e0b3",
