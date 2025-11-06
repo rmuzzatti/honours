@@ -1059,7 +1059,8 @@ male_acute_summary_plot
 # ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
-Baseline eEPSC
+## Baseline 
+### eEPSC
 ```{r}
 # data
 female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
@@ -1078,7 +1079,7 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   patchclampplotteR_theme() +
   
 # the boxes
-  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment),fatten = NULL), 
+  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
                alpha = 0.6, 
                color = "black",
 # outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
@@ -1110,7 +1111,7 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
 scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   
 # x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
+  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
   annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
   annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
   
@@ -1126,8 +1127,76 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
 
 female_baseline_amp_plot
 ```
+eEPSC amplitude after the HFS (25-30 min)
+```{r}
+# data
+female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251")) %>% 
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251")
+  )) %>%
+  
+  ggplot(aes(x = cat_treat, y = t25to30)) +
+  
+  patchclampplotteR_theme() +
+  
+# axis labels
+  labs(x = NULL, y = "FINAL eEPSC Amplitude (pA)") +
+  patchclampplotteR_theme() +
+  
+# the boxes
+  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
+               alpha = 0.6, 
+               color = "black",
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE)  +
+  
+  # the dots/scatter plot
+  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +
+  
+  # mean as a point
+  #stat_summary(fun = mean, geom = "point", 
+               #shape = 16, size = 4, color = "black") +
+  
+  # colours
+  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
+                               "2.Control" = "#f19cac",
+                               "2.AM251" = "#ffadff")) +
+  
+  scale_color_manual(values = c("1.Control" = "#ecc479", 
+                                "2.Control" = "#eb647e", 
+                                "2.AM251" = "#c11c84")) +
+  
+  # x-axis labels  
+scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
+  
+# x-axis subtitles  
+  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
+  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  
+  # t-test
+  stat_compare_means(
+    method = "t.test", 
+    label = "p.format", # p.signif does the stars, p.format shows the p-value
+    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
+    size = 5
+) + 
 
-Baseline PPR
+  guides(fill = "none", color = "none")
+
+female_HFS_amp_plot
+```
+
+
+### PPR
 ```{r}
 # data
 female_baseline_PPR_plot <- PPR_plot_df %>%
@@ -1145,9 +1214,8 @@ female_baseline_PPR_plot <- PPR_plot_df %>%
   theme(legend.position = "none") +
   
 # the boxes
-  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment),fatten = NULL), 
+  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
                alpha = 0.6, 
-               color = "black",
 # outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
                outlier.shape = NA, 
                width = 0.5, 
@@ -1161,8 +1229,8 @@ female_baseline_PPR_plot <- PPR_plot_df %>%
             show.legend = FALSE) +
   
   # mean as a point
-  stat_summary(fun = mean, geom = "point", 
-               shape = 16, size = 4, color = "black") +
+  # stat_summary(fun = mean, geom = "point", 
+               # shape = 16, size = 4, color = "black") +
   
   # colours
   scale_fill_manual(values = c("1.Control" = "#f5e0b3",
@@ -1766,3 +1834,4 @@ plot_PPR_data_single_treatment(
   save_plot_png = "no"
 )
 ```
+
