@@ -33,7 +33,7 @@ cell_characteristics
 ```
 
 Importing Sheet with Raw Evoked Current Data
-```{r eval=FALSE}
+```{r}
 eEPSC_data <- read.csv("Data/new_raw_eEPSC.csv")
 
 eEPSC_data
@@ -1346,7 +1346,7 @@ plot_AP_frequencies_single_treatment(
   save_plot_png = "no"
 )
 
-# SHOULD BE 6 BL AND 6 HFS
+# why is baseline one less? I checked and they all have some APs eventually
 ```
 
 ### AP Amplitude
