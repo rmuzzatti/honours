@@ -67,5 +67,4 @@ MR12,,Male,,,,,Glutamate,Control,3,"5.7, 14.4, 16.2, 11.7, 11.7, 15, 12.9, 15.2 
 MR13,,Male,,,,,Glutamate,Control,3,"9.6, 9.4, 2.7, 2.5, 2.9, 3.1, 3.0 (Tau not 50 for first two)",,,
 RMA7A,8.1.4,Female,41.26,262.25,30,8,Glutamate,AM251,2,"1.7, 1.8, 1.8, 1.9, 2.3, 2.1",currents go down before Ra increases,0,
 RMA8A,8.4.1,Female,234.17,572.72,30,8,Glutamate,AM251,2,"1.5, 1.5, 1.4, 1.4, 2.0, 1.9",currents go down before Ra increases,0,
-RMR7,6.2.1,Female,156.99,574.41,30,,Glutamate,Control,3,"1.9, 2.1, 2.1, 2.1, 2.0",,,
 RMR8,7.5.1,Female,101.74,436,32,,Glutamate,Control,3,"1.1, 1.2, 1.2, 1.1, 1.1, 1.1",,,

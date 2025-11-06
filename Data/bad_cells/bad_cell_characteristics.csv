@@ -1,3 +1,4 @@
 letter,cell,sex,X,Y,age,animal,synapses,treatment,category,R_a,Notes,days_alone,animal_or_slicing_problems
 RMA5,3.1.1,Female,130.68,378.98,39,3,Glutamate,Control,2,"1.4, 1.4, 1.5, 1.5, 1.5, 1.5",bad cell: baseline not stable,1,
 RMA7,3.3.1,Female,71.04,353.54,39,3,Glutamate,Control,2,"1.3, 1.4, 1.3, 1.3, 1.3, 1.4",bad cell: baseline not stable,1,
+RMR7,6.2.1,Female,156.99,574.41,30,,Glutamate,Control,3,"1.9, 2.1, 2.1, 2.1, 2.0",bad cell: baseline not stable,,

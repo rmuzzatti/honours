@@ -1692,3 +1692,22 @@ plot_PPR_data_single_treatment(
   save_plot_png = "yes"
 )
 ```
+
+```{r}
+plot_PPR_data_single_treatment(
+  data = PPR_df,
+  plot_treatment = "Control",
+  plot_category = 3,
+  baseline_label = "Baseline",
+  post_hormone_label = "HFS",
+    included_sexes = "female",
+  #facet_by_sex = "yes",
+  #left_sex = "Female",
+  test_type = "t.test",
+  map_signif_level_values = T,
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+```
