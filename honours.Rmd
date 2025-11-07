@@ -1834,4 +1834,78 @@ plot_PPR_data_single_treatment(
   save_plot_png = "no"
 )
 ```
+```{r}
+#1 facet labels
+  facet_labels <- c(
+    "1.Control.Female" = "Naive",
+    "2.Control.Female" = "Acute",
+    "2.AM251.Female" = "Acute with AM251",
+    "3.Control.Female" = "Repeated")
+
+#2 making the data frame for individual cells
+female_PPR_plot_df <- PPR_df %>%
+  filter(state %in% c("Baseline", "Post-modification")) %>% 
+  filter(sex == "Female") %>% 
+  mutate(
+    state = ifelse(state == "Post-modification", "HFS", state)) %>% # rename to HFS
+ mutate(facet_group = factor(interaction(category, treatment, sex),
+                              levels = names(facet_labels))) %>%
+  group_by(letter, state, category, treatment, sex, facet_group) %>%
+  summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
+
+# group means
+female_PPR_group_mean <- female_PPR_plot_df %>%
+  group_by(state, category, treatment, sex, facet_group) %>%
+  summarize(mean_PPR_group = mean(mean_PPR_cell, na.rm = TRUE), .groups = "drop")
+   
+#4 plot
+female_PPR_plot <- female_PPR_plot_df %>%
+  ggplot(aes(x = state, y = mean_PPR_cell, group = letter)) +
+
+# individual  cells  
+  geom_line(alpha = 0.5, colour = "lightgrey") + 
+  geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
+  
+# group mean
+  geom_line(data = female_PPR_group_mean,
+    aes(x = state, y = mean_PPR_group, group = 1, colour = interaction(category, treatment)),
+    linewidth = 0.75, inherit.aes = FALSE) +
+  geom_point(data = female_PPR_group_mean,
+    aes(x = state, y = mean_PPR_group, colour = interaction(category, treatment), shape = sex),
+    size = 1.25, inherit.aes = FALSE) +  
+ 
+# colours and shapes
+  scale_colour_manual(values = c(
+    "1.Control" = "#f5e0b3", # or "darkgrey"
+    "2.Control" = "#f19cac",
+    "2.AM251" = "#FFADFF",
+    "3.Control" = "#6497b1"
+  )) +
+scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
+  
+# facet with labels and order
+  facet_wrap(~ facet_group, labeller = as_labeller(facet_labels), nrow = 1) + # nrow = 1 makes it all on one line
+  
+# add t-test p-values
+  stat_compare_means(
+    data = female_PPR_plot_df,
+    comparisons = list(c("Baseline", "HFS")),
+    aes(group = state),
+    method = "t.test",
+    label.x = 1.25, # centers p-value (or at least the start of it...)
+    label = "p.format", # or p.value
+    bracket.size = 0.5,
+    tip.length = 0.02,
+    size = 3,
+    group.by = "facet_group",
+    label.y = max(female_PPR_plot_df$mean_PPR_cell, na.rm = TRUE) * 1.05 # smaller brings it down, bigger brings it up
+  ) +
+  
+  # theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+female_PPR_plot
+```
 
