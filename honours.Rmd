@@ -1081,7 +1081,7 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
 # the boxes
   geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
                alpha = 0.6, 
-               color = "black",
+               color = "black", # get rid of if want the dark colour to be the outline
 # outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
                outlier.shape = NA, 
                width = 0.5, 
@@ -1093,11 +1093,7 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
             shape = 16, 
             size = 2, 
             show.legend = FALSE) +
-  
-  # mean as a point
-  #stat_summary(fun = mean, geom = "point", 
-               #shape = 16, size = 4, color = "black") +
-  
+
   # colours
   scale_fill_manual(values = c("1.Control" = "#f5e0b3",
                                "2.Control" = "#f19cac",
@@ -1111,17 +1107,20 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
 scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   
 # x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
-  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
-  annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
+  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
   
   # t-test
   stat_compare_means(
     method = "t.test", 
+    test.arg = list(paired = FALSE),
     label = "p.format", # p.signif does the stars, p.format shows the p-value
     comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
-    size = 5
+    textsize = 5
 ) + 
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
 
   guides(fill = "none", color = "none")
 
@@ -1148,7 +1147,7 @@ female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
 # the boxes
   geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
                alpha = 0.6, 
-               color = "black",
+               color = "black", # get rid of if want the dark colour to be the outline
 # outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
                outlier.shape = NA, 
                width = 0.5, 
@@ -1178,17 +1177,20 @@ female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
 scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   
 # x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
-  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
-  annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
+  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
   
   # t-test
   stat_compare_means(
     method = "t.test", 
+    test.arg = list(paired = FALSE),
     label = "p.format", # p.signif does the stars, p.format shows the p-value
     comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
-    size = 5
+    textsize = 5
 ) + 
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
 
   guides(fill = "none", color = "none")
 
@@ -1216,6 +1218,7 @@ female_baseline_PPR_plot <- PPR_plot_df %>%
 # the boxes
   geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
                alpha = 0.6, 
+               color = "black", # get rid of if want the dark colour to be the outline
 # outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
                outlier.shape = NA, 
                width = 0.5, 
@@ -1245,17 +1248,22 @@ female_baseline_PPR_plot <- PPR_plot_df %>%
 scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   
 # x-axis subtitles  
-  annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
-  annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
-  annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
   
   # t-test
   stat_compare_means(
     method = "t.test", 
+    test.arg = list(paired = FALSE),
     label = "p.format", # p.signif does the stars, p.format shows the p-value
     comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
-    size = 5
+    textsize = 5
 ) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+  
+  patchclampplotteR_theme() +
 
   guides(fill = "none", color = "none") 
 
@@ -1319,23 +1327,7 @@ PPR_df <- make_PPR_data(
 )
 PPR_df
 ```
-PPR multiple treatments for acute FEMALES
-```{r}
-plot_PPR_data_multiple_treatments(
-  data = PPR_df,
-  include_all_treatments = "yes",
-  included_sexes = "female",
-  plot_category = 2,
-  baseline_label = "Baseline",
-  post_hormone_label = "HFS",
-  test_type = "t.test",
-  # significance_display_method = "stars",
-  geom_signif_family = "",
-  theme_options = my_theme_options,
-  treatment_colour_theme = my_theme_colours,
-  save_plot_png = "no"
-)
-```
+
 female vs male acute PPR HFS
 ```{r}
 plot_PPR_data_single_treatment(
@@ -1357,6 +1349,7 @@ plot_PPR_data_single_treatment(
 # sig increase in the PPR after HFS
 # higher PPR means lower probability of release
 ```
+
 female vs male naive PPR HFS
 ```{r}
 plot_PPR_data_single_treatment(
@@ -2032,5 +2025,102 @@ female_acute_PPR_plot
 
 #ggsave(female_acute_PPR_plot, path = here("Figures"), file = "female_acute_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+### PPR with ALL SEXES AND TREATMENTS
+```{r}
+#1 facet labels
+  facet_labels <- c(
+    "1.Control.Female" = "Female Naive",
+    "1.Control.Male" = "Male Naive",
+    "2.Control.Female" = "Female Acute",
+    "2.Control.Male" = "Male Acute",
+    "2.AM251.Female" = "Acute with AM251",
+    "3.Control.Female" = "Female Repeated",
+    "3.Control.Male" = "Male Repeated")
 
+#2 making the data frame for individual cells
+PPR_plot_df <- PPR_df %>%
+  filter(state %in% c("Baseline", "Post-modification")) %>% 
+  mutate(
+    state = ifelse(state == "Post-modification", "HFS", state)) %>% # rename to HFS
+ mutate(facet_group = factor(interaction(category, treatment, sex),
+                              levels = names(facet_labels))) %>%
+  group_by(letter, state, category, treatment, sex, facet_group) %>%
+  summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
+   
+#3 plot
+PPR_plot <- PPR_plot_df %>%
+  ggplot(aes(x = state, y = mean_PPR_cell)) + 
 
+# individual  cells  
+  geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) + 
+  
+# group mean
+  stat_summary(aes(group = 1, colour = interaction(category, treatment)),
+               fun.data = mean_se,
+               geom = "line",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1,shape = sex,colour = interaction(category, treatment)),
+    fun.data = mean_se,
+    geom = "point",
+    size = 2.5
+  ) +  
+ 
+# colours and shapes
+  scale_colour_manual(values = c(
+    "1.Control" = "#f5e0b3", # or "darkgrey"
+    "2.Control" = "#f19cac",
+    "2.AM251" = "#FFADFF",
+    "3.Control" = "#6497b1"
+  )) +
+scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
+  
+# facet with labels and order
+  facet_wrap(~ facet_group, labeller = as_labeller(facet_labels), nrow = 2) +
+  
+# add significance brackets
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    test = "t.test",
+    test.args = list(paired = TRUE),
+    map_signif_level = function(p)
+        if (p <= 0.0001) {
+          return("****")
+        } else {
+          if (p <= 0.001) {
+            return("***")
+          } else {
+            if (p <= 0.01) {
+              return("**")
+            } else {
+              if (p <= 0.05) {
+                return("*")
+              } else {
+                if (p < 0.1 & p > 0.05) {
+                  return(signif(p, 3))
+                } else {
+                  return("ns")
+                }
+              }
+            }
+          }
+        }
+, # or TRUE for stars, # FALSE for values
+    vjust = -0.3,
+    textsize = 5,
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+  
+# expand y-axis so the brackets don't overlap with labels
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+PPR_plot
+```
