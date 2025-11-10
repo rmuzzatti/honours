@@ -1852,11 +1852,6 @@ female_PPR_plot_df <- PPR_df %>%
                               levels = names(facet_labels))) %>%
   group_by(letter, state, category, treatment, sex, facet_group) %>%
   summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
-
-# group means
-female_PPR_group_mean <- female_PPR_plot_df %>%
-  group_by(state, category, treatment, sex, facet_group) %>%
-  summarize(mean_PPR_group = mean(mean_PPR_cell, na.rm = TRUE), .groups = "drop")
    
 #4 plot
 female_PPR_plot <- female_PPR_plot_df %>%
@@ -1867,12 +1862,16 @@ female_PPR_plot <- female_PPR_plot_df %>%
   geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) + 
   
 # group mean
-  geom_line(data = female_PPR_group_mean,
-    aes(x = state, y = mean_PPR_group, group = 1, colour = interaction(category, treatment)),
-    linewidth = 1.2, inherit.aes = FALSE) +
-  geom_point(data = female_PPR_group_mean,
-    aes(x = state, y = mean_PPR_group, colour = interaction(category, treatment), shape = sex),
-    size = 2.5, inherit.aes = FALSE) +  
+  stat_summary(aes(group = 1, colour = interaction(category, treatment)),
+               fun.data = mean_se,
+               geom = "line",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1,shape = sex,colour = interaction(category, treatment)),
+    fun.data = mean_se,
+    geom = "point",
+    size = 2.5
+  ) +  
  
 # colours and shapes
   scale_colour_manual(values = c(
@@ -1953,27 +1952,26 @@ female_acute_PPR_plot_df <- PPR_df %>%
                               levels = names(facet_labels))) %>%
   group_by(letter, state, category, treatment, sex, facet_group) %>%
   summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
-
-# group means
-female_acute_PPR_group_mean <- female_acute_PPR_plot_df %>%
-  group_by(state, category, treatment, sex, facet_group) %>%
-  summarize(mean_PPR_group = mean(mean_PPR_cell, na.rm = TRUE), .groups = "drop")
    
 #4 plot
 female_acute_PPR_plot <- female_acute_PPR_plot_df %>%
-  ggplot(aes(x = state, y = mean_PPR_cell)) + # removing group = letter fixed the brackets but got rid of the gray lines between cells (letters)
+  ggplot(aes(x = state, y = mean_PPR_cell)) + 
 
 # individual  cells  
   geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
   geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) + 
   
 # group mean
-  geom_line(data = female_acute_PPR_group_mean,
-    aes(x = state, y = mean_PPR_group, group = 1, colour = interaction(category, treatment)),
-    linewidth = 1.2, inherit.aes = FALSE) +
-  geom_point(data = female_acute_PPR_group_mean,
-    aes(x = state, y = mean_PPR_group, colour = interaction(category, treatment), shape = sex),
-    size = 2.5, inherit.aes = FALSE) +  
+  stat_summary(aes(group = 1, colour = interaction(category, treatment)),
+               fun.data = mean_se,
+               geom = "line",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1,shape = sex,colour = interaction(category, treatment)),
+    fun.data = mean_se,
+    geom = "point",
+    size = 2.5
+  ) +   
  
 # colours and shapes
   scale_colour_manual(values = c(
