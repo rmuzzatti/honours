@@ -1860,7 +1860,7 @@ female_PPR_group_mean <- female_PPR_plot_df %>%
    
 #4 plot
 female_PPR_plot <- female_PPR_plot_df %>%
-  ggplot(aes(x = state, y = mean_PPR_cell)) + # removing group = letter fixed the brackets but got rid of the gray lines between cells (letters)
+  ggplot(aes(x = state, y = mean_PPR_cell)) + 
 
 # individual  cells  
   geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
@@ -1931,7 +1931,7 @@ scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
 
 female_PPR_plot
 
-#ggsave(female_PPR_plot, path = here("Figures"), file = "female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(female_PPR_plot, path = here("Figures"), file = "female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 PPR female plot without repeated
@@ -2030,6 +2030,8 @@ scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
   theme(legend.position = "none")  # remove legend
 
 female_acute_PPR_plot
+
+#ggsave(female_acute_PPR_plot, path = here("Figures"), file = "female_acute_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 
