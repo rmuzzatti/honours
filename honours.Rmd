@@ -2119,7 +2119,4 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   guides(fill = "none", color = "none") 
 
 female_baseline_PPR_plot
-
-# ggsave(female_baseline_PPR_plot, path = here("Figures"), file = "female_PPR_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-
 ```
