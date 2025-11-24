@@ -1701,7 +1701,10 @@ PPR_plot
 ```{r}
 # data
 female_baseline_PPR_plot <- PPR_plot_df %>%
-  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251")) %>% 
+  filter(sex == "Female" & 
+           category %in% c(1,2) & 
+           treatment %in% c("Control","AM251") & 
+  state=="Baseline")  %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
     levels = c("1.Control", "2.Control", "2.AM251")
