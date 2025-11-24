@@ -686,7 +686,7 @@ naive_summary_plot <- plot_summary_current_data(
 naive_summary_plot
 
 # saving as png to figure folder
-ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(naive_summary_plot, path = here("Figures"), file = "naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Naive MALE Summary:
@@ -716,7 +716,7 @@ male_naive_summary_plot <- plot_summary_current_data(
 
 male_naive_summary_plot
 
-ggsave(male_naive_summary_plot, path = here("Figures"), file = "male_naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(male_naive_summary_plot, path = here("Figures"), file = "male_naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Acute FEMALE Summary:
@@ -1126,7 +1126,7 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
 
 female_baseline_amp_plot
 
-ggsave(female_baseline_amp_plot, path = here("Figures"), file = "female_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(female_baseline_amp_plot, path = here("Figures"), file = "female_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 
 ```
 eEPSC amplitude after the HFS (25-30 min)
@@ -1693,7 +1693,7 @@ plot_PPR_data_single_treatment(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 ```
 ```{r}
@@ -1711,7 +1711,7 @@ plot_PPR_data_single_treatment(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 ```
 ```{r}
@@ -1729,7 +1729,7 @@ plot_PPR_data_single_treatment(
   large_axis_text = "no",
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
-  save_plot_png = "yes"
+  save_plot_png = "no"
 )
 ```
 
