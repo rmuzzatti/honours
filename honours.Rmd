@@ -868,6 +868,9 @@ female_stress_plot <- pruned_eEPSC_df$all_cells %>%
   )
 
 female_stress_plot
+
+# ggsave(female_stress_plot, path = here("Figures"), file = "female_stress_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+
 ```
 
 
@@ -1026,6 +1029,9 @@ male_repeated_summary_plot <- plot_summary_current_data(
 ) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
 
 male_repeated_summary_plot
+
+# ggsave(male_repeated_summary_plot, path = here("Figures"), file = "male_repeated_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+
 ```
 
 
@@ -1770,6 +1776,9 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   guides(fill = "none", color = "none") 
 
 female_baseline_PPR_plot
+
+# ggsave(female_baseline_PPR_plot, path = here("Figures"), file = "female_baseline_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+
 ```
 
 
@@ -1833,8 +1842,6 @@ plot_AP_frequencies_single_treatment(
   theme_options = my_theme_options,
   save_plot_png = "no"
 )
-
-# why is baseline one less? I checked and they all have some APs eventually
 ```
 
 ## AP Amplitude
