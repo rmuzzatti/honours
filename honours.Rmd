@@ -1232,7 +1232,7 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
     method = "t.test", 
     test.arg = list(paired = FALSE),
     label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
+    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251"), c("2.Control", "2.AM251")), # not sure if this is accurate...
     textsize = 5
 ) + 
   
@@ -1370,7 +1370,7 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
     method = "t.test", 
     test.arg = list(paired = FALSE),
     label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
+    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251"), c("2.AM251", "2.Control")), 
     textsize = 5
 ) + 
   
@@ -1379,43 +1379,6 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   guides(fill = "none", color = "none")
 
 female_HFS_amp_plot
-```
-
-## Evoked Analysis
-### Percent Change
-percent change in amplitude during starting interval (baseline) vs ending
-```{r}
-plot_percent_change_comparisons(
-  data = summary_eEPSC_df$percent_change_data,
-  plot_category = 2,
-  current_type = "eEPSC",
-  y_variable = "amplitude",
-  include_all_treatments = "yes",
-  list_of_treatments = NULL,
-  included_sexes = "female",
-  male_label = "Male",
-  female_label = "Female",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
-```
-```{r}
-plot_percent_change_comparisons(
-  data = summary_eEPSC_df$percent_change_data,
-  plot_category = 1,
-  current_type = "eEPSC",
-  y_variable = "amplitude",
-  include_all_treatments = "yes",
-  list_of_treatments = NULL,
-  included_sexes = "both",
-  # facet_by_sex = "yes",
-  male_label = "Male",
-  female_label = "Female",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
 ```
 
 ## PPR
