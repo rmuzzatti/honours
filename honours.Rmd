@@ -2340,51 +2340,6 @@ cv_comparison_naive_plot
 vmr_comparison_naive_plot
 ```
 
-## ANOVA for summary ?
-```{r}
-# creating data frame from PRUNED data
-
-female_anova_df <- pruned_eEPSC_df$individual_cells %>%
-  filter(sex == "Female") %>% 
-  mutate(group = interaction(category, treatment, drop=TRUE))
-```
-
-```{r}
-# make sure it is as a factor
-female_anova_df <- female_anova_df %>%
-  mutate(
-    letter = factor(letter),
-    interval_pruned   = factor(interval_pruned),
-    group  = factor(group)
-  )
-
-# there should be 4 groups: naive, acute, acute+AM251, repeated
-```
-
-```{r}
-library(afex)
-
-female_anova <- aov_ez(
-  id      = "letter",
-  dv      = "mean_P1",
-  data    = female_anova_df,
-  within  = "interval_pruned",
-  between = "group",
-  type    = 3
-) # why is TYPE 3?
-
-female_anova
-```
-```{r}
-# normality on residuals
-resid_female_anova <- residuals(female_anova$lm)
-
-qqnorm(resid_female_anova)
-qqline(resid_female_anova)
-
-shapiro.test(resid_female_anova)
-```
-
 ## ANOVA for Baseline eEPSC
 ```{r}
 # data frame
@@ -2719,3 +2674,27 @@ female_HFS_PPR_anova_plot <- ggplot(df_HFS, aes(x = cat_treat, y = mean_PPR_cell
 
 female_HFS_PPR_anova_plot
 ```
+
+## Repeated Measures ANOVA for naive
+```{r}
+# convert to long
+
+library(tidyr)
+library(dplyr)
+
+df_long <- summary_eEPSC_df$percent_change_data %>%
+  pivot_longer(
+    cols = c(t0to5, t5to10, t10to15, t15to20, t20to25, t25to30),  # ONLY the time columns
+    names_to = "time",         # new column for time window
+    values_to = "time_value"   # new column for the corresponding value of that time window
+  ) %>%
+  select(letter, category, sex, treatment, time, time_value, percent_change) %>%
+  mutate(
+    time = factor(time, levels = c("t0to5","t5to10","t10to15","t15to20","t20to25","t25to30"))
+  )
+
+
+# filtering for each group individually
+
+```
+
