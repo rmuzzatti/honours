@@ -2340,5 +2340,382 @@ cv_comparison_naive_plot
 vmr_comparison_naive_plot
 ```
 
+## ANOVA for summary ?
+```{r}
+# creating data frame from PRUNED data
+
+female_anova_df <- pruned_eEPSC_df$individual_cells %>%
+  filter(sex == "Female") %>% 
+  mutate(group = interaction(category, treatment, drop=TRUE))
+```
+
+```{r}
+# make sure it is as a factor
+female_anova_df <- female_anova_df %>%
+  mutate(
+    letter = factor(letter),
+    interval_pruned   = factor(interval_pruned),
+    group  = factor(group)
+  )
+
+# there should be 4 groups: naive, acute, acute+AM251, repeated
+```
+
+```{r}
+library(afex)
+
+female_anova <- aov_ez(
+  id      = "letter",
+  dv      = "mean_P1",
+  data    = female_anova_df,
+  within  = "interval_pruned",
+  between = "group",
+  type    = 3
+) # why is TYPE 3?
+
+female_anova
+```
+```{r}
+# normality on residuals
+resid_female_anova <- residuals(female_anova$lm)
+
+qqnorm(resid_female_anova)
+qqline(resid_female_anova)
+
+shapiro.test(resid_female_anova)
+```
+
+## ANOVA for Baseline eEPSC
+```{r}
+# data frame
+female_amp_df <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251")) %>% 
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  ))
+
+female_amp_df
+```
+```{r}
+# assumptions
+
+library(car)
+leveneTest(t0to5 ~ cat_treat, data = female_amp_df)
+# variances are homogeneous
+```
 
 
+
+```{r}
+# one-way ANOVA
+female_baseline_amp_anova <- aov(t0to5 ~ cat_treat, data = female_amp_df)
+summary(female_baseline_amp_anova)
+```
+
+```{r}
+# residuals
+female_baseline_amp_anova_residuals <- residuals(female_baseline_amp_anova)
+
+# check normality of residuals
+shapiro.test(female_baseline_amp_anova_residuals)
+# not normal
+
+hist(female_baseline_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(female_baseline_amp_anova_residuals)
+qqline(female_baseline_amp_anova_residuals, col = "red")
+
+```
+```{r}
+# non-parametric Kruskal-Wallis
+
+kruskal.test(t0to5 ~ cat_treat, data = female_amp_df)
+```
+
+```{r}
+library(ggplot2)
+library(ggforce)   # for geom_sina
+library(ggpubr)    # optional, for stat_compare_means
+
+fill_colors <- c(
+  "1.Control" = "#f5e0b3",
+  "2.Control" = "#f19cac",
+  "2.AM251"   = "#ffadff",
+  "3.Control" = "#6497b1"
+)
+
+line_colors <- c(
+  "1.Control" = "#ecc479",
+  "2.Control" = "#eb647e",
+  "2.AM251"   = "#c11c84",
+  "3.Control" = "#005b96"
+)
+
+# Plot
+female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t0to5)) +
+  
+  # theme
+  patchclampplotteR_theme() +
+  
+  # Boxplots
+  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
+               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
+  
+  # Sina (jittered) points
+  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
+  
+  # Colors
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = line_colors) +
+  
+  # X-axis labels
+  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
+  
+  # Axis labels
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+
+  # Remove legend
+  guides(fill = "none", color = "none")
+
+female_baseline_amp_anova_plot
+```
+
+## ANOVA for post HFS eEPSC
+```{r}
+# using same data frame as earlier, already know variances are homogeneous
+
+# one-way ANOVA
+female_HFS_amp_anova <- aov(t25to30 ~ cat_treat, data = female_amp_df)
+summary(female_HFS_amp_anova)
+```
+
+```{r}
+# residuals
+female_HFS_amp_anova_residuals <- residuals(female_HFS_amp_anova)
+
+# check normality of residuals
+shapiro.test(female_HFS_amp_anova_residuals)
+# not normal
+
+hist(female_HFS_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(female_HFS_amp_anova_residuals)
+qqline(female_HFS_amp_anova_residuals, col = "red")
+```
+
+```{r}
+# non-parametric Kruskal-Wallis
+
+kruskal.test(t25to30 ~ cat_treat, data = female_amp_df)
+```
+
+```{r}
+fill_colors <- c(
+  "1.Control" = "#f5e0b3",
+  "2.Control" = "#f19cac",
+  "2.AM251"   = "#ffadff",
+  "3.Control" = "#6497b1"
+)
+
+line_colors <- c(
+  "1.Control" = "#ecc479",
+  "2.Control" = "#eb647e",
+  "2.AM251"   = "#c11c84",
+  "3.Control" = "#005b96"
+)
+
+# Plot
+female_HFS_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t25to30)) +
+  
+  # theme
+  patchclampplotteR_theme() +
+  
+  # Boxplots
+  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
+               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
+  
+  # Sina (jittered) points
+  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
+  
+  # Colors
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = line_colors) +
+  
+  # X-axis labels
+  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
+  
+  # Axis labels
+  labs(x = NULL, y = "Final eEPSC Amplitude (pA)") +
+
+  # Remove legend
+  guides(fill = "none", color = "none")
+
+female_HFS_amp_anova_plot
+```
+
+## ANOVA for Baseline PPR
+```{r}
+# data frame
+female_PPR_df <- PPR_plot_df %>%
+  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251")) %>% 
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  ))
+
+female_PPR_df
+```
+
+```{r}
+# assumptions
+
+library(car)
+leveneTest(mean_PPR_cell ~ cat_treat, data = female_PPR_df)
+# variances are homogeneous
+```
+
+```{r}
+# anova
+
+female_baseline_PPR_anova <- aov(mean_PPR_cell ~ cat_treat, data = female_PPR_df %>% filter(state == "Baseline"))
+
+summary(female_baseline_PPR_anova)
+```
+
+```{r}
+# residuals
+female_baseline_PPR_anova_residuals <- residuals(female_baseline_PPR_anova)
+
+# check normality of residuals
+shapiro.test(female_baseline_PPR_anova_residuals)
+
+hist(female_baseline_PPR_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(female_baseline_PPR_anova_residuals)
+qqline(female_baseline_PPR_anova_residuals, col = "red")
+
+# NORMAL !!
+```
+
+```{r}
+fill_colors <- c(
+  "1.Control" = "#f5e0b3",
+  "2.Control" = "#f19cac",
+  "2.AM251"   = "#ffadff",
+  "3.Control" = "#6497b1"
+)
+
+line_colors <- c(
+  "1.Control" = "#ecc479",
+  "2.Control" = "#eb647e",
+  "2.AM251"   = "#c11c84",
+  "3.Control" = "#005b96"
+)
+
+df_baseline <- female_PPR_df %>% filter(state == "Baseline")
+
+# Plot
+female_baseline_PPR_anova_plot <- ggplot(df_baseline, aes(x = cat_treat, y = mean_PPR_cell)) +
+  
+  # theme
+  patchclampplotteR_theme() +
+  
+  # Boxplots
+  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
+               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
+  
+  # Sina (jittered) points
+  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
+  
+  # Colors
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = line_colors) +
+  
+  # X-axis labels
+  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
+  
+  # Axis labels
+  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
+  
+  stat_compare_means(method = "anova", label.y = max(df_baseline$mean_PPR_cell) + 0.5) + 
+
+
+  # Remove legend
+  guides(fill = "none", color = "none")
+
+female_baseline_PPR_anova_plot
+```
+
+## ANOVA for post HFS PPR
+```{r}
+# using same data frame as earlier, already know variances are homogeneous
+
+female_HFS_PPR_anova <- aov(mean_PPR_cell ~ cat_treat, data = female_PPR_df %>% filter(state == "HFS"))
+
+summary(female_HFS_PPR_anova)
+```
+
+```{r}
+# residuals
+female_HFS_PPR_anova_residuals <- residuals(female_HFS_PPR_anova)
+
+# check normality of residuals
+shapiro.test(female_HFS_PPR_anova_residuals)
+
+hist(female_HFS_PPR_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(female_HFS_PPR_anova_residuals)
+qqline(female_HFS_PPR_anova_residuals, col = "red")
+
+# NORMAL !!
+```
+
+```{r}
+fill_colors <- c(
+  "1.Control" = "#f5e0b3",
+  "2.Control" = "#f19cac",
+  "2.AM251"   = "#ffadff",
+  "3.Control" = "#6497b1"
+)
+
+line_colors <- c(
+  "1.Control" = "#ecc479",
+  "2.Control" = "#eb647e",
+  "2.AM251"   = "#c11c84",
+  "3.Control" = "#005b96"
+)
+
+df_HFS <- female_PPR_df %>% filter(state == "HFS")
+
+# Plot
+female_HFS_PPR_anova_plot <- ggplot(df_HFS, aes(x = cat_treat, y = mean_PPR_cell)) +
+  
+  # theme
+  patchclampplotteR_theme() +
+  
+  # Boxplots
+  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
+               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
+  
+  # Sina (jittered) points
+  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
+  
+  # Colors
+  scale_fill_manual(values = fill_colors) +
+  scale_color_manual(values = line_colors) +
+  
+  # X-axis labels
+  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
+  
+  # Axis labels
+  labs(x = NULL, y = "Final Paired Pulse Ratio") +
+  
+  stat_compare_means(method = "anova", label.y = max(df_HFS$mean_PPR_cell) + 0.5) + 
+
+
+  # Remove legend
+  guides(fill = "none", color = "none")
+
+female_HFS_PPR_anova_plot
+```
