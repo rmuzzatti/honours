@@ -2448,9 +2448,18 @@ female_baseline_amp_anova_plot
 ```
 
 ## ANOVA for post HFS eEPSC
-```{r}
-# using same data frame as earlier, already know variances are homogeneous
 
+```{r}
+# assumptions
+
+leveneTest(t25to30 ~ cat_treat, data = female_amp_df)
+# variances are homogeneous
+
+leveneTest(log_t25to30 ~ cat_treat, data = female_amp_df)
+# variances are NOT homogeneous
+```
+
+```{r}
 # one-way ANOVA
 female_HFS_amp_anova <- aov(t25to30 ~ cat_treat, data = female_amp_df)
 summary(female_HFS_amp_anova)
