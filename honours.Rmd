@@ -2352,6 +2352,14 @@ female_amp_df <- summary_eEPSC_df$percent_change_data %>%
 
 female_amp_df
 ```
+
+```{r}
+# log transform amplitude data
+female_amp_df$log_t0to5 <- log(female_amp_df$t0to5)
+female_amp_df$log_t25to30 <- log(female_amp_df$t25to30)
+```
+
+
 ```{r}
 # assumptions
 
@@ -2513,7 +2521,7 @@ female_HFS_amp_anova_plot
 ```{r}
 # data frame
 female_PPR_df <- PPR_plot_df %>%
-  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251")) %>% 
+  filter(sex == "Female" & category %in% c(1,2, 3) & treatment %in% c("Control","AM251")) %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
     levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
@@ -2681,20 +2689,57 @@ female_HFS_PPR_anova_plot
 
 library(tidyr)
 library(dplyr)
+library(rstatix)
 
 df_long <- summary_eEPSC_df$percent_change_data %>%
   pivot_longer(
     cols = c(t0to5, t5to10, t10to15, t15to20, t20to25, t25to30),  # ONLY the time columns
     names_to = "time",         # new column for time window
     values_to = "time_value"   # new column for the corresponding value of that time window
-  ) %>%
-  select(letter, category, sex, treatment, time, time_value, percent_change) %>%
-  mutate(
+  ) %>% mutate(
     time = factor(time, levels = c("t0to5","t5to10","t10to15","t15to20","t20to25","t25to30"))
   )
+```
 
+```{r}
+# naive
+naive_anova <- df_long %>% 
+  filter(sex == "Female", category == 1, treatment == "Control") %>%
+  aov(time_value ~ time, data = .)
 
-# filtering for each group individually
+anova(naive_anova)
+summary(naive_anova)
+```
 
+```{r}
+# naive residuals
+
+naive_anova.resid <- resid(naive_anova)  
+qqnorm(naive_anova.resid)
+qqline(naive_anova.resid, col="red")
+shapiro.test(naive_anova.resid)
+
+# NOT NORMAL
+```
+
+```{r}
+# acute
+acute_anova <- df_long %>% 
+  filter(sex == "Female", category == 2, treatment == "Control") %>%
+  aov(time_value ~ time, data = .)
+
+anova(acute_anova)
+summary(acute_anova)
+```
+```{r}
+# acute residuals
+
+acute_anova.resid <- resid(acute_anova)  
+qqnorm(acute_anova.resid)
+qqline(acute_anova.resid, col="red")
+shapiro.test(acute_anova.resid)
+hist(acute_anova.resid)
+
+# NOT NORMAL
 ```
 
