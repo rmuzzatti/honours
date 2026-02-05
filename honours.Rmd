@@ -2366,6 +2366,9 @@ female_amp_df$log_t25to30 <- log(female_amp_df$t25to30)
 library(car)
 leveneTest(t0to5 ~ cat_treat, data = female_amp_df)
 # variances are homogeneous
+
+leveneTest(log_t0to5 ~ cat_treat, data = female_amp_df)
+# variances are homogeneous
 ```
 
 
