@@ -2082,10 +2082,10 @@ acute_female_AP_t.test_pvalue <- 0.01216
 ```{r}
 # visualize
 
-acute_female_AP_data_plot <- acute_female_AP_data[, c("letter", "state", "peak_amplitude")]
+acute_female_AP_plot <- acute_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 # plot
-acute_female_AP_plot <- acute_female_AP_data_plot_df %>%
+acute_female_AP_plot <- acute_female_AP_data_plot %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2160,7 +2160,7 @@ AM251_female_AP_data_plot <- AM251_female_AP_data[, c("letter", "state", "peak_a
 
 
 # plot
-AM251_female_AP_plot <- AM251_female_AP_data_plot_df %>%
+AM251_female_AP_plot <- AM251_female_AP_data %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2236,7 +2236,7 @@ repeated_female_AP_t.test_pvalue <- 0.004368
 repeated_female_AP_data_plot <- repeated_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 # plot
-repeated_female_AP_plot <- repeated_female_AP_data_plot_df %>%
+repeated_female_AP_plot <- repeated_female_AP_data %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
