@@ -2082,16 +2082,10 @@ acute_female_AP_t.test_pvalue <- 0.01216
 ```{r}
 # visualize
 
-# long format data
-acute_female_AP_data_plot_df <- data.frame(
-  letter = rep(acute_females, each = 2), # Repeat letters for both Baseline and HFS
-  state = rep(c("Baseline", "HFS"), times = length(acute_females)), # Create a column for the state
-  peak_amplitude = c(acute_female_baseline_AP_data, acute_female_HFS_AP_data) # Combine Baseline and HFS data
-)
-
+acute_female_AP_data_plot <- acute_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 # plot
-acute_female_AP_data_plot <- acute_female_AP_data_plot_df %>%
+acute_female_AP_plot <- acute_female_AP_data_plot_df %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2132,7 +2126,7 @@ acute_female_AP_data_plot <- acute_female_AP_data_plot_df %>%
   labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
   theme(legend.position = "none")  # remove legend
 
-acute_female_AP_data_plot
+acute_female_AP_plot
 ```
 
 #### AM251 Females 
@@ -2162,16 +2156,11 @@ AM251_female_AP_t.test_pvalue <- 0.1024
 ```{r}
 # visualize
 
-# long format data
-AM251_female_AP_data_plot_df <- data.frame(
-  letter = rep(AM251_females, each = 2), # Repeat letters for both Baseline and HFS
-  state = rep(c("Baseline", "HFS"), times = length(AM251_females)), # Create a column for the state
-  peak_amplitude = c(AM251_female_baseline_AP_data, AM251_female_HFS_AP_data) # Combine Baseline and HFS data
-)
+AM251_female_AP_data_plot <- AM251_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 
 # plot
-AM251_female_AP_data_plot <- AM251_female_AP_data_plot_df %>%
+AM251_female_AP_plot <- AM251_female_AP_data_plot_df %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2212,7 +2201,7 @@ AM251_female_AP_data_plot <- AM251_female_AP_data_plot_df %>%
   labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
   theme(legend.position = "none")  # remove legend
 
-AM251_female_AP_data_plot
+AM251_female_AP_plot
 ```
 
 #### Repeated Females 
@@ -2222,15 +2211,8 @@ repeated_females <- c("RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "R
 repeated_female_AP_data <- subset(AP_data, letter %in% repeated_females)
 
 
-repeated_female_baseline_AP_data <- subset(repeated_female_AP_data, state == "Baseline")[, c("letter", "peak_amplitude")]
-repeated_female_HFS_AP_data <- subset(repeated_female_AP_data, state == "HFS")[, c("letter", "peak_amplitude")]
-
-# Merge the two subsets by 'letter' to keep the correct pairing
-repeated_female_AP_data_plot_df <- merge(repeated_female_baseline_AP_data, 
-                                         repeated_female_HFS_AP_data, 
-                                         by = "letter", 
-                                         suffixes = c("_baseline", "_hfs"))
-
+repeated_female_baseline_AP_data <- subset(repeated_female_AP_data, state == "Baseline")$peak_amplitude
+repeated_female_HFS_AP_data <- subset(repeated_female_AP_data, state == "HFS")$peak_amplitude
 
 
 # difference needed for PAIRED t-test
@@ -2251,26 +2233,10 @@ repeated_female_AP_t.test_pvalue <- 0.004368
 ```{r}
 # visualize
 
-repeated_female_baseline_AP_data <- dplyr::select(repeated_female_baseline_AP_data, letter, peak_amplitude)
-repeated_female_HFS_AP_data <- dplyr::select(repeated_female_HFS_AP_data, letter, peak_amplitude)
-
-# Merge the two subsets by letter to keep the correct pairing
-repeated_female_AP_data_plot_df <- merge(repeated_female_baseline_AP_data, 
-                                         repeated_female_HFS_AP_data, 
-                                         by = "letter", 
-                                         suffixes = c("_baseline", "_hfs"))
-
-# Reshape to long format (one row per letter and state)
-repeated_female_AP_data_plot_df <- data.frame(
-  letter = rep(repeated_female_AP_data_plot_df$letter, each = 2),
-  state = rep(c("Baseline", "HFS"), times = nrow(repeated_female_AP_data_plot_df)),
-  peak_amplitude = c(repeated_female_AP_data_plot_df$peak_amplitude_baseline,
-                     repeated_female_AP_data_plot_df$peak_amplitude_hfs)
-)
-
+repeated_female_AP_data_plot <- repeated_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 # plot
-repeated_female_AP_data_plot <- repeated_female_AP_data_plot_df %>%
+repeated_female_AP_plot <- repeated_female_AP_data_plot_df %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2311,7 +2277,7 @@ repeated_female_AP_data_plot <- repeated_female_AP_data_plot_df %>%
   labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
   theme(legend.position = "none")  # remove legend
 
-repeated_female_AP_data_plot
+repeated_female_AP_plot
 ```
 
 ### Christelinda's
