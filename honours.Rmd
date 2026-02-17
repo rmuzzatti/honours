@@ -2004,6 +2004,30 @@ plot_AP_frequencies_multiple_treatments(
 )
 ```
 
+#### Acute Females 
+```{r}
+# data
+acute_freq_females <- c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10") 
+acute_female_AP_count_data <- subset(AP_count_data, letter %in% acute_freq_females)
+acute_female_AP_count_data
+
+
+acute_female_baseline_AP_count_data <- subset(acute_female_AP_count_data, state == "Baseline")$AP_frequency
+acute_female_HFS_AP_count_data <- subset(acute_female_AP_count_data, state == "HFS")$AP_frequency
+
+acute_female_count_AP_data_diff <- acute_female_baseline_AP_count_data - acute_female_HFS_AP_count_data
+
+
+# normality
+qqnorm(acute_female_count_AP_data_diff) 
+qqline(acute_female_count_AP_data_diff) 
+shapiro.test(acute_female_count_AP_data_diff) # NOT NORMAL
+
+t.test(acute_female_baseline_AP_data, acute_female_HFS_AP_data, paired = TRUE)
+
+# no idea how to have this consider current injection so I am done for the day (somehow need to get it to treat it simialr to letter but also across time idek)
+```
+
 ```{r}
 plot_AP_frequencies_single_treatment(
   data = AP_count_data, # 
