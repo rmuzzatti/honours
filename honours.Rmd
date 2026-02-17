@@ -2054,7 +2054,267 @@ plot_AP_frequencies_single_treatment(
 ```
 
 ## AP Amplitude
-AP Amplitude: Acute Females 
+### Mine
+
+#### Acute Females 
+```{r}
+# data
+acute_females <- c("RMA1", "RMA3", "RMA8", "RMA9", "RMA10") # remove RMA2, RMA4, RMA6 because they have a 0 value
+acute_female_AP_data <- subset(AP_data, letter %in% acute_females)
+
+
+acute_female_baseline_AP_data <- subset(acute_female_AP_data, state == "Baseline")$peak_amplitude
+acute_female_HFS_AP_data <- subset(acute_female_AP_data, state == "HFS")$peak_amplitude
+
+acute_female_AP_data_diff <- acute_female_baseline_AP_data-acute_female_HFS_AP_data
+
+
+# normality
+qqnorm(acute_female_AP_data_diff) 
+qqline(acute_female_AP_data_diff) 
+shapiro.test(acute_female_AP_data_diff) # normality test of difference variable
+# normal (when the cells with 0 amplitude are removed)
+
+t.test(acute_female_baseline_AP_data, acute_female_HFS_AP_data, paired = TRUE)
+
+acute_female_AP_t.test_pvalue <- 0.01216
+```
+```{r}
+# visualize
+
+# long format data
+acute_female_AP_data_plot_df <- data.frame(
+  letter = rep(acute_females, each = 2), # Repeat letters for both Baseline and HFS
+  state = rep(c("Baseline", "HFS"), times = length(acute_females)), # Create a column for the state
+  peak_amplitude = c(acute_female_baseline_AP_data, acute_female_HFS_AP_data) # Combine Baseline and HFS data
+)
+
+
+# plot
+acute_female_AP_data_plot <- acute_female_AP_data_plot_df %>%
+  ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
+  
+# individual cells
+  geom_point(aes(state), size = 1, colour = "lightgrey") + # or #f19cac
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1),
+               fun.data = mean_se,
+               geom = "line",
+               colour = "#eb647e",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1),
+    fun.data = mean_se,
+    geom = "point",
+    colour = "#eb647e",
+    size = 2.5
+  ) + 
+
+# bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,  
+    annotations = acute_female_AP_t.test_pvalue,  
+    vjust = -0.3,
+    textsize = 5,
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+
+# y-axis
+  scale_y_continuous(limits = c(0, 100)) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+acute_female_AP_data_plot
+```
+
+#### AM251 Females 
+```{r}
+# data
+AM251_females <- c("RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA10A") # remove RMA1A, RMA9A because they have a 0 value
+AM251_female_AP_data <- subset(AP_data, letter %in% AM251_females)
+
+
+AM251_female_baseline_AP_data <- subset(AM251_female_AP_data, state == "Baseline")$peak_amplitude
+AM251_female_HFS_AP_data <- subset(AM251_female_AP_data, state == "HFS")$peak_amplitude
+
+AM251_female_AP_data_diff <- AM251_female_baseline_AP_data-AM251_female_HFS_AP_data
+
+
+# normality
+qqnorm(AM251_female_AP_data_diff) 
+qqline(AM251_female_AP_data_diff) 
+shapiro.test(AM251_female_AP_data_diff) 
+# normal (when the cells with 0 amplitude are removed)
+
+t.test(AM251_female_baseline_AP_data, AM251_female_HFS_AP_data, paired = TRUE)
+
+AM251_female_AP_t.test_pvalue <- 0.1024
+```
+
+```{r}
+# visualize
+
+# long format data
+AM251_female_AP_data_plot_df <- data.frame(
+  letter = rep(AM251_females, each = 2), # Repeat letters for both Baseline and HFS
+  state = rep(c("Baseline", "HFS"), times = length(AM251_females)), # Create a column for the state
+  peak_amplitude = c(AM251_female_baseline_AP_data, AM251_female_HFS_AP_data) # Combine Baseline and HFS data
+)
+
+
+# plot
+AM251_female_AP_data_plot <- AM251_female_AP_data_plot_df %>%
+  ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
+  
+# individual cells
+  geom_point(aes(state), size = 1, colour = "lightgrey") + 
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1),
+               fun.data = mean_se,
+               geom = "line",
+               colour = "#C11C84",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1),
+    fun.data = mean_se,
+    geom = "point",
+    colour = "#C11C84",
+    size = 2.5
+  ) + 
+
+# bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,  
+    annotations = AM251_female_AP_t.test_pvalue,  
+    vjust = -0.3,
+    textsize = 5,
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+
+# y-axis
+  scale_y_continuous(limits = c(0, 100)) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+AM251_female_AP_data_plot
+```
+
+#### Repeated Females 
+```{r}
+# data
+repeated_females <- c("RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "RMR9", "RMR10") # none have 0 values
+repeated_female_AP_data <- subset(AP_data, letter %in% repeated_females)
+
+
+repeated_female_baseline_AP_data <- subset(repeated_female_AP_data, state == "Baseline")[, c("letter", "peak_amplitude")]
+repeated_female_HFS_AP_data <- subset(repeated_female_AP_data, state == "HFS")[, c("letter", "peak_amplitude")]
+
+# Merge the two subsets by 'letter' to keep the correct pairing
+repeated_female_AP_data_plot_df <- merge(repeated_female_baseline_AP_data, 
+                                         repeated_female_HFS_AP_data, 
+                                         by = "letter", 
+                                         suffixes = c("_baseline", "_hfs"))
+
+
+
+# difference needed for PAIRED t-test
+repeated_female_AP_data_diff <- repeated_female_baseline_AP_data-repeated_female_HFS_AP_data
+
+
+# normality
+qqnorm(repeated_female_AP_data_diff) 
+qqline(repeated_female_AP_data_diff) 
+shapiro.test(repeated_female_AP_data_diff) 
+# normal (when the cells with 0 amplitude are removed)
+
+t.test(repeated_female_baseline_AP_data, repeated_female_HFS_AP_data, paired = TRUE)
+
+repeated_female_AP_t.test_pvalue <- 0.004368
+```
+
+```{r}
+# visualize
+
+repeated_female_baseline_AP_data <- dplyr::select(repeated_female_baseline_AP_data, letter, peak_amplitude)
+repeated_female_HFS_AP_data <- dplyr::select(repeated_female_HFS_AP_data, letter, peak_amplitude)
+
+# Merge the two subsets by letter to keep the correct pairing
+repeated_female_AP_data_plot_df <- merge(repeated_female_baseline_AP_data, 
+                                         repeated_female_HFS_AP_data, 
+                                         by = "letter", 
+                                         suffixes = c("_baseline", "_hfs"))
+
+# Reshape to long format (one row per letter and state)
+repeated_female_AP_data_plot_df <- data.frame(
+  letter = rep(repeated_female_AP_data_plot_df$letter, each = 2),
+  state = rep(c("Baseline", "HFS"), times = nrow(repeated_female_AP_data_plot_df)),
+  peak_amplitude = c(repeated_female_AP_data_plot_df$peak_amplitude_baseline,
+                     repeated_female_AP_data_plot_df$peak_amplitude_hfs)
+)
+
+
+# plot
+repeated_female_AP_data_plot <- repeated_female_AP_data_plot_df %>%
+  ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
+  
+# individual cells
+  geom_point(aes(state), size = 1, colour = "lightgrey") + 
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1),
+               fun.data = mean_se,
+               geom = "line",
+               colour = "#005b96",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1),
+    fun.data = mean_se,
+    geom = "point",
+    colour = "#005b96",
+    size = 2.5
+  ) + 
+
+# bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,  
+    annotations = repeated_female_AP_t.test_pvalue,  
+    vjust = -0.3,
+    textsize = 5,
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+
+# y-axis
+  scale_y_continuous(limits = c(30, 80)) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+repeated_female_AP_data_plot
+```
+
+### Christelinda's
 ```{r}
 plot_AP_comparison(
   AP_data,
@@ -2375,7 +2635,7 @@ leveneTest(log_t0to5 ~ cat_treat, data = female_amp_df)
 
 ```{r}
 # one-way ANOVA
-female_baseline_amp_anova <- aov(t0to5 ~ cat_treat, data = female_amp_df)
+female_baseline_amp_anova <- aov(log_t0to5 ~ cat_treat, data = female_amp_df)
 summary(female_baseline_amp_anova)
 ```
 
@@ -2419,7 +2679,7 @@ line_colors <- c(
 )
 
 # Plot
-female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t0to5)) +
+female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = log_t0to5)) +
   
   # theme
   patchclampplotteR_theme() +
@@ -2439,13 +2699,21 @@ female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t
   scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
   
   # Axis labels
-  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+  labs(x = NULL, y = "log of Baseline eEPSC Amplitude (pA)") +
 
   # Remove legend
   guides(fill = "none", color = "none")
 
 female_baseline_amp_anova_plot
 ```
+```{r}
+# post hoc
+pairwise.t.test(female_amp_df$log_t0to5, female_amp_df$cat_treat, "none", data = female_amp_df) # no alpha level correction applied
+# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
+# you can run with alpha level of 0.05/3 = 0.015
+```
+
+
 
 ## ANOVA for post HFS eEPSC
 
@@ -2477,6 +2745,8 @@ hist(female_HFS_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
 
 qqnorm(female_HFS_amp_anova_residuals)
 qqline(female_HFS_amp_anova_residuals, col = "red")
+
+# log transforming made it not HoV so because HoV is more important I am going to do a non-parametric test instead 
 ```
 
 ```{r}
@@ -2528,6 +2798,7 @@ female_HFS_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t25to3
 
 female_HFS_amp_anova_plot
 ```
+
 
 ## ANOVA for Baseline PPR
 ```{r}
@@ -2621,6 +2892,14 @@ female_baseline_PPR_anova_plot <- ggplot(df_baseline, aes(x = cat_treat, y = mea
 
 female_baseline_PPR_anova_plot
 ```
+```{r}
+# post hoc
+
+pairwise.t.test(female_PPR_df$mean_PPR_cell, female_PPR_df$cat_treat, "none", data = female_PPR_df %>% filter(state == "Baseline")) # no alpha level correction applied
+# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
+# you can run with alpha level of 0.05/3 = 0.015
+```
+
 
 ## ANOVA for post HFS PPR
 ```{r}
@@ -2694,6 +2973,18 @@ female_HFS_PPR_anova_plot <- ggplot(df_HFS, aes(x = cat_treat, y = mean_PPR_cell
 
 female_HFS_PPR_anova_plot
 ```
+```{r}
+# post hoc
+
+pairwise.t.test(female_PPR_df$mean_PPR_cell, female_PPR_df$cat_treat, "none", data = female_PPR_df %>% filter(state == "HFS")) # no alpha level correction applied
+# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
+# you can run with alpha level of 0.05/3 = 0.015
+
+
+# same results as BL??
+```
+
+
 
 ## Repeated Measures ANOVA for naive
 ```{r}
