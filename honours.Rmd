@@ -27,6 +27,7 @@ library(car)
 library(ez)
 library(lme4)
 library(lmerTest)
+library(tidyr)
 ```
 ## Importing Data
 Importing Cell Characteristics
@@ -3101,7 +3102,7 @@ leveneTest(time_value ~ time, data = naive_summary_df)
 ```{r}
 # running anova
 
-naive_summary_df_anova <- ezANOVA(
+naive_summary_anova <- ezANOVA(
   data = naive_summary_df,
   dv = time_value,
   wid = letter,
@@ -3112,19 +3113,19 @@ naive_summary_df_anova <- ezANOVA(
   return_aov = T
 )
 
-print(naive_summary_df_anova)
+print(naive_summary_anova)
 # ignore warning about letter, it is already a factor
 ```
 
 ```{r}
 # normality of residuals
 
-naive_summary_df_anova_lm_model <- lm(time_value ~ time, data = naive_summary_df)
-naive_summary_df_anova_resid_vals <- residuals(naive_summary_df_anova_lm_model)
+naive_summary_anova_lm_model <- lm(time_value ~ time, data = naive_summary_df)
+naive_summary_anova_resid_vals <- residuals(naive_summary_anova_lm_model)
 
-qqnorm(naive_summary_df_anova_resid_vals)
-qqline(naive_summary_df_anova_resid_vals)
-shapiro.test(naive_summary_df_anova_resid_vals)
+qqnorm(naive_summary_anova_resid_vals)
+qqline(naive_summary_anova_resid_vals)
+shapiro.test(naive_summary_anova_resid_vals)
 # p is 0.01571 but its fine visually
 ```
 
