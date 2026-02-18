@@ -23,6 +23,10 @@ library(ggtext)
 library(ggforce)
 library(ggpubr)
 library(here)
+library(car)
+library(ez)
+library(lme4)
+library(lmerTest)
 ```
 ## Importing Data
 Importing Cell Characteristics
@@ -2023,7 +2027,7 @@ qqnorm(acute_female_count_AP_data_diff)
 qqline(acute_female_count_AP_data_diff) 
 shapiro.test(acute_female_count_AP_data_diff) # NOT NORMAL
 
-t.test(acute_female_baseline_AP_data, acute_female_HFS_AP_data, paired = TRUE)
+# t.test(acute_female_baseline_AP_count_data, acute_female_HFS_AP_data, paired = TRUE) # idk what is happening rn and i need to run everything else
 
 # no idea how to have this consider current injection so I am done for the day (somehow need to get it to treat it simialr to letter but also across time idek)
 ```
@@ -2109,7 +2113,7 @@ acute_female_AP_t.test_pvalue <- 0.01216
 acute_female_AP_plot <- acute_female_AP_data[, c("letter", "state", "peak_amplitude")]
 
 # plot
-acute_female_AP_plot <- acute_female_AP_data_plot %>%
+acute_female_AP_plot <- acute_female_AP_data %>%
   ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
   
 # individual cells
@@ -2303,6 +2307,89 @@ repeated_female_AP_plot <- repeated_female_AP_data %>%
 
 repeated_female_AP_plot
 ```
+#### ANOVA
+```{r}
+# making it into one data frame
+AP_amp_anova_data <- subset(AP_data, 
+                     letter %in% c(acute_females,
+                                   AM251_females,
+                                   repeated_females))
+
+# add group variable
+AP_amp_anova_data$group[AP_amp_anova_data$letter %in% acute_females] <- "acute"
+AP_amp_anova_data$group[AP_amp_anova_data$letter %in% AM251_females] <- "AM251"
+AP_amp_anova_data$group[AP_amp_anova_data$letter %in% repeated_females] <- "repeated"
+
+# treated as factors
+AP_amp_anova_data$group <- factor(AP_amp_anova_data$group)
+AP_amp_anova_data$state <- factor(AP_amp_anova_data$state)
+AP_amp_anova_data$letter <- factor(AP_amp_anova_data$letter)
+```
+
+```{r}
+# visualize
+
+AP_amp_anova_plot <- ggplot(AP_amp_anova_data, aes(x = group, y = peak_amplitude, fill = group)) +
+  geom_boxplot(alpha = 0.6, outlier.shape = NA) +
+  geom_jitter(aes(color = group), width = 0.15, size = 2, alpha = 0.8) +
+  facet_wrap(~ state) +
+  patchclampplotteR_theme() +
+  labs(y = "Peak Amplitude (pA)", x = NULL) +
+  theme(legend.position = "none") +
+  scale_fill_manual(values = c("acute" = "#f19cac",
+                               "AM251" = "#ffadff",
+                               "repeated" = "#6497b1")) +
+  
+  scale_color_manual(values = c("acute" = "#eb647e", 
+                                "AM251" = "#c11c84",
+                                "repeated" = "#005b96")) 
+
+AP_amp_anova_plot
+```
+```{r}
+# HoV
+
+leveneTest(AP_amp_anova_data$peak_amplitude, interaction(AP_amp_anova_data$state, AP_amp_anova_data$group))
+# no evidence to reject the null that variances are homogeneous
+```
+```{r}
+# running anova
+
+AP_amp_anova <- ezANOVA(
+  data = AP_amp_anova_data,
+  dv = peak_amplitude,
+  wid = letter,
+  within = state,
+  between = group,
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(AP_amp_anova)
+
+```
+
+```{r}
+# normality of residuals
+
+# linear model 
+AP_amp_anova_lm_model <- lm(peak_amplitude ~ group * state, data = AP_amp_anova_data)
+
+# Extract residuals
+resid.AP_amp_anova <- residuals(AP_amp_anova_lm_model)
+
+# Q-Q plot
+qqnorm(resid.AP_amp_anova)
+qqline(resid.AP_amp_anova)
+
+# Shapiro-Wilk test
+shapiro.test(resid.AP_amp_anova)
+
+# log transforming actually made it worse so gonna stick with slight devition form normality cause its fine
+```
+
+
 
 ### Christelinda's
 ```{r}
@@ -2975,15 +3062,9 @@ pairwise.t.test(female_PPR_df$mean_PPR_cell, female_PPR_df$cat_treat, "none", da
 ```
 
 
-
-## Repeated Measures ANOVA for naive
+## Repeated Measures ANOVA
 ```{r}
 # convert to long
-
-library(tidyr)
-library(dplyr)
-library(rstatix)
-
 df_long <- summary_eEPSC_df$percent_change_data %>%
   pivot_longer(
     cols = c(t0to5, t5to10, t10to15, t15to20, t20to25, t25to30),  # ONLY the time columns
@@ -2992,47 +3073,58 @@ df_long <- summary_eEPSC_df$percent_change_data %>%
   ) %>% mutate(
     time = factor(time, levels = c("t0to5","t5to10","t10to15","t15to20","t20to25","t25to30"))
   )
+
+
+# adding a column for group name
+summary_anova_df <- df_long %>%
+  mutate(group = case_when(
+    sex == "Female" & category == 1 & treatment == "Control" ~ "naive",
+    sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
+    sex == "Female" & category == 2 & treatment == "AM251" ~ "AM251",
+    sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated")))
+```
+
+### naive females
+```{r}
+# making a subset for just naive females
+naive_summary_df <- summary_anova_df %>%
+  filter(group == "naive")
+# both time (interval) and letter are as factor which is good
+
+
+# HoV
+leveneTest(time_value ~ time, data = naive_summary_df)
+# good
+```
+```{r}
+# running anova
+
+naive_summary_df_anova <- ezANOVA(
+  data = naive_summary_df,
+  dv = time_value,
+  wid = letter,
+  within = time,
+  # between = group,
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(naive_summary_df_anova)
+# ignore warning about letter, it is already a factor
 ```
 
 ```{r}
-# naive
-naive_anova <- df_long %>% 
-  filter(sex == "Female", category == 1, treatment == "Control") %>%
-  aov(time_value ~ time, data = .)
+# normality of residuals
 
-anova(naive_anova)
-summary(naive_anova)
-```
+naive_summary_df_anova_lm_model <- lm(time_value ~ time, data = naive_summary_df)
+naive_summary_df_anova_resid_vals <- residuals(naive_summary_df_anova_lm_model)
 
-```{r}
-# naive residuals
-
-naive_anova.resid <- resid(naive_anova)  
-qqnorm(naive_anova.resid)
-qqline(naive_anova.resid, col="red")
-shapiro.test(naive_anova.resid)
-
-# NOT NORMAL
-```
-
-```{r}
-# acute
-acute_anova <- df_long %>% 
-  filter(sex == "Female", category == 2, treatment == "Control") %>%
-  aov(time_value ~ time, data = .)
-
-anova(acute_anova)
-summary(acute_anova)
-```
-```{r}
-# acute residuals
-
-acute_anova.resid <- resid(acute_anova)  
-qqnorm(acute_anova.resid)
-qqline(acute_anova.resid, col="red")
-shapiro.test(acute_anova.resid)
-hist(acute_anova.resid)
-
-# NOT NORMAL
+qqnorm(naive_summary_df_anova_resid_vals)
+qqline(naive_summary_df_anova_resid_vals)
+shapiro.test(naive_summary_df_anova_resid_vals)
+# p is 0.01571 but its fine visually
 ```
 
