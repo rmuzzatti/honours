@@ -3128,3 +3128,131 @@ shapiro.test(naive_summary_df_anova_resid_vals)
 # p is 0.01571 but its fine visually
 ```
 
+### acute females
+```{r}
+# making a subset for just acute females
+acute_summary_df <- summary_anova_df %>%
+  filter(group == "acute")
+# both time (interval) and letter are as factor which is good
+
+
+# HoV
+leveneTest(time_value ~ time, data = acute_summary_df)
+# good
+```
+
+```{r}
+# running anova
+
+acute_summary_anova <- ezANOVA(
+  data = acute_summary_df,
+  dv = time_value,
+  wid = letter,
+  within = time,
+  # between = group,
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(acute_summary_anova)
+# ignore warning about letter, it is already a factor
+```
+
+```{r}
+# normality of residuals
+
+acute_summary_anova_lm_model <- lm(time_value ~ time, data = acute_summary_df)
+acute_summary_anova_resid_vals <- residuals(acute_summary_anova_lm_model)
+
+qqnorm(acute_summary_anova_resid_vals)
+qqline(acute_summary_anova_resid_vals)
+shapiro.test(acute_summary_anova_resid_vals)
+# log transform could do good
+```
+
+### acute with AM251 females
+```{r}
+# making a subset for just acute with AM251 females
+AM251_summary_df <- summary_anova_df %>%
+  filter(group == "AM251")
+# both time (interval) and letter are as factor which is good
+
+
+# HoV
+leveneTest(time_value ~ time, data = AM251_summary_df)
+# good
+```
+
+```{r}
+# running anova
+
+AM251_summary_anova <- ezANOVA(
+  data = AM251_summary_df,
+  dv = time_value,
+  wid = letter,
+  within = time,
+  # between = group,
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(AM251_summary_anova)
+# ignore warning about letter, it is already a factor
+```
+
+```{r}
+# normality of residuals
+
+AM251_summary_anova_lm_model <- lm(time_value ~ time, data = AM251_summary_df)
+AM251_summary_anova_resid_vals <- residuals(AM251_summary_anova_lm_model)
+
+qqnorm(AM251_summary_anova_resid_vals)
+qqline(AM251_summary_anova_resid_vals)
+shapiro.test(AM251_summary_anova_resid_vals)
+# log transform could do good here too
+```
+
+### repeated females
+```{r}
+# making a subset for just repeated females
+repeated_summary_df <- summary_anova_df %>%
+  filter(group == "repeated")
+# both time (interval) and letter are as factor which is good
+
+
+# HoV
+leveneTest(time_value ~ time, data = repeated_summary_df)
+# good
+```
+
+```{r}
+# running anova
+
+repeated_summary_anova <- ezANOVA(
+  data = repeated_summary_df,
+  dv = time_value,
+  wid = letter,
+  within = time,
+  # between = group,
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(repeated_summary_anova)
+# ignore warning about letter, it is already a factor
+```
+
+```{r}
+# normality of residuals
+
+repeated_summary_anova_lm_model <- lm(time_value ~ time, data = repeated_summary_df)
+repeated_summary_anova_resid_vals <- residuals(repeated_summary_anova_lm_model)
+
+qqnorm(repeated_summary_anova_resid_vals)
+qqline(repeated_summary_anova_resid_vals)
+shapiro.test(repeated_summary_anova_resid_vals)
+# log transform could do good here too
+```
