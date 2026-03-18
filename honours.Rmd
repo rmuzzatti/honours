@@ -106,6 +106,19 @@ add_new_cells(
 AP_data <- read.csv(here("Data/AP_parameters.csv"))
 ```
 
+```{r}
+# adding group column
+AP_data <- AP_data %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251" ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated")))
+```
+
+
 ## Theme and Colour Options
 defining my colour theme
 ```{r}
@@ -1180,6 +1193,26 @@ male_acute_summary_plot
 
 # ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+### overall summary percent change mean and SE
+```{r}
+female_percentchange_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  group_by(cat_treat) %>%  
+  summarise(
+    n = n(),
+    mean_percentchange = mean(percent_change, na.rm = TRUE),
+    sd_percentchange = sd(percent_change, na.rm = TRUE), 
+    se_percentchange = sd_percentchange / sqrt(n), 
+    .groups = "drop"  
+  )
+female_percentchange_eEPSC_summary
+```
+
+
 
 ## Baseline eEPSC
 ```{r}
@@ -1314,6 +1347,43 @@ female_baseline_control_amp_plot
 
 ```
 
+### eEPSC mean and SE
+```{r}
+female_baseline_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  group_by(cat_treat) %>%  
+  summarise(
+    n = n(),
+    mean_amplitude = mean(t0to5, na.rm = TRUE),
+    sd_amplitude = sd(t0to5, na.rm = TRUE), 
+    se_amplitude = sd_amplitude / sqrt(n), 
+    .groups = "drop"  
+  )
+female_baseline_eEPSC_summary
+
+female_HFS_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  group_by(cat_treat) %>%  
+  summarise(
+    n = n(),
+    mean_amplitude = mean(t25to30, na.rm = TRUE),
+    sd_amplitude = sd(t25to30, na.rm = TRUE), 
+    se_amplitude = sd_amplitude / sqrt(n), 
+    .groups = "drop"  
+  )
+female_HFS_eEPSC_summary
+```
+
+
+
 eEPSC amplitude after the HFS (25-30 min)
 ## post HFS eEPSC
 ```{r}
@@ -1399,7 +1469,40 @@ PPR_df <- make_PPR_data(
   treatment_colour_theme = my_theme_colours
 )
 PPR_df
+
+# add group column
+PPR_df <- PPR_df %>%
+  mutate(group = interaction(category, treatment, sep = ".", drop = TRUE))
 ```
+
+### PPR mean and averages
+```{r}
+# mean and SE output
+female_baseline_PPR_summary_df <- PPR_plot_df %>%
+  filter(sex == "Female", state == "Baseline") %>%
+  group_by(facet_group) %>%  
+  summarise(
+    n = n(),  
+    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE), 
+    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE), 
+    se_PPR = sd_PPR / sqrt(n), 
+    .groups = "drop"  # to remove the grouping structure in the result
+  )
+female_baseline_PPR_summary_df
+
+female_HFS_PPR_summary_df <- PPR_plot_df %>%
+  filter(sex == "Female", state == "HFS") %>%
+  group_by(facet_group) %>%  
+  summarise(
+    n = n(),  
+    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE), 
+    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE), 
+    se_PPR = sd_PPR / sqrt(n), 
+    .groups = "drop"  # to remove the grouping structure in the result
+  )
+female_HFS_PPR_summary_df
+```
+
 
 female vs male acute PPR HFS
 ```{r}
@@ -2009,29 +2112,51 @@ plot_AP_frequencies_multiple_treatments(
 )
 ```
 
-#### Acute Females 
+#### Mine 
 ```{r}
-# data
-acute_freq_females <- c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10") 
-acute_female_AP_count_data <- subset(AP_count_data, letter %in% acute_freq_females)
-acute_female_AP_count_data
+# data prep: adding group column
+AP_freq_df <- AP_count_data %>%
+  mutate(group = case_when(
+    sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
+    sex == "Female" & category == 2 & treatment == "AM251" ~ "AM251",
+    sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
+  )) %>%
+  mutate(group = factor(group, levels = c("acute", "AM251", "repeated")))
 
-
-acute_female_baseline_AP_count_data <- subset(acute_female_AP_count_data, state == "Baseline")$AP_frequency
-acute_female_HFS_AP_count_data <- subset(acute_female_AP_count_data, state == "HFS")$AP_frequency
-
-acute_female_count_AP_data_diff <- acute_female_baseline_AP_count_data - acute_female_HFS_AP_count_data
-
-
-# normality
-qqnorm(acute_female_count_AP_data_diff) 
-qqline(acute_female_count_AP_data_diff) 
-shapiro.test(acute_female_count_AP_data_diff) # NOT NORMAL
-
-# t.test(acute_female_baseline_AP_count_data, acute_female_HFS_AP_data, paired = TRUE) # idk what is happening rn and i need to run everything else
-
-# no idea how to have this consider current injection so I am done for the day (somehow need to get it to treat it simialr to letter but also across time idek)
+# letter and state need to be factors
+AP_freq_df$state <- factor(AP_freq_df$state)
+AP_freq_df$letter <- factor(AP_freq_df$letter)
+AP_freq_df$sweep <- factor(AP_freq_df$sweep)
 ```
+
+##### acute females
+```{r}
+# making the acute df
+acute_AP_freq_df <- AP_freq_df %>%
+  filter(group == "acute")
+
+# don't need to test for HoV because paired
+
+# anova
+acute_AP_freq_anova <- ezANOVA(
+  data = acute_AP_freq_df,
+  dv = AP_frequency,
+  wid = letter,
+  within = .(state, sweep),
+  type = 3,
+  detailed = T,
+  return_aov = T
+)
+
+print(acute_AP_freq_anova)
+```
+
+```{r}
+# normality of residuals
+# ???
+```
+
+
 
 ```{r}
 plot_AP_frequencies_single_treatment(
@@ -2041,7 +2166,7 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars", # could be "p-values" or "stars"
+  significance_display_method = "p-values", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions
@@ -2057,7 +2182,7 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars", # could be "p-values" or "stars"
+  significance_display_method = "p-values", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
   test_type = "wilcox.test", # need to test assumptions, can be "wilcox.test", "t.test", or "none"
@@ -2073,10 +2198,10 @@ plot_AP_frequencies_single_treatment(
   included_sexes = "female",
   baseline_label = "Baseline",
   hormone_added = "HFS",
-  significance_display_method = "stars", # could be "p-values" or "stars"
+  significance_display_method = "p-values", # could be "p-values" or "stars"
   treatment_colour_theme = my_theme_colours,
   large_axis_text = "no",
-  test_type = "none", # need to test assumptions, can be "wilcox.test", "t.test", or "none"
+  test_type = "wilcox.test", # need to test assumptions, can be "wilcox.test", "t.test", or "none"
   theme_options = my_theme_options,
   save_plot_png = "no"
 )
@@ -2156,6 +2281,8 @@ acute_female_AP_plot <- acute_female_AP_data %>%
   theme(legend.position = "none")  # remove legend
 
 acute_female_AP_plot
+
+# ggsave(acute_female_AP_plot, path = here("Figures"), file = "acute_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 #### AM251 Females 
@@ -2231,6 +2358,8 @@ AM251_female_AP_plot <- AM251_female_AP_data %>%
   theme(legend.position = "none")  # remove legend
 
 AM251_female_AP_plot
+
+# ggsave(AM251_female_AP_plot, path = here("Figures"), file = "AM251_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 #### Repeated Females 
@@ -2299,7 +2428,7 @@ repeated_female_AP_plot <- repeated_female_AP_data %>%
   ) +
 
 # y-axis
-  scale_y_continuous(limits = c(30, 80)) +
+  scale_y_continuous(limits = c(0, 100)) +
   
 # theme and titles
   patchclampplotteR_theme() +
@@ -2307,6 +2436,8 @@ repeated_female_AP_plot <- repeated_female_AP_data %>%
   theme(legend.position = "none")  # remove legend
 
 repeated_female_AP_plot
+
+# ggsave(repeated_female_AP_plot, path = here("Figures"), file = "repeated_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 #### ANOVA
 ```{r}
@@ -2391,9 +2522,8 @@ shapiro.test(resid.AP_amp_anova)
 ```
 
 
-
 ### Christelinda's
-```{r}
+```{r eval=FALSE}
 plot_AP_comparison(
   AP_data,
   plot_treatment = "Control",
@@ -2412,7 +2542,7 @@ plot_AP_comparison(
 )
 ```
 AP Amplitude: Acute Females with AM251
-```{r}
+```{r eval=FALSE}
 plot_AP_comparison(
   AP_data,
   plot_treatment = "AM251",
@@ -2432,7 +2562,7 @@ plot_AP_comparison(
 ```
 
 AP Amplitude: Repeated Females 
-```{r}
+```{r eval=FALSE}
 plot_AP_comparison(
   AP_data,
   plot_treatment = "Control",
@@ -3169,7 +3299,7 @@ acute_summary_anova_resid_vals <- residuals(acute_summary_anova_lm_model)
 qqnorm(acute_summary_anova_resid_vals)
 qqline(acute_summary_anova_resid_vals)
 shapiro.test(acute_summary_anova_resid_vals)
-# log transform could do good
+# its like 2 points pulling it, visually I'm taking it
 ```
 
 ### acute with AM251 females
