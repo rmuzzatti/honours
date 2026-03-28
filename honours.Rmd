@@ -2604,3 +2604,306 @@ female_HFS_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t25to3
 female_HFS_amp_anova_plot
 ```
 
+## Repeated Measures
+```{r}
+# convert to long
+df_female_long <- summary_eEPSC_df$percent_change_data %>% filter(sex=="Female") %>%
+  pivot_longer(
+    cols = c(t0to5, t5to10, t10to15, t15to20, t20to25, t25to30),  # ONLY the time columns
+    names_to = "time",         # new column for time window
+    values_to = "time_value"   # new column for the corresponding value of that time window
+  ) %>% mutate(
+    time = factor(time, levels = c("t0to5","t5to10","t10to15","t15to20","t20to25","t25to30")),
+group = case_when(
+      sex == "Female" & category == 1 & treatment == "Control" ~ "naive",
+      sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
+      sex == "Female" & category == 2 & treatment == "AM251"   ~ "AM251",
+      sex == "Female" & category == 3 & treatment == "Control" ~ "repeated"
+      ),
+    group = factor(group, levels = c("naive", "acute", "AM251", "repeated"))
+  ) %>% ungroup() %>% as.data.frame() %>% droplevels() %>%
+  filter(!is.na(group))
+
+df_female_long <- df_female_long %>% filter(! letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107")) # need to filter out neurons that are ONLY baselines (they are not repeated)
+```
+
+means and variances.
+```{r}
+library(tidyverse)
+df_female_long %>%
+  group_by(group, time) %>%
+  summarise(N = n(), mean=mean(time_value), var=var(time_value))
+# unlikely to have homogeneity of variances 
+```
+
+```{r}
+# eyeball interaction plot
+
+library(sciplot)
+df_female_long$time <- factor(df_female_long$time, levels=c("t0to5", "t5to10", "t10to15", "t15to20", "t20to25", "t25to30")) # telling it what order
+lineplot.CI(x.factor=time, response=time_value, group=group, xlab="Time Interval", ylab="eEPSC Amplitude (pA)", data=df_female_long) 
+
+# looks like an interaction for sure
+```
+
+```{r}
+library(nlme)
+# don't need letter/time because there are not multiple measurements (subsamples) for each letter (neuron) at each time interval
+
+# starting it off with imposed compound symmetry (assumes sphericity)
+project_model.cs = lme(time_value ~ group*time, data = df_female_long, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(project_model.cs) 
+```
+
+
+```{r, fig.width = 12, fig.height = 10}
+library(sjPlot) 
+plot_grid(plot_model(project_model.cs, type = "diag")) 
+# residuals don't look very normal
+# variance has a fan pattern
+# not passing assumptions
+```
+
+```{r}
+# actually testing for sphericity
+library(afex) 
+project_repmesanov <- aov_ez(
+  id = "letter",  
+  dv = "time_value",
+  data = df_female_long,
+  between = c("group"),
+  within = c("time"),
+  type = "III")  # type III because I probably have an interaction
+summary(project_repmesanov)
+anova(project_repmesanov)
+
+# FAILS SPHERICITY (Mauchly Test p-value was less than 0.05) -> want linear mixed model -> compound symmetry variance structure not appropriate
+```
+
+```{r}
+# failed sphericity -> can't use the model with compound symmetry imposed -> but still want to use a linear mixed model
+
+# still don't need letter/time because there are not multiple measurements (sub samples) for each letter (neuron) at each time interval
+
+
+# log transform
+df_female_long$log_time_value <- log(df_female_long$time_value)
+
+
+# log model with imposed compound symmetry
+log_project_model.cs = lme(log_time_value ~ group*time, data = df_female_long, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(log_project_model.cs) 
+
+
+# does the log model with imposed compound symmetry pass assumptions of sphericity
+library(afex) 
+log_project_repmesanov <- aov_ez(
+  id = "letter",  
+  dv = "log_time_value",
+  data = df_female_long,
+  between = c("group"),
+  within = c("time"),
+  type = "III")  # type III because I probably have an interaction
+summary(log_project_repmesanov)
+anova(log_project_repmesanov)
+
+# FAILS SPHERICITY (Mauchly Test p-value was less than 0.05... tiny bit better than before but still bad) -> compound symmetry variance structure not appropriate
+```
+
+
+```{r}
+# don't need letter/time because each letter was not measured multiple times at each time interval (because I already pruned them)
+
+# check for autocorrelation
+acf(resid(log_project_model.cs))
+# looks autocorrelated (bigger to smaller trend) -> try ar1 (autoregressive)
+
+log_project_model.ar1 = lme(log_time_value ~ group*time, data = df_female_long, random = ~1|letter, correlation=corAR1(form= ~1|letter))
+anova(log_project_model.ar1)
+anova(log_project_model.cs, log_project_model.ar1)
+
+# (autoregressive) ar1 structure is a better fit (lower AIC by 101)
+# significant effect of time (p < 0.0001) and of group*time interaction (p = 0.0083)
+# INTERACTION -> CANNOT DIRECTLY INTERPRET MAIN EFFECTS
+```
+
+```{r, fig.width = 12, fig.height = 10}
+# does this ar1 log model pass assumptions for a linear mixed model?
+
+plot_grid(plot_model(log_project_model.ar1, type = "diag")) 
+
+# want a p-value
+log_project_model.ar1.resid=resid(log_project_model.ar1)
+shapiro.test(log_project_model.ar1.resid) 
+```
+
+INTERACTION -> CANNOT DIRECTLY INTERPRET MAIN EFFECTS
+more interested in the effect of time WITHIN groups
+remove the between-subjects factor (group/treatment)
+
+```{r}
+library(emmeans)
+library(nlme) 
+
+# randomized block analysis for each group level
+
+
+# subset by group
+df_female_summary_naive <- df_female_long %>% filter(group == "naive")
+df_female_summary_acute <- df_female_long %>% filter(group == "acute")
+df_female_summary_AM251 <- df_female_long %>% filter(group == "AM251")
+df_female_summary_repeated <- df_female_long %>% filter(group == "repeated")
+```
+
+```{r}
+# naive
+ar1.project_naive.fit <- lme(
+  log_time_value ~ time,
+  random = ~1 | letter,
+  data = df_female_summary_naive,
+  correlation = corAR1(form= ~1|letter)
+)
+anova(ar1.project_naive.fit) # not significant (p = 0.093) -> don't need post hoc
+```
+
+```{r}
+# acute
+ar1.project_acute.fit <- lme(
+  log_time_value ~ time,
+  random = ~1 | letter,
+  data = df_female_summary_acute,
+  correlation = corAR1(form= ~1|letter)
+)
+anova(ar1.project_acute.fit) # significant effect of time (p = 1e-0.4) -> need post hoc
+
+
+# acute subset
+acute_t0to5_t5to10 <- subset(df_female_summary_acute, time=="t0to5" | time=="t5to10")
+acute_t0to5_t10to15 <- subset(df_female_summary_acute, time=="t0to5" | time=="t10to15")
+acute_t0to5_t15to20 <- subset(df_female_summary_acute, time=="t0to5" | time=="t15to20")
+acute_t0to5_t20to25 <- subset(df_female_summary_acute, time=="t0to5" | time=="t20to25")
+acute_t0to5_t25to30 <- subset(df_female_summary_acute, time=="t0to5" | time=="t25to30")
+
+# p-values evaluated against p = 0.01 to account for multiple (5) comparisons
+
+# t0to5 vs t5to10 = not significant (0.3919511)
+acute_repmesanov.t0to5_t5to10 <- aov_ez(id = "letter", dv = "time_value", data = acute_t0to5_t5to10, within = "time",
+  type = "III") # type III is default for when there is only one factor (time)
+summary(acute_repmesanov.t0to5_t5to10)
+
+# t0to5 vs t10to15 = not significant (0.2490239)
+acute_repmesanov.t0to5_t10to15 <- aov_ez(id = "letter", dv = "time_value", data = acute_t0to5_t10to15, within = "time",
+  type = "III")  
+summary(acute_repmesanov.t0to5_t10to15)
+
+# t0to5 vs t15to20 = not significant (0.0198726) evaluating against alpha 0.01 to account for multiple comparisons
+acute_repmesanov.t0to5_t15to20 <- aov_ez(id = "letter", dv = "time_value", data = acute_t0to5_t15to20, within = "time",
+  type = "III")  
+summary(acute_repmesanov.t0to5_t15to20)
+
+# t0to5 vs t20to25 = significant (0.0066564)
+acute_repmesanov.t0to5_t20to25 <- aov_ez(id = "letter", dv = "time_value", data = acute_t0to5_t20to25, within = "time",
+  type = "III")  
+summary(acute_repmesanov.t0to5_t20to25)
+
+# t0to5 vs t25to30 = significant (0.00618)
+acute_repmesanov.t0to5_t25to30 <- aov_ez(id = "letter", dv = "time_value", data = acute_t0to5_t25to30, within = "time",
+  type = "III")  
+summary(acute_repmesanov.t0to5_t25to30)
+```
+
+```{r}
+# AM251
+ar1.project_AM251.fit <- lme(
+  log_time_value ~ time,
+  random = ~1 | letter,
+  data = df_female_summary_AM251,
+  correlation = corAR1(form= ~1|letter)
+)
+anova(ar1.project_AM251.fit) # significant effect of time (p = 0.0279) -> need post hoc
+
+
+# am251 subset
+AM251_t0to5_t5to10 <- subset(df_female_summary_AM251, time=="t0to5" | time=="t5to10")
+AM251_t0to5_t10to15 <- subset(df_female_summary_AM251, time=="t0to5" | time=="t10to15")
+AM251_t0to5_t15to20 <- subset(df_female_summary_AM251, time=="t0to5" | time=="t15to20")
+AM251_t0to5_t20to25 <- subset(df_female_summary_AM251, time=="t0to5" | time=="t20to25")
+AM251_t0to5_t25to30 <- subset(df_female_summary_AM251, time=="t0to5" | time=="t25to30")
+
+# p-values evaluated against p = 0.01 to account for multiple (5) comparisons
+
+# t0to5 vs t5to10 = not significant (0.430472)
+AM251_repmesanov.t0to5_t5to10 <- aov_ez(id = "letter", dv = "time_value", data = AM251_t0to5_t5to10, within = "time",
+  type = "III") # type III is default for when there is only one factor (time)
+summary(AM251_repmesanov.t0to5_t5to10)
+
+# t0to5 vs t10to15 = not significant (0.495999)
+AM251_repmesanov.t0to5_t10to15 <- aov_ez(id = "letter", dv = "time_value", data = AM251_t0to5_t10to15, within = "time",
+  type = "III")  
+summary(AM251_repmesanov.t0to5_t10to15)
+
+# t0to5 vs t15to20 = not significant (0.310160)
+AM251_repmesanov.t0to5_t15to20 <- aov_ez(id = "letter", dv = "time_value", data = AM251_t0to5_t15to20, within = "time",
+  type = "III")  
+summary(AM251_repmesanov.t0to5_t15to20)
+
+# t0to5 vs t20to25 = not significant (0.15574)
+AM251_repmesanov.t0to5_t20to25 <- aov_ez(id = "letter", dv = "time_value", data = AM251_t0to5_t20to25, within = "time",
+  type = "III")  
+summary(AM251_repmesanov.t0to5_t20to25)
+
+# t0to5 vs t25to30 = not significant (0.031281)
+AM251_repmesanov.t0to5_t25to30 <- aov_ez(id = "letter", dv = "time_value", data = AM251_t0to5_t25to30, within = "time",
+  type = "III")  
+summary(AM251_repmesanov.t0to5_t25to30)
+```
+
+
+```{r}
+# repeated
+ar1.project_repeated.fit <- lme(
+  log_time_value ~ time,
+  random = ~1 | letter,
+  data = df_female_summary_repeated,
+  correlation = corAR1(form= ~1|letter)
+)
+anova(ar1.project_repeated.fit) # significant effect of time (p = 0.0169) -> need post hoc
+
+
+# repeated subset
+repeated_t0to5_t5to10 <- subset(df_female_summary_repeated, time=="t0to5" | time=="t5to10")
+repeated_t0to5_t10to15 <- subset(df_female_summary_repeated, time=="t0to5" | time=="t10to15")
+repeated_t0to5_t15to20 <- subset(df_female_summary_repeated, time=="t0to5" | time=="t15to20")
+repeated_t0to5_t20to25 <- subset(df_female_summary_repeated, time=="t0to5" | time=="t20to25")
+repeated_t0to5_t25to30 <- subset(df_female_summary_repeated, time=="t0to5" | time=="t25to30")
+
+# p-values evaluated against p = 0.01 to account for multiple (5) comparisons
+
+# t0to5 vs t5to10 = not significant (0.342114)
+repeated_repmesanov.t0to5_t5to10 <- aov_ez(id = "letter", dv = "time_value", data = repeated_t0to5_t5to10, within = "time",
+  type = "III") # type III is default for when there is only one factor (time)
+summary(repeated_repmesanov.t0to5_t5to10)
+
+# t0to5 vs t10to15 = not significant (0.200030)
+repeated_repmesanov.t0to5_t10to15 <- aov_ez(id = "letter", dv = "time_value", data = repeated_t0to5_t10to15, within = "time",
+  type = "III")  
+summary(repeated_repmesanov.t0to5_t10to15)
+
+# t0to5 vs t15to20 = not significant (0.095749)
+repeated_repmesanov.t0to5_t15to20 <- aov_ez(id = "letter", dv = "time_value", data = repeated_t0to5_t15to20, within = "time",
+  type = "III")  
+summary(repeated_repmesanov.t0to5_t15to20)
+
+# t0to5 vs t20to25 = not significant (0.128527)
+repeated_repmesanov.t0to5_t20to25 <- aov_ez(id = "letter", dv = "time_value", data = repeated_t0to5_t20to25, within = "time",
+  type = "III")  
+summary(repeated_repmesanov.t0to5_t20to25)
+
+# t0to5 vs t25to30 = not significant (0.190323)
+repeated_repmesanov.t0to5_t25to30 <- aov_ez(id = "letter", dv = "time_value", data = repeated_t0to5_t25to30, within = "time",
+  type = "III")  
+summary(repeated_repmesanov.t0to5_t25to30)
+```
+p-values evaluated against p = 0.01 to account for multiple (5) comparisons
+bonferroni correction
+0.05/5 = 0.01 (corrected alpha level)
