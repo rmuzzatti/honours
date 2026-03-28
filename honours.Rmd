@@ -29,6 +29,7 @@ library(lme4)
 library(lmerTest)
 library(tidyr)
 ```
+
 ## Importing Data
 Importing Cell Characteristics
 ```{r}
@@ -64,8 +65,6 @@ add_new_cells(
 Look at the data frame
 ```{r}
 raw_eEPSC_df <- read.csv(here("Data/raw_eEPSC_df.csv")) # puts it in the environment
-
-raw_eEPSC_df # prints it
 ```
 
 ### AP Count
