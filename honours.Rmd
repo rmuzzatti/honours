@@ -190,7 +190,7 @@ normalized_raw_eEPSC_df <- make_normalized_EPSC_data(
 ```
 
 Raw ACUTE Plots for each cell:
-```{r}
+```{r eval=FALSE}
 raw_eEPSC_acute_plots <- plot_raw_current_data(
  data = normalized_raw_eEPSC_df, # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
@@ -208,7 +208,7 @@ raw_eEPSC_acute_plots <- plot_raw_current_data(
  raw_eEPSC_acute_plots
 ```
 Raw ACUTE Plots for each cell with AM251:
-```{r}
+```{r eval=FALSE}
 raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
  data = normalized_raw_eEPSC_df,
   plot_treatment = "AM251",
@@ -227,7 +227,7 @@ raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 ```
 
 Raw Naive Plots for each cell:
-```{r}
+```{r eval=FALSE}
 raw_eEPSC_naive_plots <- plot_raw_current_data(
  data = normalized_raw_eEPSC_df,
   plot_treatment = "Control",
@@ -258,7 +258,7 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
 ```
 
 Raw REPEATED Plots for each cell:
-```{r}
+```{r eval=FALSE}
 raw_eEPSC_repeated_plots <- plot_raw_current_data(
  data = normalized_raw_eEPSC_df, # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
@@ -276,14 +276,14 @@ raw_eEPSC_repeated_plots <- plot_raw_current_data(
  raw_eEPSC_repeated_plots
 ```
 ## Pruned Plots per Cell
-Prune full cells from the normalized raw data:
+Prune full cells from the normalized raw data: FOR FULL CELLS ONLY
 ```{r}
 # pruning averages data per minute
 
 pruned_eEPSC_df <- make_pruned_EPSC_data(
   data = normalized_raw_eEPSC_df,
   current_type = "eEPSC",
-  min_time_value = 0,
+  min_time_value = 6,
   max_time_value = 30,
   baseline_length = 5,
   interval_length = 1
@@ -294,7 +294,7 @@ pruned_eEPSC_df$individual_cells
 
 
 Plot Pruned NAIVE Data
-```{r}
+```{r eval=FALSE}
 pruned_eEPSC_naive_plots <- plot_raw_current_data(
   data = pruned_eEPSC_df$individual_cells,
   plot_treatment = "Control",
@@ -311,7 +311,7 @@ pruned_eEPSC_naive_plots <- plot_raw_current_data(
 pruned_eEPSC_naive_plots
 ```
 Plot Pruned ACUTE Data
-```{r}
+```{r eval=FALSE}
 pruned_eEPSC_acute_plots <- plot_raw_current_data(
   data = pruned_eEPSC_df$individual_cells,
   plot_treatment = "Control",
@@ -330,7 +330,7 @@ pruned_eEPSC_acute_plots
 
 
 Plot Pruned ACUTE Data with AM251
-```{r}
+```{r eval=FALSE}
 pruned_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
   data = pruned_eEPSC_df$individual_cells,
   plot_treatment = "AM251",
@@ -347,7 +347,7 @@ pruned_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 pruned_eEPSC_acute_plots_AM251
 ```
 Plot Pruned REPEATED Data
-```{r}
+```{r eval=FALSE}
 pruned_eEPSC_repeated_plots <- plot_raw_current_data(
   data = pruned_eEPSC_df$individual_cells,
   plot_treatment = "Control",
@@ -384,298 +384,10 @@ summary_eEPSC_df # what I will use in my summary data stuff and plots from now o
 # Category 1 is naive, 2 is acute
 ```
 
-### testing assumptions
-testing assumptions for naive FEMALE summary data
-```{r}
-naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
-  mutate(
-    naive_difference0to5_vs_25to30 = t25to30 - t0to5,
-    naive_difference0to5_vs_20to25 = t20to25 - t0to5,
-    naive_difference0to5_vs_15to20 = t15to20 - t0to5,
-    naive_difference0to5_vs_10to15 = t10to15 - t0to5,
-    naive_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
 
-shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_25to30)
-
-shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_20to25)
-
-shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_15to20)
-
-shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_10to15)
-
-shapiro.test(naive_difference_evoked_df$naive_difference0to5_vs_5to10)
-
-# all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
-
-
-bartlett.test(list(naive_difference_evoked_df$naive_difference0to5_vs_25to30, naive_difference_evoked_df$naive_difference0to5_vs_20to25, naive_difference_evoked_df$naive_difference0to5_vs_15to20, naive_difference_evoked_df$naive_difference0to5_vs_10to15, naive_difference_evoked_df$naive_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-
-
-testing assumptions for naive MALE summary data
-```{r}
-male_naive_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "1") %>% filter(treatment == "Control") %>%
-  mutate(
-    male_naive_difference0to5_vs_25to30 = t25to30 - t0to5,
-    male_naive_difference0to5_vs_20to25 = t20to25 - t0to5,
-    male_naive_difference0to5_vs_15to20 = t15to20 - t0to5,
-    male_naive_difference0to5_vs_10to15 = t10to15 - t0to5,
-    male_naive_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_25to30)
-
-shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_20to25)
-
-shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_15to20)
-
-shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_10to15)
-
-shapiro.test(male_naive_difference_evoked_df$male_naive_difference0to5_vs_5to10)
-
-# all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
-
-bartlett.test(list(male_naive_difference_evoked_df$male_naive_difference0to5_vs_25to30, male_naive_difference_evoked_df$male_naive_difference0to5_vs_20to25, male_naive_difference_evoked_df$male_naive_difference0to5_vs_15to20, male_naive_difference_evoked_df$male_naive_difference0to5_vs_10to15, male_naive_difference_evoked_df$male_naive_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-
-testing assumptions for ACUTE FEMALE summary data
-```{r}
-acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "2") %>% filter(treatment == "Control") %>%
-  mutate(
-    acute_difference0to5_vs_25to30 = t25to30 - t0to5,
-    acute_difference0to5_vs_20to25 = t20to25 - t0to5,
-    acute_difference0to5_vs_15to20 = t15to20 - t0to5,
-    acute_difference0to5_vs_10to15 = t10to15 - t0to5,
-    acute_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_25to30) # not showing up
-qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
-qqline(acute_difference_evoked_df$acute_difference0to5_vs_25to30)
-
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_20to25) # normal
-qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_20to25)
-qqline(acute_difference_evoked_df$acute_difference0to5_vs_20to25)
-
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_15to20) # normal
-qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_15to20)
-qqline(acute_difference_evoked_df$acute_difference0to5_vs_15to20)
-
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_10to15) # normal
-qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_10to15)
-qqline(acute_difference_evoked_df$acute_difference0to5_vs_10to15)
-
-shapiro.test(acute_difference_evoked_df$acute_difference0to5_vs_5to10) # NOT normal
-qqnorm(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
-qqline(acute_difference_evoked_df$acute_difference0to5_vs_5to10)
-
-# the 5 to 10 minute and 25 to 30 minute periods have p-values less than 0.05 are are not normal
-
-
-bartlett.test(list(acute_difference_evoked_df$acute_difference0to5_vs_25to30, acute_difference_evoked_df$acute_difference0to5_vs_20to25, acute_difference_evoked_df$acute_difference0to5_vs_15to20, acute_difference_evoked_df$acute_difference0to5_vs_10to15, acute_difference_evoked_df$acute_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-
-testing assumptions for ACUTE FEMALE summary data with AM251
-```{r}
-am251_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "2") %>% filter(treatment == "AM251") %>%
-  mutate(
-    am251_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
-    am251_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
-    am251_acute_difference0to5_vs_15to20 = t15to20 - t0to5,
-    am251_acute_difference0to5_vs_10to15 = t10to15 - t0to5,
-    am251_acute_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_25to30) # normal
-
-shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_20to25) # normal
-
-shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_15to20) # normal
-
-shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_10to15) # normal
-
-shapiro.test(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to10) # NOT normal
-
-# the 5 to 10 minute have p-values less than 0.05 are are not normal
-
-
-bartlett.test(list(am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_25to30, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_20to25, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_15to20, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_10to15, am251_acute_difference_evoked_df$am251_acute_difference0to5_vs_5to10))
-
-  # p-value is LESS than 0.05 -> variances are NOT equal
-```
-
-testing assumptions for ACUTE MALE summary data
-```{r}
-male_acute_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "2") %>% filter(treatment == "Control") %>%
-  mutate(
-    male_acute_difference0to5_vs_25to30 = t25to30 - t0to5,
-    male_acute_difference0to5_vs_20to25 = t20to25 - t0to5,
-    male_acute_difference0to5_vs_15to20 = t15to20 - t0to5,
-    male_acute_difference0to5_vs_10to15 = t10to15 - t0to5,
-    male_acute_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_25to30) # not normal
-shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_20to25) # not normal
-shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_15to20) # normal
-shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_10to15) # normal
-shapiro.test(male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10) # not normal
-
-
-bartlett.test(list(male_acute_difference_evoked_df$male_acute_difference0to5_vs_25to30, male_acute_difference_evoked_df$male_acute_difference0to5_vs_20to25, male_acute_difference_evoked_df$male_acute_difference0to5_vs_15to20, male_acute_difference_evoked_df$male_acute_difference0to5_vs_10to15, male_acute_difference_evoked_df$male_acute_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-
-testing assumptions for REPEATED female summary data
-```{r}
-rr_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Female") %>% filter(category == "3") %>% filter(treatment == "Control") %>%
-  mutate(
-    rr_difference0to5_vs_25to30 = t25to30 - t0to5,
-    rr_difference0to5_vs_20to25 = t20to25 - t0to5,
-    rr_difference0to5_vs_15to20 = t15to20 - t0to5,
-    rr_difference0to5_vs_10to15 = t10to15 - t0to5,
-    rr_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_25to30) 
-shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_20to25) 
-shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_15to20) 
-shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_10to15) 
-shapiro.test(rr_difference_evoked_df$rr_difference0to5_vs_5to10) 
-
-# all p-values are greater than 0.05 -> fail to reject the null hypothesis that they are normally distributed -> the data is normally distributed
-
-
-bartlett.test(list(rr_difference_evoked_df$rr_difference0to5_vs_25to30, rr_difference_evoked_df$rr_difference0to5_vs_20to25, rr_difference_evoked_df$rr_difference0to5_vs_15to20, rr_difference_evoked_df$rr_difference0to5_vs_10to15, rr_difference_evoked_df$rr_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-testing assumptions for REPEATED male summary data
-```{r}
-male_rr_difference_evoked_df <- summary_eEPSC_df$percent_change_data %>% filter(sex == "Male") %>% filter(category == "3") %>% filter(treatment == "Control") %>%
-  mutate(
-    male_rr_difference0to5_vs_25to30 = t25to30 - t0to5,
-    male_rr_difference0to5_vs_20to25 = t20to25 - t0to5,
-    male_rr_difference0to5_vs_15to20 = t15to20 - t0to5,
-    male_rr_difference0to5_vs_10to15 = t10to15 - t0to5,
-    male_rr_difference0to5_vs_5to10 = t5to10 - t0to5,
-         )
-
-shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_25to30) 
-shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_20to25) 
-shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_15to20) 
-shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_10to15) 
-shapiro.test(male_rr_difference_evoked_df$male_rr_difference0to5_vs_5to10) 
-
-# NONE of p-values are less than 0.05 -> reject the null hypothesis that they are normally distributed -> the data is NOT normally distributed
-
-
-bartlett.test(list(male_rr_difference_evoked_df$male_rr_difference0to5_vs_25to30, male_rr_difference_evoked_df$male_rr_difference0to5_vs_20to25, male_rr_difference_evoked_df$male_rr_difference0to5_vs_15to20, male_rr_difference_evoked_df$male_rr_difference0to5_vs_10to15, male_rr_difference_evoked_df$male_rr_difference0to5_vs_5to10))
-
-# p-value is greater than 0.05 -> cannot reject the null hypothesis that the variances are equal -> variances are equal
-```
-
-### t-test for summary plots
-```{r}
-t_test_female_naive <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
-  test_category = 1,
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-t_test_male_naive <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Male"),
-  test_category = 1,
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-t_test_female_acute <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"),
-  test_category = 2,
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-t_test_female_acute_am251 <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
-  test_category = 2,
-  include_all_treatments = "no",
-  list_of_treatments = c("AM251"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-t_test_male_acute <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Male"), 
-  test_category = 2,
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-t_test_female_repeated <-perform_t_tests_for_summary_plot(
-  data = summary_eEPSC_df$summary_data %>% filter(sex == "Female"), 
-  test_category = 3,
-  include_all_treatments = "no",
-  list_of_treatments = c("Control"),
-  current_type = "eEPSC",
-  parameter = "amplitude",
-  baseline_interval = "t0to5",
-  interval_length = 5,
-  treatment_colour_theme = my_theme_colours,
-  save_output_as_RDS = "no"
-)
-
-
-t_test_female_naive
-t_test_male_naive
-t_test_female_acute
-t_test_female_acute_am251
-t_test_male_acute
-t_test_female_repeated
-```
-
-
-Summary Plots (use PRUNED data, for visual ease, but t-tests are done with the SUMMARY data)
+Summary Plots (use PRUNED data, for visual ease)
 ### summary plots
-Naive FEMALE Summary:
+Naive FEMALE Summary: (only FULL)
 ```{r}
 naive_summary_plot <- plot_summary_current_data(
   data = pruned_eEPSC_df$all_cells,
@@ -689,9 +401,9 @@ naive_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_naive,
+  t_test_df = NULL,
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -720,9 +432,9 @@ male_naive_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_male_naive,
+  t_test_df = NULL,
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -736,7 +448,7 @@ male_naive_summary_plot
 # ggsave(male_naive_summary_plot, path = here("Figures"), file = "male_naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
-Acute FEMALE Summary:
+Acute FEMALE Summary: (only FULL)
 ```{r}
 acute_summary_plot <- plot_summary_current_data(
   data = pruned_eEPSC_df$all_cells, 
@@ -750,9 +462,9 @@ acute_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_acute, # proper t-test
+  t_test_df = NULL, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -766,7 +478,8 @@ acute_summary_plot
 # saving as png to figure folder
 # ggsave(acute_summary_plot, path = here("Figures"), file = "acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
-FEMALE TREATMENT 1 COMBINED
+
+FEMALE TREATMENT 1 COMBINED (only FULL)
 ```{r}
 female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
   filter(sex == "Female" & category %in% c(1,2) & treatment == "Control") %>%
@@ -776,32 +489,6 @@ female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
   labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) + # NULL for legend heading
   geom_hline(yintercept = 100, linetype = "dashed") +
   scale_colour_manual(values = c("lightgrey", "#f19cac"), labels = c("Naive, n = 10", "Acute, n = 8")) + 
-  
-  # add naive t-test
-  geom_text(
-    data = t_test_female_naive,
-    aes(
-      x = asterisk_time,
-      y = 50,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "lightgrey"
-  ) +
-
-  # add acute t-test
-  geom_text(
-    data = t_test_female_acute,
-    aes(
-      x = asterisk_time,
-      y = 170,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "#eb647e"
-  ) +
   
   # add HFS text
   annotate(
@@ -844,18 +531,6 @@ female_stress_plot <- pruned_eEPSC_df$all_cells %>%
   geom_hline(yintercept = 100, linetype = "dashed") +
   scale_colour_manual(values = c("#FFADFF", "#f5e0b3", "#f19cac", "#6497b1"), labels = c("Acute with AM25", "Naive", "Acute", "Repeated")) + 
   
-    # add acute t-test
-  geom_text(
-    data = t_test_female_acute,
-    aes(
-      x = asterisk_time,
-      y = 170,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "#eb647e"
-  ) +
   
   # add HFS text
   annotate(
@@ -898,19 +573,6 @@ female_control_stress_plot <- pruned_eEPSC_df$all_cells %>%
   labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) + # NULL for legend heading
   geom_hline(yintercept = 100, linetype = "dashed") +
   scale_colour_manual(values = c("#f5e0b3", "#f19cac", "#6497b1"), labels = c("Naive", "Acute", "Repeated")) + 
-  
-    # add acute t-test
-  geom_text(
-    data = t_test_female_acute,
-    aes(
-      x = asterisk_time,
-      y = 170,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "#eb647e"
-  ) +
   
   # add HFS text
   annotate(
@@ -955,18 +617,6 @@ female_acute_stress_plot <- pruned_eEPSC_df$all_cells %>%
   geom_hline(yintercept = 100, linetype = "dashed") +
   scale_colour_manual(values = c("#FFADFF", "#f5e0b3", "#f19cac"), labels = c("Acute with AM25", "Naive", "Acute")) + 
   
-    # add acute t-test
-  geom_text(
-    data = t_test_female_acute,
-    aes(
-      x = asterisk_time,
-      y = 170,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "#eb647e"
-  ) +
   
   # add HFS text
   annotate(
@@ -1014,32 +664,7 @@ male_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
   geom_hline(yintercept = 100, linetype = "dashed") +
   scale_colour_manual(values = c("lightgrey", "#f19cac"), labels = c("Naive, n = 13", "Acute, n = 8")) +
   
-  # add naive t-test
-  geom_text(
-    data = t_test_male_naive,
-    aes(x = asterisk_time,
-      y = 170,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "grey"
-  ) +
-
-  # add acute t-test
-  geom_text(
-    data = t_test_male_acute,
-    aes(
-      x = asterisk_time,
-      y = 50,
-      label = significance_stars
-    ),
-    inherit.aes = FALSE,
-    size = 8,
-    colour = "#eb647e"
-  ) +
-  
-  # add HFS text
+ # add HFS text
   annotate(
         geom = "text",
         x = 5,
@@ -1072,7 +697,7 @@ male_treatment1_plot
 ```
 
 
-Acute FEMALE Summary with AM251:
+Acute FEMALE Summary with AM251: (only FULL)
 ```{r}
 am251_acute_summary_plot <- plot_summary_current_data(
   data = pruned_eEPSC_df$all_cells, 
@@ -1086,9 +711,9 @@ am251_acute_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_acute_am251, 
+  t_test_df = NULL, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -1102,7 +727,7 @@ am251_acute_summary_plot
 # ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
-REPEATED FEMALE Summary:
+REPEATED FEMALE Summary: (only FULL)
 ```{r}
 repeated_summary_plot <- plot_summary_current_data(
   data = pruned_eEPSC_df$all_cells, 
@@ -1116,9 +741,9 @@ repeated_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_repeated, 
+  t_test_df = NULL, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -1131,6 +756,7 @@ repeated_summary_plot
 
 # ggsave(repeated_summary_plot, path = here("Figures"), file = "repeated_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 REPEATED MALE Summary:
 ```{r}
 male_repeated_summary_plot <- plot_summary_current_data(
@@ -1145,9 +771,9 @@ male_repeated_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_female_repeated, # need own t-test but doesn't pass assumptions
+  t_test_df = NULL, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -1177,9 +803,9 @@ male_acute_summary_plot <- plot_summary_current_data(
   include_representative_trace = "no",
   representative_trace_filename = import_ext_data("Control-trace.png"),
   y_axis_limit = 230,
-  signif_stars = "yes",
+  # signif_stars = "yes",
   geom_signif_text_size = 8,
-  t_test_df = t_test_male_acute, # proper t-test
+  t_test_df = NULL, 
   large_axis_text = "no",
   legend_position = "inside",
   shade_intervals = "no",
@@ -1192,7 +818,9 @@ male_acute_summary_plot
 
 # ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
-### overall summary percent change mean and SE
+
+### overall summary percent change mean and SE for eEPSC
+summary data has both full and baseline only cells
 ```{r}
 female_percentchange_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
   filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
@@ -1211,10 +839,45 @@ female_percentchange_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
 female_percentchange_eEPSC_summary
 ```
 
+### eEPSC mean and SE 
+```{r}
+# baseline
+female_baseline_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  group_by(cat_treat) %>%  
+  summarise(
+    n = n(),
+    mean_amplitude = mean(t0to5, na.rm = TRUE),
+    sd_amplitude = sd(t0to5, na.rm = TRUE), 
+    se_amplitude = sd_amplitude / sqrt(n), 
+    .groups = "drop"  
+  )
+female_baseline_eEPSC_summary
 
+# post HFS
+female_HFS_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  group_by(cat_treat) %>%  
+  summarise(
+    n = n(),
+    mean_amplitude = mean(t25to30, na.rm = TRUE),
+    sd_amplitude = sd(t25to30, na.rm = TRUE), 
+    se_amplitude = sd_amplitude / sqrt(n), 
+    .groups = "drop"  
+  )
+female_HFS_eEPSC_summary
+```
 
 ## Baseline eEPSC
-```{r}
+```{r eval=FALSE}
 # data
 female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251")) %>% 
@@ -1264,15 +927,6 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
   #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
   #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
   
-  # t-test
-  stat_compare_means(
-    method = "t.test", 
-    test.arg = list(paired = FALSE),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251"), c("2.Control", "2.AM251")), # not sure if this is accurate...
-    textsize = 5
-) + 
-  
   scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
 
   guides(fill = "none", color = "none")
@@ -1282,7 +936,8 @@ female_baseline_amp_plot
 # ggsave(female_baseline_amp_plot, path = here("Figures"), file = "female_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 
 ```
-```{r}
+
+```{r eval=FALSE}
 # data
 female_baseline_control_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control")) %>% 
@@ -1327,14 +982,6 @@ female_baseline_control_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   # x-axis labels  
 scale_x_discrete(labels = c("Naive", "Acute", "Repeated")) +
   
-  # t-test
-  stat_compare_means(
-    method = "t.test", 
-    test.arg = list(paired = FALSE),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "3.Control"), c("2.Control", "3.Control")), 
-    textsize = 5
-) + 
   
   scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
 
@@ -1346,49 +993,14 @@ female_baseline_control_amp_plot
 
 ```
 
-### eEPSC mean and SE
-```{r}
-female_baseline_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
-  )) %>%
-  group_by(cat_treat) %>%  
-  summarise(
-    n = n(),
-    mean_amplitude = mean(t0to5, na.rm = TRUE),
-    sd_amplitude = sd(t0to5, na.rm = TRUE), 
-    se_amplitude = sd_amplitude / sqrt(n), 
-    .groups = "drop"  
-  )
-female_baseline_eEPSC_summary
-
-female_HFS_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
-  )) %>%
-  group_by(cat_treat) %>%  
-  summarise(
-    n = n(),
-    mean_amplitude = mean(t25to30, na.rm = TRUE),
-    sd_amplitude = sd(t25to30, na.rm = TRUE), 
-    se_amplitude = sd_amplitude / sqrt(n), 
-    .groups = "drop"  
-  )
-female_HFS_eEPSC_summary
-```
-
 
 
 eEPSC amplitude after the HFS (25-30 min)
-## post HFS eEPSC
-```{r}
+## post HFS eEPSC (final)
+```{r eval=FALSE}}
 # data
 female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251")) %>% 
+  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
     levels = c("1.Control", "2.Control", "2.AM251")
@@ -1457,11 +1069,12 @@ female_HFS_amp_plot
 
 ## PPR
 Make PPR Dataset
+includes full cells and baseline only
 ```{r}
 PPR_df <- make_PPR_data(
   data = normalized_raw_eEPSC_df,
   include_all_treatments = "yes",
-  list_of_treatments = NULL,
+  list_of_treatments = "yes",
   PPR_min = 0,
   PPR_max = 5,
   baseline_interval = "t0to5",
@@ -1469,42 +1082,72 @@ PPR_df <- make_PPR_data(
 )
 PPR_df
 
-# add group column
+# adding group colulmn
 PPR_df <- PPR_df %>%
-  mutate(group = interaction(category, treatment, sep = ".", drop = TRUE))
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251" ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated"
+  )) 
 ```
 
-### PPR mean and averages
 ```{r}
-# mean and SE output
-female_baseline_PPR_summary_df <- PPR_plot_df %>%
-  filter(sex == "Female", state == "Baseline") %>%
-  group_by(facet_group) %>%  
+# cell means
+PPR_cell_df <- PPR_df %>%
+  group_by(letter, group, state, sex) %>%
+  summarise(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")
+
+
+# BASELINE
+# filtering sex and state
+female_baseline_PPR_df <- PPR_cell_df %>%
+  filter(sex == "Female", state == "Baseline") 
+
+# getting the mean and se...
+female_baseline_PPR_summary_df <- female_baseline_PPR_df %>%
+  group_by(group) %>%
   summarise(
-    n = n(),  
-    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE), 
-    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE), 
-    se_PPR = sd_PPR / sqrt(n), 
-    .groups = "drop"  # to remove the grouping structure in the result
+    n = n(),
+    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE),
+    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE),
+    se_PPR = sd_PPR / sqrt(n),
+    .groups = "drop"
   )
 female_baseline_PPR_summary_df
 
-female_HFS_PPR_summary_df <- PPR_plot_df %>%
-  filter(sex == "Female", state == "HFS") %>%
-  group_by(facet_group) %>%  
+# HFS
+# filtering and adding group column
+female_HFS_PPR_df <- PPR_cell_df %>%
+  filter(sex == "Female", state == "Post-modification") 
+
+# getting the mean and se...
+female_HFS_PPR_summary_df <- female_HFS_PPR_df %>%
+  group_by(group) %>%
   summarise(
-    n = n(),  
-    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE), 
-    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE), 
-    se_PPR = sd_PPR / sqrt(n), 
-    .groups = "drop"  # to remove the grouping structure in the result
+    n = n(),
+    mean_PPR = mean(mean_PPR_cell, na.rm = TRUE),
+    sd_PPR = sd(mean_PPR_cell, na.rm = TRUE),
+    se_PPR = sd_PPR / sqrt(n),
+    .groups = "drop"
   )
 female_HFS_PPR_summary_df
+
+
+# only paired letters (for change over time)
+female_paired_PPR_df <- PPR_cell_df %>%
+  filter(sex == "Female", state %in% c("Baseline", "Post-modification")) %>%
+  group_by(letter, group) %>%
+  filter(n_distinct(state) == 2) %>%  # only keep letters with both states
+  ungroup()
+# rename to HFS
+female_paired_PPR_df <- female_paired_PPR_df %>%
+  mutate(state = ifelse(state == "Post-modification", "HFS", state))
 ```
 
 
 female vs male acute PPR HFS
-```{r}
+```{r eval=FALSE}
 plot_PPR_data_single_treatment(
   data = PPR_df,
   plot_treatment = "Control",
@@ -1526,7 +1169,7 @@ plot_PPR_data_single_treatment(
 ```
 
 female vs male naive PPR HFS
-```{r}
+```{r eval=FALSE}
 plot_PPR_data_single_treatment(
   data = PPR_df,
   plot_treatment = "Control",
@@ -1543,8 +1186,9 @@ plot_PPR_data_single_treatment(
   save_plot_png = "no"
 )
 ```
+
 female vs male repeated PPR HFS
-```{r}
+```{r eval=FALSE}
 plot_PPR_data_single_treatment(
   data = PPR_df,
   plot_treatment = "Control",
@@ -1562,129 +1206,42 @@ plot_PPR_data_single_treatment(
 )
 ```
 
-testing assumptions for comparing PPR during baseline
-```{r}
-PPR_plot_df <- PPR_df %>% # making the data frame so that we have mean PPR
-  filter(state == "Baseline") %>%
-  group_by(category, letter, treatment, sex) %>%
-  summarize(mean_PPR = mean(PPR),
-            n = n())
 
-shapiro.test(PPR_plot_df$mean_PPR) # testing assumptions using the mean PPR
+### change in PPR female plot
+```{r}
+#1 group labels
+  group_labels <- c(
+    "naive" = "Naive",
+    "acute" = "Acute",
+    "AM251" = "Acute with AM251",
+    "repeated" = "Repeated")
 
-# p value is greater than 0.05, data is normal
 
-# need to do bartlett's test ?
-```
-PPR FOR POSTER
-```{r}
-plot_PPR_data_single_treatment(
-  data = PPR_df,
-  plot_treatment = "Control",
-  plot_category = 2,
-  baseline_label = "Baseline",
-  post_hormone_label = "HFS",
-    included_sexes = "female",
-  #facet_by_sex = "yes",
-  #left_sex = "Female",
-  test_type = "t.test",
-  map_signif_level_values = T,
-  large_axis_text = "no",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
-```
-```{r}
-plot_PPR_data_single_treatment(
-  data = PPR_df,
-  plot_treatment = "Control",
-  plot_category = 1,
-  baseline_label = "Baseline",
-  post_hormone_label = "HFS",
-    included_sexes = "female",
-  #facet_by_sex = "yes",
-  #left_sex = "Female",
-  test_type = "t.test",
-  map_signif_level_values = T,
-  large_axis_text = "no",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
-```
-```{r}
-plot_PPR_data_single_treatment(
-  data = PPR_df,
-  plot_treatment = "AM251",
-  plot_category = 2,
-  baseline_label = "Baseline",
-  post_hormone_label = "HFS",
-    included_sexes = "female",
-  #facet_by_sex = "yes",
-  #left_sex = "Female",
-  test_type = "t.test",
-  map_signif_level_values = T,
-  large_axis_text = "no",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
-```
+# baseline only cells  
+female_baseline_only_PPR_df <- female_baseline_PPR_df %>%
+  filter(!(letter %in% female_paired_PPR_df$letter)) %>%  # only letters NOT in paired df
+  mutate(state = "Baseline") %>%
+  mutate(group = group)
 
-```{r}
-plot_PPR_data_single_treatment(
-  data = PPR_df,
-  plot_treatment = "Control",
-  plot_category = 3,
-  baseline_label = "Baseline",
-  post_hormone_label = "HFS",
-    included_sexes = "female",
-  #facet_by_sex = "yes",
-  #left_sex = "Female",
-  test_type = "t.test",
-  map_signif_level_values = T,
-  large_axis_text = "no",
-  treatment_colour_theme = my_theme_colours,
-  theme_options = my_theme_options,
-  save_plot_png = "no"
-)
-```
-### PPR female plot
-```{r}
-#1 facet labels
-  facet_labels <- c(
-    "1.Control.Female" = "Naive",
-    "2.Control.Female" = "Acute",
-    "2.AM251.Female" = "Acute with AM251",
-    "3.Control.Female" = "Repeated")
-
-#2 making the data frame for individual cells
-female_PPR_plot_df <- PPR_df %>%
-  filter(state %in% c("Baseline", "Post-modification")) %>% 
-  filter(sex == "Female") %>% 
-  mutate(
-    state = ifelse(state == "Post-modification", "HFS", state)) %>% # rename to HFS
- mutate(facet_group = factor(interaction(category, treatment, sex),
-                              levels = names(facet_labels))) %>%
-  group_by(letter, state, category, treatment, sex, facet_group) %>%
-  summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
-   
-#3 plot
-female_PPR_plot <- female_PPR_plot_df %>%
+#2 plot
+female_PPR_plot <- female_paired_PPR_df %>%
   ggplot(aes(x = state, y = mean_PPR_cell)) + 
 
-# individual  cells  
+# baseline-only cells
+  geom_point(data = female_baseline_only_PPR_df,
+             aes(x = state, y = mean_PPR_cell),
+             shape = 16, size = 1.5, colour = "lightgrey") +
+  
+# paired individual cells  
   geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
   geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) + 
   
-# group mean
-  stat_summary(aes(group = 1, colour = interaction(category, treatment)),
+# group mean + SE
+  stat_summary(aes(group = 1, colour = group),
                fun.data = mean_se,
                geom = "line",
                linewidth = 1.2) +
-  
-  stat_summary(aes(group = 1,shape = sex,colour = interaction(category, treatment)),
+  stat_summary(aes(group = 1,shape = sex,colour = group),
     fun.data = mean_se,
     geom = "point",
     size = 2.5
@@ -1692,15 +1249,15 @@ female_PPR_plot <- female_PPR_plot_df %>%
  
 # colours and shapes
   scale_colour_manual(values = c(
-    "1.Control" = "#f5e0b3", # or "darkgrey"
-    "2.Control" = "#f19cac",
-    "2.AM251" = "#FFADFF",
-    "3.Control" = "#6497b1"
+    "naive" = "#f5e0b3", # or "darkgrey"
+    "acute" = "#f19cac",
+    "AM251" = "#FFADFF",
+    "repeated" = "#6497b1"
   )) +
 scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
   
-# facet with labels and order
-  facet_wrap(~ facet_group, labeller = as_labeller(facet_labels), nrow = 1) + # nrow = 1 makes it all on one line
+# facet by group in order
+  facet_wrap(~ group, labeller = as_labeller(group_labels), nrow = 1) + # nrow = 1 makes it all on one line
   
 # add significance brackets
   geom_signif(
@@ -1751,7 +1308,7 @@ female_PPR_plot
 ```
 
 ### PPR female acute plot
-```{r}
+```{r eval=FALSE}
 #1 facet labels
   facet_labels <- c(
     "1.Control.Female" = "Naive",
@@ -1848,8 +1405,9 @@ female_acute_PPR_plot
 
 #ggsave(female_acute_PPR_plot, path = here("Figures"), file = "female_acute_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 ### PPR with ALL SEXES AND TREATMENTS
-```{r}
+```{r eval=FALSE}
 #1 facet labels
   facet_labels <- c(
     "1.Control.Female" = "Female Naive",
@@ -1948,154 +1506,161 @@ scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
 PPR_plot
 ```
 
-### PPR baseline
+### PPR baseline visualization
 ```{r}
-# data
-female_baseline_PPR_plot <- PPR_plot_df %>%
-  filter(sex == "Female" & 
-           category %in% c(1,2) & 
-           treatment %in% c("Control","AM251") & 
-  state=="Baseline")  %>% 
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251")
-  )) %>%
-  
-  ggplot(aes(x = cat_treat, y = mean_PPR_cell)) +
-  
+# specific group order
+group_order <- c("naive", "acute", "AM251", "repeated")
+
+# colours for groups
+light_group_colors <- c(
+  "naive" = "#f5e0b3",
+  "acute" = "#f19cac",
+  "AM251" = "#FFADFF",
+  "repeated" = "#6497b1"
+)
+
+group_colors <- c(
+  "naive" = "#ecc479",
+  "acute" = "#eb647e",
+  "AM251" = "#c11c84",
+  "repeated" = "#005b96"
+)
+
+
+# plot baseline PPR for female groups
+female_baseline_group_PPR_plot <- female_baseline_PPR_df %>%
+  mutate(group = factor(group, levels = group_order)) %>%
+  ggplot(aes(x = group, y = mean_PPR_cell)) +
+
+# boxes
+  geom_boxplot(aes(fill = group), alpha = 0.6,
+               outlier.shape = NA, width = 0.5, show.legend = FALSE,
+               color = "black") +
+
+# individual cells as dots (sina plot)
+  geom_sina(aes(color = group), max_width = 0.2,
+            shape = 16, size = 2, show.legend = FALSE) +
+
 # axis labels
   labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
+
+# group color mapping for boxplot and dots
+  scale_fill_manual(values = light_group_colors) +
+  scale_color_manual(values = group_colors) +
+
+  # x-axis labels
+  scale_x_discrete(labels = c("naive" = "Naive", 
+                              "acute" = "Acute", 
+                              "AM251" = "Acute with AM251", 
+                              "repeated" = "Repeated")) +
+  # y-axis
+    scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0, 0.05))) +
+
   patchclampplotteR_theme() +
-  theme(legend.position = "none") +
-  
-# the boxes
-  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
-               alpha = 0.6, 
-               color = "black", # get rid of if want the dark colour to be the outline
-# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
-               outlier.shape = NA, 
-               width = 0.5, 
-               show.legend = FALSE)  +
-  
-  # the dots/scatter plot
-  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
-            max_width = 0.2, 
-            shape = 16, 
-            size = 2, 
-            show.legend = FALSE) +
-  
-  # mean as a point
-  # stat_summary(fun = mean, geom = "point", 
-               # shape = 16, size = 4, color = "black") +
-  
-  # colours
-  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
-                               "2.Control" = "#f19cac",
-                               "2.AM251" = "#ffadff")) +
-  
-  scale_color_manual(values = c("1.Control" = "#ecc479", 
-                                "2.Control" = "#eb647e", 
-                                "2.AM251" = "#c11c84")) +
-  
-  # x-axis labels  
-scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
-  
-# x-axis subtitles  
-  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) + 
-  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
-  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
-  
-  # t-test
-  stat_compare_means(
-    method = "t.test", 
-    test.arg = list(paired = FALSE),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251")), # not sure if this is accurate...
-    textsize = 5
-) +
-  
-  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
-  
-  patchclampplotteR_theme() +
+  theme(legend.position = "none") 
 
-  guides(fill = "none", color = "none") 
-
-female_baseline_PPR_plot
-
-# ggsave(female_baseline_PPR_plot, path = here("Figures"), file = "female_baseline_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-
-```
-```{r}
-# data
-female_baseline_control_PPR_plot <- PPR_plot_df %>%
-  filter(sex == "Female" & 
-           category %in% c(1,2, 3) & 
-           treatment %in% c("Control") & 
-  state=="Baseline")  %>% 
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "3.Control")
-  )) %>%
   
-  ggplot(aes(x = cat_treat, y = mean_PPR_cell)) +
-  
-# axis labels
-  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
-  patchclampplotteR_theme() +
-  theme(legend.position = "none") +
-  
-# the boxes
-  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
-               alpha = 0.6, 
-               color = "black", # get rid of if want the dark colour to be the outline
-# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
-               outlier.shape = NA, 
-               width = 0.5, 
-               show.legend = FALSE)  +
-  
-  # the dots/scatter plot
-  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
-            max_width = 0.2, 
-            shape = 16, 
-            size = 2, 
-            show.legend = FALSE) +
-  
-  # mean as a point
-  # stat_summary(fun = mean, geom = "point", 
-               # shape = 16, size = 4, color = "black") +
-  
-  # colours
-  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
-                               "2.Control" = "#f19cac",
-                               "3.Control" = "#6497b1")) +
-  
-  scale_color_manual(values = c("1.Control" = "#ecc479", 
-                                "2.Control" = "#eb647e", 
-                                "3.Control" = "#005b96")) +
-  
-  # x-axis labels  
-scale_x_discrete(labels = c("Naive", "Acute", "Repeated")) +
-
-  # t-test
-  stat_compare_means(
-    method = "t.test", 
-    test.arg = list(paired = FALSE),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "3.Control"), c("2.Control", "3.Control")), 
-    textsize = 5
-) +
-  
-  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
-  
-  patchclampplotteR_theme() +
-
-  guides(fill = "none", color = "none") 
-
-female_baseline_control_PPR_plot
+female_baseline_group_PPR_plot
 
 # ggsave(female_baseline_control_PPR_plot, path = here("Figures"), file = "female_baseline_control_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-
 ```
+#### anova
+```{r}
+# HoV
+leveneTest(mean_PPR_cell ~ group, data = female_baseline_PPR_df)
+# passed
+
+# anova
+female_baseline_PPR_anova <- aov(mean_PPR_cell ~ group, data = female_baseline_PPR_df)
+summary(female_baseline_PPR_anova)
+# not significant
+
+# assumption of normality
+female_baseline_PPR_anova_resid <- residuals(female_baseline_PPR_anova)
+shapiro.test(female_baseline_PPR_anova_resid)
+qqnorm(female_baseline_PPR_anova_resid)
+qqline(female_baseline_PPR_anova_resid, col = "red")
+# passed
+```
+
+
+### PPR HFS visualization
+```{r}
+# specific group order
+group_order <- c("naive", "acute", "AM251", "repeated")
+
+# colours for groups
+light_group_colors <- c(
+  "naive" = "#f5e0b3",
+  "acute" = "#f19cac",
+  "AM251" = "#FFADFF",
+  "repeated" = "#6497b1"
+)
+
+group_colors <- c(
+  "naive" = "#ecc479",
+  "acute" = "#eb647e",
+  "AM251" = "#c11c84",
+  "repeated" = "#005b96"
+)
+
+
+# plot baseline PPR for female groups
+female_HFS_group_PPR_plot <- female_HFS_PPR_df %>%
+  mutate(group = factor(group, levels = group_order)) %>%
+  ggplot(aes(x = group, y = mean_PPR_cell)) +
+
+# boxes
+  geom_boxplot(aes(fill = group), alpha = 0.6,
+               outlier.shape = NA, width = 0.5, show.legend = FALSE,
+               color = "black") +
+
+# individual cells as dots (sina plot)
+  geom_sina(aes(color = group), max_width = 0.2,
+            shape = 16, size = 2, show.legend = FALSE) +
+
+# axis labels
+  labs(x = NULL, y = "Final Paired Pulse Ratio") +
+
+# group color mapping for boxplot and dots
+  scale_fill_manual(values = light_group_colors) +
+  scale_color_manual(values = group_colors) +
+
+  # x-axis labels
+  scale_x_discrete(labels = c("naive" = "Naive", 
+                              "acute" = "Acute", 
+                              "AM251" = "Acute with AM251", 
+                              "repeated" = "Repeated")) +
+  # y-axis
+    scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0, 0.05))) +
+
+  patchclampplotteR_theme() +
+  theme(legend.position = "none") 
+
+  
+female_HFS_group_PPR_plot
+
+# ggsave(female_baseline_control_PPR_plot, path = here("Figures"), file = "female_baseline_control_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+#### anova
+```{r}
+# HoV
+leveneTest(mean_PPR_cell ~ group, data = female_HFS_PPR_df)
+# passed
+
+# anova
+female_HFS_PPR_anova <- aov(mean_PPR_cell ~ group, data = female_HFS_PPR_df)
+summary(female_HFS_PPR_anova)
+# not significant
+
+# assumption of normality
+female_HFS_PPR_anova_resid <- residuals(female_HFS_PPR_anova)
+shapiro.test(female_HFS_PPR_anova_resid)
+qqnorm(female_HFS_PPR_anova_resid)
+qqline(female_HFS_PPR_anova_resid, col = "red")
+# passed
+```
+
 
 
 ## AP Frequency
@@ -2126,38 +1691,47 @@ AP_freq_df <- AP_count_data %>%
 AP_freq_df$state <- factor(AP_freq_df$state)
 AP_freq_df$letter <- factor(AP_freq_df$letter)
 AP_freq_df$sweep <- factor(AP_freq_df$sweep)
-```
 
-##### acute females
-```{r}
-# making the acute df
-acute_AP_freq_df <- AP_freq_df %>%
-  filter(group == "acute")
-
-# don't need to test for HoV because paired
-
-# anova
-acute_AP_freq_anova <- ezANOVA(
-  data = acute_AP_freq_df,
-  dv = AP_frequency,
-  wid = letter,
-  within = .(state, sweep),
-  type = 3,
-  detailed = T,
-  return_aov = T
-)
-
-print(acute_AP_freq_anova)
+# baseline only
+female_baseline_AP_freq_df <- AP_freq_df %>%
+  filter(state == "Baseline")
 ```
 
 ```{r}
-# normality of residuals
-# ???
+# eyeball interaction plot
+
+library(sciplot)
+female_baseline_AP_freq_df$sweep <- factor(female_baseline_AP_freq_df$sweep, levels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) # telling it what order
+lineplot.CI(x.factor=sweep, response=AP_frequency, group=group, xlab="Sweep", ylab="AP Frequency (Hz)", data=female_baseline_AP_freq_df) 
+```
+
+```{r}
+library(nlme)
+# starting it off with imposed compound symmetry (assumes sphericity)
+female_baseline_AP_freq_model.cs = lme(AP_frequency ~ group*sweep, data = female_baseline_AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(female_baseline_AP_freq_model.cs) 
+```
+```{r, fig.width = 12, fig.height = 10}
+library(sjPlot) 
+plot_grid(plot_model(female_baseline_AP_freq_model.cs, type = "diag")) 
+# lowkey fine
+```
+
+```{r}
+library(emmeans)
+
+# get estimated marginal means for sweep
+female_baseline_AP_freq_emm <- emmeans(female_baseline_AP_freq_model.cs, ~ sweep)
+
+# pairwise comparisons with Tukey correction
+pairs(female_baseline_AP_freq_emm, adjust = "tukey")
 ```
 
 
 
-```{r}
+
+### Christelinda's
+```{r eval=FALSE}
 plot_AP_frequencies_single_treatment(
   data = AP_count_data, # 
   plot_treatment = "Control",
@@ -2173,7 +1747,7 @@ plot_AP_frequencies_single_treatment(
   save_plot_png = "no"
 )
 ```
-```{r}
+```{r eval=FALSE}
 plot_AP_frequencies_single_treatment(
   data = AP_count_data, 
   plot_treatment = "AM251",
@@ -2189,7 +1763,7 @@ plot_AP_frequencies_single_treatment(
   save_plot_png = "no"
 )
 ```
-```{r}
+```{r eval=FALSE}
 plot_AP_frequencies_single_treatment(
   data = AP_count_data, 
   plot_treatment = "Control",
@@ -2208,6 +1782,23 @@ plot_AP_frequencies_single_treatment(
 
 ## AP Amplitude
 ### Mine
+```{r}
+library(lme4)
+library(lmerTest)
+library(sciplot)
+
+# can't have neurons that didn't fire any dragging it down
+no_zeros_female_AP_amp <- subset(AP_data, letter %in% c("RMA1", "RMA3", "RMA8", "RMA9", "RMA10", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA10A", "RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "RMR9", "RMR10"))
+
+lineplot.CI(x.factor = state, response = peak_amplitude, group = group, xlab="State", ylab="AP Amplitude (pA)", data = no_zeros_female_AP_amp) 
+# looks like there will be an interaction
+
+# starting it off with imposed compound symmetry (assumes sphericity)
+no_zeros_female_AP_amp.cs = lme(peak_amplitude ~ group*state, data = no_zeros_female_AP_amp, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(no_zeros_female_AP_amp.cs) 
+
+```
+
 
 #### Acute Females 
 ```{r}
@@ -2438,6 +2029,7 @@ repeated_female_AP_plot
 
 # ggsave(repeated_female_AP_plot, path = here("Figures"), file = "repeated_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 #### ANOVA
 ```{r}
 # making it into one data frame
@@ -2445,11 +2037,6 @@ AP_amp_anova_data <- subset(AP_data,
                      letter %in% c(acute_females,
                                    AM251_females,
                                    repeated_females))
-
-# add group variable
-AP_amp_anova_data$group[AP_amp_anova_data$letter %in% acute_females] <- "acute"
-AP_amp_anova_data$group[AP_amp_anova_data$letter %in% AM251_females] <- "AM251"
-AP_amp_anova_data$group[AP_amp_anova_data$letter %in% repeated_females] <- "repeated"
 
 # treated as factors
 AP_amp_anova_data$group <- factor(AP_amp_anova_data$group)
@@ -2477,12 +2064,14 @@ AP_amp_anova_plot <- ggplot(AP_amp_anova_data, aes(x = group, y = peak_amplitude
 
 AP_amp_anova_plot
 ```
+
 ```{r}
 # HoV
 
 leveneTest(AP_amp_anova_data$peak_amplitude, interaction(AP_amp_anova_data$state, AP_amp_anova_data$group))
 # no evidence to reject the null that variances are homogeneous
 ```
+
 ```{r}
 # running anova
 
@@ -2498,7 +2087,6 @@ AP_amp_anova <- ezANOVA(
 )
 
 print(AP_amp_anova)
-
 ```
 
 ```{r}
@@ -2507,7 +2095,7 @@ print(AP_amp_anova)
 # linear model 
 AP_amp_anova_lm_model <- lm(peak_amplitude ~ group * state, data = AP_amp_anova_data)
 
-# Extract residuals
+# extract residuals
 resid.AP_amp_anova <- residuals(AP_amp_anova_lm_model)
 
 # Q-Q plot
@@ -2832,22 +2420,26 @@ female_amp_df$log_t25to30 <- log(female_amp_df$t25to30)
 
 library(car)
 leveneTest(t0to5 ~ cat_treat, data = female_amp_df)
-# variances are homogeneous
+# normal variances are homogeneous
 
 leveneTest(log_t0to5 ~ cat_treat, data = female_amp_df)
-# variances are homogeneous
+# log variances are homogeneous
 ```
 
 
 
 ```{r}
 # one-way ANOVA
-female_baseline_amp_anova <- aov(log_t0to5 ~ cat_treat, data = female_amp_df)
+female_baseline_amp_anova <- aov(t0to5 ~ cat_treat, data = female_amp_df)
 summary(female_baseline_amp_anova)
+
+# log one-way ANOVA
+log_female_baseline_amp_anova <- aov(log_t0to5 ~ cat_treat, data = female_amp_df)
+summary(log_female_baseline_amp_anova)
 ```
 
 ```{r}
-# residuals
+# normal residuals
 female_baseline_amp_anova_residuals <- residuals(female_baseline_amp_anova)
 
 # check normality of residuals
@@ -2859,9 +2451,23 @@ hist(female_baseline_amp_anova_residuals, breaks = 10, main = "Residuals Histogr
 qqnorm(female_baseline_amp_anova_residuals)
 qqline(female_baseline_amp_anova_residuals, col = "red")
 
+
+
+# log residuals
+log_female_baseline_amp_anova_residuals <- residuals(female_baseline_amp_anova)
+
+# check normality of residuals
+shapiro.test(log_female_baseline_amp_anova_residuals)
+# not any better
+
+hist(log_female_baseline_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(log_female_baseline_amp_anova_residuals)
+qqline(log_female_baseline_amp_anova_residuals, col = "red")
 ```
+
 ```{r}
-# non-parametric Kruskal-Wallis
+# non-parametric Kruskal-Wallis (on original untransformed data)
 
 kruskal.test(t0to5 ~ cat_treat, data = female_amp_df)
 ```
@@ -2886,7 +2492,7 @@ line_colors <- c(
 )
 
 # Plot
-female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = log_t0to5)) +
+female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t0to5)) +
   
   # theme
   patchclampplotteR_theme() +
@@ -2906,21 +2512,13 @@ female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = l
   scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
   
   # Axis labels
-  labs(x = NULL, y = "log of Baseline eEPSC Amplitude (pA)") +
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
 
   # Remove legend
   guides(fill = "none", color = "none")
 
 female_baseline_amp_anova_plot
 ```
-```{r}
-# post hoc
-pairwise.t.test(female_amp_df$log_t0to5, female_amp_df$cat_treat, "none", data = female_amp_df) # no alpha level correction applied
-# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
-# you can run with alpha level of 0.05/3 = 0.015
-```
-
-
 
 ## ANOVA for post HFS eEPSC
 
@@ -3006,383 +2604,3 @@ female_HFS_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t25to3
 female_HFS_amp_anova_plot
 ```
 
-
-## ANOVA for Baseline PPR
-```{r}
-# data frame
-female_PPR_df <- PPR_plot_df %>%
-  filter(sex == "Female" & category %in% c(1,2, 3) & treatment %in% c("Control","AM251")) %>% 
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
-  ))
-
-female_PPR_df
-```
-
-```{r}
-# assumptions
-
-library(car)
-leveneTest(mean_PPR_cell ~ cat_treat, data = female_PPR_df)
-# variances are homogeneous
-```
-
-```{r}
-# anova
-
-female_baseline_PPR_anova <- aov(mean_PPR_cell ~ cat_treat, data = female_PPR_df %>% filter(state == "Baseline"))
-
-summary(female_baseline_PPR_anova)
-```
-
-```{r}
-# residuals
-female_baseline_PPR_anova_residuals <- residuals(female_baseline_PPR_anova)
-
-# check normality of residuals
-shapiro.test(female_baseline_PPR_anova_residuals)
-
-hist(female_baseline_PPR_anova_residuals, breaks = 10, main = "Residuals Histogram")
-
-qqnorm(female_baseline_PPR_anova_residuals)
-qqline(female_baseline_PPR_anova_residuals, col = "red")
-
-# NORMAL !!
-```
-
-```{r}
-fill_colors <- c(
-  "1.Control" = "#f5e0b3",
-  "2.Control" = "#f19cac",
-  "2.AM251"   = "#ffadff",
-  "3.Control" = "#6497b1"
-)
-
-line_colors <- c(
-  "1.Control" = "#ecc479",
-  "2.Control" = "#eb647e",
-  "2.AM251"   = "#c11c84",
-  "3.Control" = "#005b96"
-)
-
-df_baseline <- female_PPR_df %>% filter(state == "Baseline")
-
-# Plot
-female_baseline_PPR_anova_plot <- ggplot(df_baseline, aes(x = cat_treat, y = mean_PPR_cell)) +
-  
-  # theme
-  patchclampplotteR_theme() +
-  
-  # Boxplots
-  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
-               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
-  
-  # Sina (jittered) points
-  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
-  
-  # Colors
-  scale_fill_manual(values = fill_colors) +
-  scale_color_manual(values = line_colors) +
-  
-  # X-axis labels
-  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
-  
-  # Axis labels
-  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
-  
-  stat_compare_means(method = "anova", label.y = max(df_baseline$mean_PPR_cell) + 0.5) + 
-
-
-  # Remove legend
-  guides(fill = "none", color = "none")
-
-female_baseline_PPR_anova_plot
-```
-```{r}
-# post hoc
-
-pairwise.t.test(female_PPR_df$mean_PPR_cell, female_PPR_df$cat_treat, "none", data = female_PPR_df %>% filter(state == "Baseline")) # no alpha level correction applied
-# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
-# you can run with alpha level of 0.05/3 = 0.015
-```
-
-
-## ANOVA for post HFS PPR
-```{r}
-# using same data frame as earlier, already know variances are homogeneous
-
-female_HFS_PPR_anova <- aov(mean_PPR_cell ~ cat_treat, data = female_PPR_df %>% filter(state == "HFS"))
-
-summary(female_HFS_PPR_anova)
-```
-
-```{r}
-# residuals
-female_HFS_PPR_anova_residuals <- residuals(female_HFS_PPR_anova)
-
-# check normality of residuals
-shapiro.test(female_HFS_PPR_anova_residuals)
-
-hist(female_HFS_PPR_anova_residuals, breaks = 10, main = "Residuals Histogram")
-
-qqnorm(female_HFS_PPR_anova_residuals)
-qqline(female_HFS_PPR_anova_residuals, col = "red")
-
-# NORMAL !!
-```
-
-```{r}
-fill_colors <- c(
-  "1.Control" = "#f5e0b3",
-  "2.Control" = "#f19cac",
-  "2.AM251"   = "#ffadff",
-  "3.Control" = "#6497b1"
-)
-
-line_colors <- c(
-  "1.Control" = "#ecc479",
-  "2.Control" = "#eb647e",
-  "2.AM251"   = "#c11c84",
-  "3.Control" = "#005b96"
-)
-
-df_HFS <- female_PPR_df %>% filter(state == "HFS")
-
-# Plot
-female_HFS_PPR_anova_plot <- ggplot(df_HFS, aes(x = cat_treat, y = mean_PPR_cell)) +
-  
-  # theme
-  patchclampplotteR_theme() +
-  
-  # Boxplots
-  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
-               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
-  
-  # Sina (jittered) points
-  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
-  
-  # Colors
-  scale_fill_manual(values = fill_colors) +
-  scale_color_manual(values = line_colors) +
-  
-  # X-axis labels
-  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
-  
-  # Axis labels
-  labs(x = NULL, y = "Final Paired Pulse Ratio") +
-  
-  stat_compare_means(method = "anova", label.y = max(df_HFS$mean_PPR_cell) + 0.5) + 
-
-
-  # Remove legend
-  guides(fill = "none", color = "none")
-
-female_HFS_PPR_anova_plot
-```
-```{r}
-# post hoc
-
-pairwise.t.test(female_PPR_df$mean_PPR_cell, female_PPR_df$cat_treat, "none", data = female_PPR_df %>% filter(state == "HFS")) # no alpha level correction applied
-# I only only care about 4 (biologically meaningful): naive to acute, naive to AM251, naive to repeated
-# you can run with alpha level of 0.05/3 = 0.015
-
-
-# same results as BL??
-```
-
-
-## Repeated Measures ANOVA
-```{r}
-# convert to long
-df_long <- summary_eEPSC_df$percent_change_data %>%
-  pivot_longer(
-    cols = c(t0to5, t5to10, t10to15, t15to20, t20to25, t25to30),  # ONLY the time columns
-    names_to = "time",         # new column for time window
-    values_to = "time_value"   # new column for the corresponding value of that time window
-  ) %>% mutate(
-    time = factor(time, levels = c("t0to5","t5to10","t10to15","t15to20","t20to25","t25to30"))
-  )
-
-
-# adding a column for group name
-summary_anova_df <- df_long %>%
-  mutate(group = case_when(
-    sex == "Female" & category == 1 & treatment == "Control" ~ "naive",
-    sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
-    sex == "Female" & category == 2 & treatment == "AM251" ~ "AM251",
-    sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
-  )) %>%
-  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated")))
-```
-
-### naive females
-```{r}
-# making a subset for just naive females
-naive_summary_df <- summary_anova_df %>%
-  filter(group == "naive")
-# both time (interval) and letter are as factor which is good
-
-
-# HoV
-leveneTest(time_value ~ time, data = naive_summary_df)
-# good
-```
-```{r}
-# running anova
-
-naive_summary_anova <- ezANOVA(
-  data = naive_summary_df,
-  dv = time_value,
-  wid = letter,
-  within = time,
-  # between = group,
-  type = 3,
-  detailed = T,
-  return_aov = T
-)
-
-print(naive_summary_anova)
-# ignore warning about letter, it is already a factor
-```
-
-```{r}
-# normality of residuals
-
-naive_summary_anova_lm_model <- lm(time_value ~ time, data = naive_summary_df)
-naive_summary_anova_resid_vals <- residuals(naive_summary_anova_lm_model)
-
-qqnorm(naive_summary_anova_resid_vals)
-qqline(naive_summary_anova_resid_vals)
-shapiro.test(naive_summary_anova_resid_vals)
-# p is 0.01571 but its fine visually
-```
-
-### acute females
-```{r}
-# making a subset for just acute females
-acute_summary_df <- summary_anova_df %>%
-  filter(group == "acute")
-# both time (interval) and letter are as factor which is good
-
-
-# HoV
-leveneTest(time_value ~ time, data = acute_summary_df)
-# good
-```
-
-```{r}
-# running anova
-
-acute_summary_anova <- ezANOVA(
-  data = acute_summary_df,
-  dv = time_value,
-  wid = letter,
-  within = time,
-  # between = group,
-  type = 3,
-  detailed = T,
-  return_aov = T
-)
-
-print(acute_summary_anova)
-# ignore warning about letter, it is already a factor
-```
-
-```{r}
-# normality of residuals
-
-acute_summary_anova_lm_model <- lm(time_value ~ time, data = acute_summary_df)
-acute_summary_anova_resid_vals <- residuals(acute_summary_anova_lm_model)
-
-qqnorm(acute_summary_anova_resid_vals)
-qqline(acute_summary_anova_resid_vals)
-shapiro.test(acute_summary_anova_resid_vals)
-# its like 2 points pulling it, visually I'm taking it
-```
-
-### acute with AM251 females
-```{r}
-# making a subset for just acute with AM251 females
-AM251_summary_df <- summary_anova_df %>%
-  filter(group == "AM251")
-# both time (interval) and letter are as factor which is good
-
-
-# HoV
-leveneTest(time_value ~ time, data = AM251_summary_df)
-# good
-```
-
-```{r}
-# running anova
-
-AM251_summary_anova <- ezANOVA(
-  data = AM251_summary_df,
-  dv = time_value,
-  wid = letter,
-  within = time,
-  # between = group,
-  type = 3,
-  detailed = T,
-  return_aov = T
-)
-
-print(AM251_summary_anova)
-# ignore warning about letter, it is already a factor
-```
-
-```{r}
-# normality of residuals
-
-AM251_summary_anova_lm_model <- lm(time_value ~ time, data = AM251_summary_df)
-AM251_summary_anova_resid_vals <- residuals(AM251_summary_anova_lm_model)
-
-qqnorm(AM251_summary_anova_resid_vals)
-qqline(AM251_summary_anova_resid_vals)
-shapiro.test(AM251_summary_anova_resid_vals)
-# log transform could do good here too
-```
-
-### repeated females
-```{r}
-# making a subset for just repeated females
-repeated_summary_df <- summary_anova_df %>%
-  filter(group == "repeated")
-# both time (interval) and letter are as factor which is good
-
-
-# HoV
-leveneTest(time_value ~ time, data = repeated_summary_df)
-# good
-```
-
-```{r}
-# running anova
-
-repeated_summary_anova <- ezANOVA(
-  data = repeated_summary_df,
-  dv = time_value,
-  wid = letter,
-  within = time,
-  # between = group,
-  type = 3,
-  detailed = T,
-  return_aov = T
-)
-
-print(repeated_summary_anova)
-# ignore warning about letter, it is already a factor
-```
-
-```{r}
-# normality of residuals
-
-repeated_summary_anova_lm_model <- lm(time_value ~ time, data = repeated_summary_df)
-repeated_summary_anova_resid_vals <- residuals(repeated_summary_anova_lm_model)
-
-qqnorm(repeated_summary_anova_resid_vals)
-qqline(repeated_summary_anova_resid_vals)
-shapiro.test(repeated_summary_anova_resid_vals)
-# log transform could do good here too
-```
