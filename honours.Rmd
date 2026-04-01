@@ -258,7 +258,7 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
 ```
 
 Raw REPEATED Plots for each cell:
-```{r eval=FALSE}
+```{r}
 raw_eEPSC_repeated_plots <- plot_raw_current_data(
  data = normalized_raw_eEPSC_df, # why are RMA3 and RMA4 not showing up (May 2025)
  # no longer filtering bad cells RMA5 and RMA7 (2025/6/16)
