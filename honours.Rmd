@@ -113,8 +113,9 @@ AP_data <- AP_data %>%
     category == 2 & treatment == "Control" ~ "acute",
     category == 2 & treatment == "AM251" ~ "AM251",
     category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort" ~ "cort",
   )) %>%
-  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated")))
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
 ```
 
 
@@ -122,11 +123,11 @@ AP_data <- AP_data %>%
 defining my colour theme
 ```{r}
 my_theme_colours <- data.frame(
-  category = c(1, 2, 3, 2),
-    treatment = c("Control", "Control", "Control", "AM251"),
-  display_names = c("Naive", "Acute", "Repeated", "Acute with AM251"),
-  colours = c("#ecc479", "#eb647e", "#005b96", "#C11C84"),
-  very_pale_colours = c("#f5e0b3", "#f19cac", "#6497b1", "#FFADFF")
+  category = c(1, 2, 3, 2, 1),
+    treatment = c("Control", "Control", "Control", "AM251", "Cort"),
+  display_names = c("Naive", "Acute", "Repeated", "Acute with AM251", "Naive with Corticosterone"),
+  colours = c("#ecc479", "#eb647e", "#005b96", "#C11C84", "#6aa84f"),
+  very_pale_colours = c("#f5e0b3", "#f19cac", "#6497b1", "#FFADFF","#93c47d")
 )
 ```
 
@@ -275,6 +276,25 @@ raw_eEPSC_repeated_plots <- plot_raw_current_data(
 
  raw_eEPSC_repeated_plots
 ```
+
+```{r eval=FALSE}
+raw_eEPSC_cort_plots <- plot_raw_current_data(
+ data = normalized_raw_eEPSC_df, 
+  plot_treatment = "Cort", 
+  plot_category = 1, 
+  current_type = "eEPSC",
+  y_variable = "P1",
+  pruned = "no",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+ raw_eEPSC_cort_plots
+```
+
+
 ## Pruned Plots per Cell
 Prune full cells from the normalized raw data: FOR FULL CELLS ONLY
 ```{r}
@@ -283,13 +303,27 @@ Prune full cells from the normalized raw data: FOR FULL CELLS ONLY
 pruned_eEPSC_df <- make_pruned_EPSC_data(
   data = normalized_raw_eEPSC_df,
   current_type = "eEPSC",
-  min_time_value = 6,
+  min_time_value = 0, 
+  max_time_value = 30,
+  baseline_length = 5, 
+  interval_length = 1
+)
+
+pruned_eEPSC_df$individual_cells
+```
+
+```{r}
+# all cells
+all_pruned_eEPSC_df <- make_pruned_EPSC_data(
+  data = normalized_raw_eEPSC_df,
+  current_type = "eEPSC",
+  min_time_value = 0,
   max_time_value = 30,
   baseline_length = 5,
   interval_length = 1
 )
 
-pruned_eEPSC_df$individual_cells
+all_pruned_eEPSC_df$individual_cells
 ```
 
 
@@ -365,6 +399,25 @@ pruned_eEPSC_repeated_plots
 
 # MR11, MR12, maybe MR7 baselines might be questionable
 ```
+
+```{r eval=FALSE}
+pruned_eEPSC_cort_plots <- plot_raw_current_data(
+  data = pruned_eEPSC_df$individual_cells,
+  plot_treatment = "Cort",
+  plot_category = 1,
+  current_type = "eEPSC",
+  y_variable = "mean_P1",
+  pruned = "yes",
+  hormone_added = "HFS",
+  hormone_or_HFS_start_time = 5,
+  theme_options = my_theme_options,
+  treatment_colour_theme = my_theme_colours
+)
+
+pruned_eEPSC_cort_plots
+```
+
+
 ## Summary Plots
 Summary DATA
 ```{r}
@@ -819,14 +872,57 @@ male_acute_summary_plot
 # ggsave(male_acute_summary_plot, path = here("Figures"), file = "male_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
+CORT FEMALE Summary:
+```{r}
+female_cort_summary_plot <- pruned_eEPSC_df$all_cells %>%
+  filter(sex == "Female" & category %in% c(1) & treatment == "Cort") %>%
+  ggplot(aes(x = time, y = mean_P1_all_cells, ymin = mean_P1_all_cells - se_P1_all_cells, ymax = mean_P1_all_cells + se_P1_all_cells, colour = category)) +
+  geom_pointrange(size = 0.9, shape = 16) +
+  ylim(0,230) +
+  labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) + # NULL for legend heading
+  geom_hline(yintercept = 100, linetype = "dashed") +
+  scale_colour_manual(values = c("#93c47d"), labels = c("Naive with Corticosterone, n = 7")) + 
+  
+  # add HFS text
+  annotate(
+        geom = "text",
+        x = 5,
+        y = 220,
+        label = "HFS",
+        size = 4,
+        hjust = 0.5
+      ) +
+  
+  # add arrow
+   annotate(
+        geom = "segment",
+        x = 5,
+        y = 210,
+        xend = 5,
+        yend = 190,
+        arrow = grid::arrow(type = "closed", length = grid::unit(0.02, "npc"))
+      ) +
+  patchclampplotteR_theme() +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.025, 0.05),
+    legend.justification = c(0, 0)
+  )
+
+female_cort_summary_plot
+
+# ggsave(female_cort_summary_plot, path = here("Figures"), file = "female_cort_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+
 ### overall summary percent change mean and SE for eEPSC
 summary data has both full and baseline only cells
 ```{r}
 female_percentchange_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251", "Cort")) %>%
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   )) %>%
   group_by(cat_treat) %>%  
   summarise(
@@ -843,10 +939,10 @@ female_percentchange_eEPSC_summary
 ```{r}
 # baseline
 female_baseline_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251")) %>%
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251", "Cort")) %>%
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   )) %>%
   group_by(cat_treat) %>%  
   summarise(
@@ -860,10 +956,10 @@ female_baseline_eEPSC_summary
 
 # post HFS
 female_HFS_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys
+  filter(sex == "Female" & category %in% c(1, 2, 3) & treatment %in% c("Control", "AM251", "Cort") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   )) %>%
   group_by(cat_treat) %>%  
   summarise(
@@ -877,13 +973,13 @@ female_HFS_eEPSC_summary
 ```
 
 ## Baseline eEPSC
-```{r eval=FALSE}
+```{r}
 # data
 female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251")) %>% 
+  filter(sex == "Female" & category %in% c(1,2, 3) & treatment %in% c("Control","AM251", "Cort")) %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   )) %>%
   
   ggplot(aes(x = cat_treat, y = t0to5)) +
@@ -913,14 +1009,18 @@ female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   # colours
   scale_fill_manual(values = c("1.Control" = "#f5e0b3",
                                "2.Control" = "#f19cac",
-                               "2.AM251" = "#ffadff")) +
+                               "2.AM251" = "#ffadff",
+                               "3.Control" = "#6497b1",
+                               "1.Cort" = "#93c47d")) +
   
   scale_color_manual(values = c("1.Control" = "#ecc479", 
                                 "2.Control" = "#eb647e", 
-                                "2.AM251" = "#c11c84")) +
+                                "2.AM251" = "#c11c84",
+                                "3.Control" = "#005b96",
+                                "1.Cort" = "#6aa84f")) +
   
   # x-axis labels  
-scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
+scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated", "Naive with Corticosterone")) +
   
 # x-axis subtitles  
   #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
@@ -937,62 +1037,6 @@ female_baseline_amp_plot
 
 ```
 
-```{r eval=FALSE}
-# data
-female_baseline_control_amp_plot <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control")) %>% 
-  mutate(cat_treat = factor(
-    interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "3.Control")
-  )) %>%
-  
-  ggplot(aes(x = cat_treat, y = t0to5)) +
-  
-  patchclampplotteR_theme() +
-  
-# axis labels
-  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
-  patchclampplotteR_theme() +
-  
-# the boxes
-  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
-               alpha = 0.6, 
-               color = "black", # get rid of if want the dark colour to be the outline
-# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
-               outlier.shape = NA, 
-               width = 0.5, 
-               show.legend = FALSE)  +
-  
-  # the dots/scatter plot
-  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
-            max_width = 0.2, 
-            shape = 16, 
-            size = 2, 
-            show.legend = FALSE) +
-
-  # colours
-  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
-                               "2.Control" = "#f19cac",
-                               "3.Control" = "#6497b1")) +
-  
-  scale_color_manual(values = c("1.Control" = "#ecc479", 
-                                "2.Control" = "#eb647e", 
-                                "3.Control" = "#005b96")) +
-  
-  # x-axis labels  
-scale_x_discrete(labels = c("Naive", "Acute", "Repeated")) +
-  
-  
-  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
-
-  guides(fill = "none", color = "none")
-
-female_baseline_control_amp_plot
-
-# ggsave(female_baseline_control_amp_plot, path = here("Figures"), file = "female_baseline_control_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-
-```
-
 
 
 eEPSC amplitude after the HFS (25-30 min)
@@ -1000,10 +1044,10 @@ eEPSC amplitude after the HFS (25-30 min)
 ```{r eval=FALSE}}
 # data
 female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control","AM251") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys %>% 
+  filter(sex == "Female" & category %in% c(1,2, 3) & treatment %in% c("Control","AM251", "Cort") & !(letter %in% c("RMA100A", "RMR100", "RMR101", "RMR102", "RMR103", "RMR104", "RMR105", "RMR106", "RMR107"))) %>% # excluding baseline onlys %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   )) %>%
   
   ggplot(aes(x = cat_treat, y = t25to30)) +
@@ -1037,28 +1081,24 @@ female_HFS_amp_plot <- summary_eEPSC_df$percent_change_data %>%
   # colours
   scale_fill_manual(values = c("1.Control" = "#f5e0b3",
                                "2.Control" = "#f19cac",
-                               "2.AM251" = "#ffadff")) +
+                               "2.AM251" = "#ffadff",
+                               "3.Control" = "#6497b1",
+                               "1.Cort" = "#93c47d")) +
   
   scale_color_manual(values = c("1.Control" = "#ecc479", 
                                 "2.Control" = "#eb647e", 
-                                "2.AM251" = "#c11c84")) +
+                                "2.AM251" = "#c11c84",
+                                "3.Control" = "#005b96",
+                                "1.Cort" = "#6aa84f")) +
   
   # x-axis labels  
-scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251")) +
+scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated", "Naive with Corticosterone")) +
   
 # x-axis subtitles  
   #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
   #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
   #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
-  
-  # t-test
-  stat_compare_means(
-    method = "t.test", 
-    test.arg = list(paired = FALSE),
-    label = "p.format", # p.signif does the stars, p.format shows the p-value
-    comparisons = list(c("1.Control", "2.Control"), c("1.Control", "2.AM251"), c("2.AM251", "2.Control")), 
-    textsize = 5
-) + 
+
   
   scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
 
@@ -1088,7 +1128,8 @@ PPR_df <- PPR_df %>%
     category == 1 & treatment == "Control" ~ "naive",
     category == 2 & treatment == "Control" ~ "acute",
     category == 2 & treatment == "AM251" ~ "AM251",
-    category == 3 & treatment == "Control" ~ "repeated"
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort" ~ "cort"
   )) 
 ```
 
@@ -1214,7 +1255,8 @@ plot_PPR_data_single_treatment(
     "naive" = "Naive",
     "acute" = "Acute",
     "AM251" = "Acute with AM251",
-    "repeated" = "Repeated")
+    "repeated" = "Repeated",
+    "cort" = "Naive with Corticosterone")
 
 
 # baseline only cells  
@@ -1252,12 +1294,14 @@ female_PPR_plot <- female_paired_PPR_df %>%
     "naive" = "#f5e0b3", # or "darkgrey"
     "acute" = "#f19cac",
     "AM251" = "#FFADFF",
-    "repeated" = "#6497b1"
+    "repeated" = "#6497b1",
+    "cort" = "#93c47d"
   )) +
 scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
   
 # facet by group in order
   facet_wrap(~ group, labeller = as_labeller(group_labels), nrow = 1) + # nrow = 1 makes it all on one line
+  # want to change order but whatever
   
 # add significance brackets
   geom_signif(
@@ -1307,19 +1351,20 @@ female_PPR_plot
 # ggsave(female_PPR_plot, path = here("Figures"), file = "female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
-### PPR female acute plot
+### PPR female plot
 ```{r eval=FALSE}
 #1 facet labels
   facet_labels <- c(
     "1.Control.Female" = "Naive",
     "2.Control.Female" = "Acute",
-    "2.AM251.Female" = "Acute with AM251")
+    "2.AM251.Female" = "Acute with AM251",
+    "1.Cort.Female" = "Naive with Corticosterone")
 
 #2 making the data frame for individual cells
 female_acute_PPR_plot_df <- PPR_df %>%
   filter(state %in% c("Baseline", "Post-modification")) %>% 
   filter(sex == "Female") %>% 
-  filter(category != 3) %>% # excluding category 3 (repeated), could also use category %in% c(1,2)
+  filter(category %in% c(1,2,3)) %>% # excluding category 3 (repeated), could use category %in% c(1,2) or exclude using filter(category != 3)
   mutate(
     state = ifelse(state == "Post-modification", "HFS", state)) %>% # rename to HFS
  mutate(facet_group = factor(interaction(category, treatment, sex),
@@ -1351,7 +1396,9 @@ female_acute_PPR_plot <- female_acute_PPR_plot_df %>%
   scale_colour_manual(values = c(
     "1.Control" = "#f5e0b3", # or "darkgrey"
     "2.Control" = "#f19cac",
-    "2.AM251" = "#FFADFF"
+    "2.AM251" = "#FFADFF",
+    "3.Control" = "#6497b1",
+    "1.Cort" = "#93c47d"
   )) +
 scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
   
@@ -1509,21 +1556,23 @@ PPR_plot
 ### PPR baseline visualization
 ```{r}
 # specific group order
-group_order <- c("naive", "acute", "AM251", "repeated")
+group_order <- c("naive", "acute", "AM251", "repeated", "cort")
 
 # colours for groups
 light_group_colors <- c(
   "naive" = "#f5e0b3",
   "acute" = "#f19cac",
   "AM251" = "#FFADFF",
-  "repeated" = "#6497b1"
+  "repeated" = "#6497b1",
+  "cort" = "#93c47d"
 )
 
 group_colors <- c(
   "naive" = "#ecc479",
   "acute" = "#eb647e",
   "AM251" = "#c11c84",
-  "repeated" = "#005b96"
+  "repeated" = "#005b96",
+  "cort" = "#6aa84f"
 )
 
 
@@ -1552,7 +1601,8 @@ female_baseline_group_PPR_plot <- female_baseline_PPR_df %>%
   scale_x_discrete(labels = c("naive" = "Naive", 
                               "acute" = "Acute", 
                               "AM251" = "Acute with AM251", 
-                              "repeated" = "Repeated")) +
+                              "repeated" = "Repeated",
+                              "cort" = "Naive with Corticosterone")) +
   # y-axis
     scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0, 0.05))) +
 
@@ -1587,21 +1637,23 @@ qqline(female_baseline_PPR_anova_resid, col = "red")
 ### PPR HFS visualization
 ```{r}
 # specific group order
-group_order <- c("naive", "acute", "AM251", "repeated")
+group_order <- c("naive", "acute", "AM251", "repeated", "cort")
 
 # colours for groups
 light_group_colors <- c(
   "naive" = "#f5e0b3",
   "acute" = "#f19cac",
   "AM251" = "#FFADFF",
-  "repeated" = "#6497b1"
+  "repeated" = "#6497b1",
+  "cort" = "#93c47d"
 )
 
 group_colors <- c(
   "naive" = "#ecc479",
   "acute" = "#eb647e",
   "AM251" = "#c11c84",
-  "repeated" = "#005b96"
+  "repeated" = "#005b96",
+  "cort" = "#6aa84f"
 )
 
 
@@ -1630,7 +1682,8 @@ female_HFS_group_PPR_plot <- female_HFS_PPR_df %>%
   scale_x_discrete(labels = c("naive" = "Naive", 
                               "acute" = "Acute", 
                               "AM251" = "Acute with AM251", 
-                              "repeated" = "Repeated")) +
+                              "repeated" = "Repeated",
+                              "cort" = "Naive with Corticosterone")) +
   # y-axis
     scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0, 0.05))) +
 
@@ -1684,8 +1737,9 @@ AP_freq_df <- AP_count_data %>%
     sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
     sex == "Female" & category == 2 & treatment == "AM251" ~ "AM251",
     sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
+    sex == "Female" & category == 1 & treatment == "Cort" ~ "cort",
   )) %>%
-  mutate(group = factor(group, levels = c("acute", "AM251", "repeated")))
+  mutate(group = factor(group, levels = c("acute", "AM251", "repeated", "cort")))
 
 # letter and state need to be factors
 AP_freq_df$state <- factor(AP_freq_df$state)
@@ -1701,33 +1755,52 @@ female_baseline_AP_freq_df <- AP_freq_df %>%
 # eyeball interaction plot
 
 library(sciplot)
-female_baseline_AP_freq_df$sweep <- factor(female_baseline_AP_freq_df$sweep, levels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) # telling it what order
-lineplot.CI(x.factor=sweep, response=AP_frequency, group=group, xlab="Sweep", ylab="AP Frequency (Hz)", data=female_baseline_AP_freq_df) 
+AP_freq_df$state <- factor(AP_freq_df$state, levels=c("Baseline", "HFS")) # telling it what order
+lineplot.CI(x.factor=state, response=AP_frequency, group=group, xlab="State", ylab="AP Frequency (Hz)", data=AP_freq_df) 
 ```
 
 ```{r}
 library(nlme)
 # starting it off with imposed compound symmetry (assumes sphericity)
-female_baseline_AP_freq_model.cs = lme(AP_frequency ~ group*sweep, data = female_baseline_AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
-anova(female_baseline_AP_freq_model.cs) 
+AP_freq_model.cs = lme(AP_frequency ~ group*state, data = AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(AP_freq_model.cs) 
 ```
 ```{r, fig.width = 12, fig.height = 10}
 library(sjPlot) 
-plot_grid(plot_model(female_baseline_AP_freq_model.cs, type = "diag")) 
-# lowkey fine
+plot_grid(plot_model(AP_freq_model.cs, type = "diag")) 
+# bad
 ```
 
 ```{r}
-library(emmeans)
+# log + 1 transform
+AP_freq_df$log_AP_frequency <- log(AP_freq_df$AP_frequency + 1)
 
-# get estimated marginal means for sweep
-female_baseline_AP_freq_emm <- emmeans(female_baseline_AP_freq_model.cs, ~ sweep)
+# new model
+log_AP_freq_model.cs = lme(log_AP_frequency ~ group*state, data = AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+anova(log_AP_freq_model.cs) 
 
-# pairwise comparisons with Tukey correction
-pairs(female_baseline_AP_freq_emm, adjust = "tukey")
+# retest assumptions
+plot_grid(plot_model(log_AP_freq_model.cs, type = "diag")) # looks horrible, this is technically count data so maybe want to use negative binomial
 ```
 
+```{r}
+# negative binomial
 
+library(glmmTMB)
+library(lme4)
+library(car)
+library(DHARMa)
+
+AP_freq_model.nb <- glmer.nb(AP_frequency ~ group*state + (1|letter), data=AP_freq_df)
+Anova(AP_freq_model.nb, type="III", component="cond")
+summary(AP_freq_model.nb)
+
+
+AP_freq_model.res.nb <- simulateResiduals(AP_freq_model.nb, n = 1000)
+plot(AP_freq_model.res.nb)
+testUniformity(AP_freq_model.res.nb)
+testDispersion(AP_freq_model.res.nb)
+```
 
 
 ### Christelinda's
@@ -1779,6 +1852,24 @@ plot_AP_frequencies_single_treatment(
   save_plot_png = "no"
 )
 ```
+```{r eval=FALSE}
+plot_AP_frequencies_single_treatment(
+  data = AP_count_data, # 
+  plot_treatment = "Cort",
+  plot_category = 1, 
+  included_sexes = "female",
+  baseline_label = "Baseline",
+  hormone_added = "HFS",
+  significance_display_method = "p-values", # could be "p-values" or "stars"
+  treatment_colour_theme = my_theme_colours,
+  large_axis_text = "no",
+  test_type = "wilcox.test", # need to test assumptions
+  theme_options = my_theme_options,
+  save_plot_png = "no"
+)
+```
+
+
 
 ## AP Amplitude
 ### Mine
@@ -1788,7 +1879,7 @@ library(lmerTest)
 library(sciplot)
 
 # can't have neurons that didn't fire any dragging it down
-no_zeros_female_AP_amp <- subset(AP_data, letter %in% c("RMA1", "RMA3", "RMA8", "RMA9", "RMA10", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA10A", "RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "RMR9", "RMR10"))
+no_zeros_female_AP_amp <- subset(AP_data, letter %in% c("RMA1", "RMA3", "RMA8", "RMA9", "RMA10", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA10A", "RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "RMR9", "RMR10", "RMC1", "RMC2", "RMC3", "RMC4", "RMC5", "RMC6", "RMC7"))
 
 lineplot.CI(x.factor = state, response = peak_amplitude, group = group, xlab="State", ylab="AP Amplitude (pA)", data = no_zeros_female_AP_amp) 
 # looks like there will be an interaction
@@ -2030,13 +2121,92 @@ repeated_female_AP_plot
 # ggsave(repeated_female_AP_plot, path = here("Figures"), file = "repeated_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
+#### Cort Females 
+```{r}
+# data
+cort_females <- c("RMC1", "RMC2", "RMC4", "RMC5", "RMC6", "RMC7") # remove RMC3 because they have a 0 value
+cort_female_AP_data <- subset(AP_data, letter %in% cort_females)
+
+
+cort_female_baseline_AP_data <- subset(cort_female_AP_data, state == "Baseline")$peak_amplitude
+cort_female_HFS_AP_data <- subset(cort_female_AP_data, state == "HFS")$peak_amplitude
+
+cort_female_AP_data_diff <- cort_female_baseline_AP_data-cort_female_HFS_AP_data
+
+
+# normality
+qqnorm(cort_female_AP_data_diff) 
+qqline(cort_female_AP_data_diff) 
+shapiro.test(cort_female_AP_data_diff) # normality test of difference variable
+# normal (when the cells with 0 amplitude are removed)
+
+t.test(cort_female_baseline_AP_data, cort_female_HFS_AP_data, paired = TRUE)
+
+cort_female_AP_t.test_pvalue <- 0.1261
+```
+
+```{r}
+# visualize
+
+cort_female_AP_plot <- cort_female_AP_data[, c("letter", "state", "peak_amplitude")]
+
+# plot
+cort_female_AP_plot <- cort_female_AP_data %>%
+  ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
+  
+# individual cells
+  geom_point(aes(state), size = 1, colour = "lightgrey") + # or #f19cac
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1),
+               fun.data = mean_se,
+               geom = "line",
+               colour = "#6aa84f",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1),
+    fun.data = mean_se,
+    geom = "point",
+    colour = "#6aa84f",
+    size = 2.5
+  ) + 
+
+# bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,  
+    annotations = cort_female_AP_t.test_pvalue,  
+    vjust = -0.3,
+    textsize = 5,
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+
+# y-axis
+  scale_y_continuous(limits = c(0, 100)) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+cort_female_AP_plot
+
+# ggsave(acute_female_AP_plot, path = here("Figures"), file = "acute_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+
+
 #### ANOVA
 ```{r}
 # making it into one data frame
 AP_amp_anova_data <- subset(AP_data, 
                      letter %in% c(acute_females,
                                    AM251_females,
-                                   repeated_females))
+                                   repeated_females,
+                                   cort_females))
 
 # treated as factors
 AP_amp_anova_data$group <- factor(AP_amp_anova_data$group)
@@ -2056,11 +2226,13 @@ AP_amp_anova_plot <- ggplot(AP_amp_anova_data, aes(x = group, y = peak_amplitude
   theme(legend.position = "none") +
   scale_fill_manual(values = c("acute" = "#f19cac",
                                "AM251" = "#ffadff",
-                               "repeated" = "#6497b1")) +
+                               "repeated" = "#6497b1",
+                               "cort" = "#93c47d")) +
   
   scale_color_manual(values = c("acute" = "#eb647e", 
                                 "AM251" = "#c11c84",
-                                "repeated" = "#005b96")) 
+                                "repeated" = "#005b96",
+                                "cort" = "#6aa84f")) 
 
 AP_amp_anova_plot
 ```
@@ -2128,6 +2300,7 @@ plot_AP_comparison(
   save_plot_png = "no"
 )
 ```
+
 AP Amplitude: Acute Females with AM251
 ```{r eval=FALSE}
 plot_AP_comparison(
@@ -2191,6 +2364,7 @@ variance_2_df
 # 1/CV2 depends on N and Pr, but not on Q
 # VMR depends on Pr and Q, but not on N
 ```
+
 ```{r}
 variance_1_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
@@ -2205,6 +2379,7 @@ variance_1_df <- make_variance_data(
 
 variance_1_df
 ```
+
 ```{r}
 variance_3_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
@@ -2395,14 +2570,53 @@ cv_comparison_naive_plot
 vmr_comparison_naive_plot
 ```
 
+```{r}
+cv_comparison_cort_plot <- plot_variance_comparison_data(
+  data = variance_1_df,
+  plot_category = 1, 
+  plot_treatment = "Cort",
+  variance_measure = "cv",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  left_sex = "Female",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+vmr_comparison_cort_plot <- plot_variance_comparison_data(
+  data = variance_1_df,
+  plot_category = 1, 
+  plot_treatment = "Cort",
+  variance_measure = "VMR",
+  included_sexes = "both",
+  facet_by_sex = "yes",
+  left_sex = "Female",
+  baseline_interval = "t0to5",
+  post_hormone_interval = "t25to30",
+  post_hormone_label = "HFS",
+  test_type = "wilcox.test",
+  large_axis_text = "no",
+  treatment_colour_theme = my_theme_colours,
+  theme_options = my_theme_options
+)
+
+cv_comparison_cort_plot
+vmr_comparison_cort_plot
+```
+
 ## ANOVA for Baseline eEPSC
 ```{r}
 # data frame
 female_amp_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251")) %>% 
+  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251", "Cort")) %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
   ))
 
 female_amp_df
@@ -2472,54 +2686,6 @@ qqline(log_female_baseline_amp_anova_residuals, col = "red")
 kruskal.test(t0to5 ~ cat_treat, data = female_amp_df)
 ```
 
-```{r}
-library(ggplot2)
-library(ggforce)   # for geom_sina
-library(ggpubr)    # optional, for stat_compare_means
-
-fill_colors <- c(
-  "1.Control" = "#f5e0b3",
-  "2.Control" = "#f19cac",
-  "2.AM251"   = "#ffadff",
-  "3.Control" = "#6497b1"
-)
-
-line_colors <- c(
-  "1.Control" = "#ecc479",
-  "2.Control" = "#eb647e",
-  "2.AM251"   = "#c11c84",
-  "3.Control" = "#005b96"
-)
-
-# Plot
-female_baseline_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t0to5)) +
-  
-  # theme
-  patchclampplotteR_theme() +
-  
-  # Boxplots
-  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
-               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
-  
-  # Sina (jittered) points
-  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
-  
-  # Colors
-  scale_fill_manual(values = fill_colors) +
-  scale_color_manual(values = line_colors) +
-  
-  # X-axis labels
-  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
-  
-  # Axis labels
-  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
-
-  # Remove legend
-  guides(fill = "none", color = "none")
-
-female_baseline_amp_anova_plot
-```
-
 ## ANOVA for post HFS eEPSC
 
 ```{r}
@@ -2529,13 +2695,17 @@ leveneTest(t25to30 ~ cat_treat, data = female_amp_df)
 # variances are homogeneous
 
 leveneTest(log_t25to30 ~ cat_treat, data = female_amp_df)
-# variances are NOT homogeneous
+# variances are homogeneous
 ```
 
 ```{r}
 # one-way ANOVA
 female_HFS_amp_anova <- aov(t25to30 ~ cat_treat, data = female_amp_df)
 summary(female_HFS_amp_anova)
+
+# log
+log_female_HFS_amp_anova <- aov(log_t25to30 ~ cat_treat, data = female_amp_df)
+summary(log_female_HFS_amp_anova)
 ```
 
 ```{r}
@@ -2551,58 +2721,21 @@ hist(female_HFS_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
 qqnorm(female_HFS_amp_anova_residuals)
 qqline(female_HFS_amp_anova_residuals, col = "red")
 
-# log transforming made it not HoV so because HoV is more important I am going to do a non-parametric test instead 
+
+
+# log transformed
+log_female_HFS_amp_anova_residuals <- residuals(log_female_HFS_amp_anova)
+
+# check normality of residuals
+shapiro.test(log_female_HFS_amp_anova_residuals)
+# normal
+
+hist(log_female_HFS_amp_anova_residuals, breaks = 10, main = "Residuals Histogram")
+
+qqnorm(log_female_HFS_amp_anova_residuals)
+qqline(log_female_HFS_amp_anova_residuals, col = "red")
 ```
 
-```{r}
-# non-parametric Kruskal-Wallis
-
-kruskal.test(t25to30 ~ cat_treat, data = female_amp_df)
-```
-
-```{r}
-fill_colors <- c(
-  "1.Control" = "#f5e0b3",
-  "2.Control" = "#f19cac",
-  "2.AM251"   = "#ffadff",
-  "3.Control" = "#6497b1"
-)
-
-line_colors <- c(
-  "1.Control" = "#ecc479",
-  "2.Control" = "#eb647e",
-  "2.AM251"   = "#c11c84",
-  "3.Control" = "#005b96"
-)
-
-# Plot
-female_HFS_amp_anova_plot <- ggplot(female_amp_df, aes(x = cat_treat, y = t25to30)) +
-  
-  # theme
-  patchclampplotteR_theme() +
-  
-  # Boxplots
-  geom_boxplot(aes(fill = cat_treat, color = cat_treat),
-               alpha = 0.6, outlier.shape = NA, width = 0.5, show.legend = FALSE) +
-  
-  # Sina (jittered) points
-  geom_sina(aes(color = cat_treat), max_width = 0.2, shape = 16, size = 2, show.legend = FALSE) +
-  
-  # Colors
-  scale_fill_manual(values = fill_colors) +
-  scale_color_manual(values = line_colors) +
-  
-  # X-axis labels
-  scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
-  
-  # Axis labels
-  labs(x = NULL, y = "Final eEPSC Amplitude (pA)") +
-
-  # Remove legend
-  guides(fill = "none", color = "none")
-
-female_HFS_amp_anova_plot
-```
 
 ## Repeated Measures
 ```{r}
@@ -2618,9 +2751,10 @@ group = case_when(
       sex == "Female" & category == 1 & treatment == "Control" ~ "naive",
       sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
       sex == "Female" & category == 2 & treatment == "AM251"   ~ "AM251",
-      sex == "Female" & category == 3 & treatment == "Control" ~ "repeated"
+      sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
+      sex == "Female" & category == 1 & treatment == "Cort" ~ "cort"
       ),
-    group = factor(group, levels = c("naive", "acute", "AM251", "repeated"))
+    group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort"))
   ) %>% ungroup() %>% as.data.frame() %>% droplevels() %>%
   filter(!is.na(group))
 
@@ -2722,8 +2856,8 @@ log_project_model.ar1 = lme(log_time_value ~ group*time, data = df_female_long, 
 anova(log_project_model.ar1)
 anova(log_project_model.cs, log_project_model.ar1)
 
-# (autoregressive) ar1 structure is a better fit (lower AIC by 101)
-# significant effect of time (p < 0.0001) and of group*time interaction (p = 0.0083)
+# (autoregressive) ar1 structure is a better fit (lower AIC)
+# significant effect of time (p < 0.0001) and of group*time interaction (p = 0.0133)
 # INTERACTION -> CANNOT DIRECTLY INTERPRET MAIN EFFECTS
 ```
 
@@ -2753,6 +2887,7 @@ df_female_summary_naive <- df_female_long %>% filter(group == "naive")
 df_female_summary_acute <- df_female_long %>% filter(group == "acute")
 df_female_summary_AM251 <- df_female_long %>% filter(group == "AM251")
 df_female_summary_repeated <- df_female_long %>% filter(group == "repeated")
+df_female_summary_cort <- df_female_long %>% filter(group == "cort")
 ```
 
 ```{r}
@@ -2904,6 +3039,18 @@ repeated_repmesanov.t0to5_t25to30 <- aov_ez(id = "letter", dv = "time_value", da
   type = "III")  
 summary(repeated_repmesanov.t0to5_t25to30)
 ```
+
+```{r}
+# cort
+ar1.project_cort.fit <- lme(
+  log_time_value ~ time,
+  random = ~1 | letter,
+  data = df_female_summary_cort,
+  correlation = corAR1(form= ~1|letter)
+)
+anova(ar1.project_cort.fit) # significant effect of time (p = 0.1603) -> need post hoc
+```
+
 p-values evaluated against p = 0.01 to account for multiple (5) comparisons
 bonferroni correction
 0.05/5 = 0.01 (corrected alpha level)
