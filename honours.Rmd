@@ -513,7 +513,7 @@ acute_summary_plot <- plot_summary_current_data(
   hormone_or_HFS_start_time = 5,
   included_sexes = "female",
   include_representative_trace = "no",
-  representative_trace_filename = import_ext_data("Control-trace.png"),
+  representative_trace_filename = "Figures/Representative-Traces/acute_trace.png",
   y_axis_limit = 230,
   # signif_stars = "yes",
   geom_signif_text_size = 8,
@@ -524,7 +524,7 @@ acute_summary_plot <- plot_summary_current_data(
   treatment_colour_theme = my_theme_colours,
   theme_options = my_theme_options,
   save_plot_png = "no"
-) #+ theme(legend.position = "none") keeping this hashed out keeps the n = # label in
+) # + theme(legend.position = "none") # keeping this hashed out keeps the n = # label in
 
 acute_summary_plot
 
@@ -2222,7 +2222,7 @@ AP_amp_anova_plot <- ggplot(AP_amp_anova_data, aes(x = group, y = peak_amplitude
   geom_jitter(aes(color = group), width = 0.15, size = 2, alpha = 0.8) +
   facet_wrap(~ state) +
   patchclampplotteR_theme() +
-  labs(y = "Peak Amplitude (pA)", x = NULL) +
+  labs(y = "AP Peak Amplitude (pA)", x = NULL) +
   theme(legend.position = "none") +
   scale_fill_manual(values = c("acute" = "#f19cac",
                                "AM251" = "#ffadff",
