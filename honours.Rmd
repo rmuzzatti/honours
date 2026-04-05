@@ -207,6 +207,16 @@ raw_eEPSC_acute_plots <- plot_raw_current_data(
 )
 
  raw_eEPSC_acute_plots
+ 
+# ggsave(raw_eEPSC_acute_plots$RMA1, path = here("Figures"), file = "raw_eEPSC_acute_plots_RMA1.png", width = 7, height = 5, units = "in", dpi = 300)
+
+# remove the title and subtitle 
+RMA1_plot <- raw_eEPSC_acute_plots$RMA1 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+
+RMA1_plot
+
+# saving as png to figure folder
+# ggsave(RMA1_plot, path = here("Figures"), file = "RMA1_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 Raw ACUTE Plots for each cell with AM251:
 ```{r eval=FALSE}
@@ -225,6 +235,13 @@ raw_eEPSC_acute_plots_AM251 <- plot_raw_current_data(
 
  raw_eEPSC_acute_plots_AM251
 
+# remove the title and subtitle 
+RMA2A_plot <- raw_eEPSC_acute_plots_AM251$RMA2A + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+
+RMA2A_plot
+
+# saving as png to figure folder
+# ggsave(RMA2A_plot, path = here("Figures"), file = "RMA2A_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Raw Naive Plots for each cell:
@@ -245,9 +262,9 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
  raw_eEPSC_naive_plots
 
 # remove the title ("Recording LS10") and subtitle ("Treatment: Control Sex: Female")
-# LS10_plot <- raw_eEPSC_naive_plots$LS10 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+LS2_plot <- raw_eEPSC_naive_plots$LS2 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
 
-# LS10_plot
+LS2_plot
 
 #fixing the y-axis
 # LS10_final_plot <- LS10_plot + ylim(0,550)
@@ -255,7 +272,7 @@ raw_eEPSC_naive_plots <- plot_raw_current_data(
 # LS10_final_plot
 
 # saving as png to figure folder
-#ggsave(LS10_final_plot, path = here("Figures"), file = "LS10_final_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+# ggsave(LS2_plot, path = here("Figures"), file = "LS2_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 Raw REPEATED Plots for each cell:
@@ -275,6 +292,16 @@ raw_eEPSC_repeated_plots <- plot_raw_current_data(
 )
 
  raw_eEPSC_repeated_plots
+ 
+# ggsave(raw_eEPSC_repeated_plots$RMR5, path = here("Figures"), file = "raw_eEPSC_repeated_plots_RMR5.png", width = 7, height = 5, units = "in", dpi = 300)
+ 
+ # remove the title and subtitle 
+RMR5_plot <- raw_eEPSC_repeated_plots$RMR5 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+
+RMR5_plot
+
+# saving as png to figure folder
+# ggsave(RMR5_plot, path = here("Figures"), file = "RMR5_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 ```{r eval=FALSE}
@@ -1294,7 +1321,238 @@ female_paired_PPR_df <- PPR_cell_df %>%
 female_paired_PPR_df <- female_paired_PPR_df %>%
   mutate(state = ifelse(state == "Post-modification", "HFS", state))
 ```
+### Thesis 
+```{r}
+# renaming to HFS
+PPR_cell_df <- PPR_cell_df %>%
+  mutate(state = recode_factor(state,
+                        "Post-modification" = "HFS"))
 
+# removing unpaired neurons (that are only baselines)
+paired_PPR_cell_df <- PPR_cell_df %>%
+  group_by(group, letter) %>%
+  filter(n_distinct(state) == 2) %>%  
+  ungroup()
+
+# converting to wide format
+wide_paired_PPR_cell_df <- paired_PPR_cell_df %>%
+  select(group, sex, letter, state, mean_PPR_cell) %>%
+  pivot_wider(names_from = state, values_from = mean_PPR_cell)
+
+
+# adding difference column (for mean_PPR_cell) to test for normality
+wide_paired_PPR_cell_df <- wide_paired_PPR_cell_df %>%
+  mutate(diff = HFS - Baseline)
+
+# filtering for only females
+wide_female_paired_PPR_cell_df <- wide_paired_PPR_cell_df %>%
+  filter(sex == "Female")
+
+
+
+# testing for normality (all good)
+shapiro.test(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "naive"])
+qqnorm(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "naive"])
+qqline(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "naive"])
+
+shapiro.test(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "acute"])
+qqnorm(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "acute"])
+qqline(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "acute"])
+
+shapiro.test(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "AM251"])
+qqnorm(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "AM251"])
+qqline(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "AM251"])
+
+shapiro.test(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "repeated"]) 
+qqnorm(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "repeated"])
+qqline(wide_female_paired_PPR_cell_df$diff[wide_female_paired_PPR_cell_df$group == "repeated"])
+
+
+# running the t-tests
+# naive 
+t.test(wide_female_paired_PPR_cell_df$HFS[wide_female_paired_PPR_cell_df$group == "naive"],
+            wide_female_paired_PPR_cell_df$Baseline[wide_female_paired_PPR_cell_df$group == "naive"],
+            paired = TRUE)
+
+# acute
+t.test(wide_female_paired_PPR_cell_df$HFS[wide_female_paired_PPR_cell_df$group == "acute"],
+       wide_female_paired_PPR_cell_df$Baseline[wide_female_paired_PPR_cell_df$group == "acute"],
+       paired = TRUE)
+
+# AM251 
+t.test(wide_female_paired_PPR_cell_df$HFS[wide_female_paired_PPR_cell_df$group == "AM251"],
+       wide_female_paired_PPR_cell_df$Baseline[wide_female_paired_PPR_cell_df$group == "AM251"],
+       paired = TRUE)
+
+# repeated 
+t.test(wide_female_paired_PPR_cell_df$HFS[wide_female_paired_PPR_cell_df$group == "repeated"],
+       wide_female_paired_PPR_cell_df$Baseline[wide_female_paired_PPR_cell_df$group == "repeated"],
+       paired = TRUE)
+```
+
+```{r}
+naive_female_PPR_plot_data <- wide_female_paired_PPR_cell_df %>%
+  filter(group == "naive") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "mean_PPR_cell")
+
+# plot
+naive_female_PPR_plot <- ggplot(naive_female_PPR_plot_data, aes(x = state, y = mean_PPR_cell, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#ecc479", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#ecc479", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(naive_female_PPR_plot_data$mean_PPR_cell) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(naive_female_PPR_plot_data$mean_PPR_cell) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")
+
+naive_female_PPR_plot
+
+# ggsave(naive_female_PPR_plot, path = here("Figures"), file = "naive_female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+acute_female_PPR_plot_data <- wide_female_paired_PPR_cell_df %>%
+  filter(group == "acute") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "mean_PPR_cell")
+
+# plot
+acute_female_PPR_plot <- ggplot(acute_female_PPR_plot_data, aes(x = state, y = mean_PPR_cell, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#eb647e", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#eb647e", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "*", 
+    y_position = max(acute_female_PPR_plot_data$mean_PPR_cell) * 1.05,
+    tip_length = 0.02,
+    textsize = 7
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(acute_female_PPR_plot_data$mean_PPR_cell) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")
+
+acute_female_PPR_plot
+
+# ggsave(acute_female_PPR_plot, path = here("Figures"), file = "acute_female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+am251_female_PPR_plot_data <- wide_female_paired_PPR_cell_df %>%
+  filter(group == "AM251") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "mean_PPR_cell")
+
+# plot
+am251_female_PPR_plot <- ggplot(am251_female_PPR_plot_data, aes(x = state, y = mean_PPR_cell, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#C11C84", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#C11C84", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(am251_female_PPR_plot_data$mean_PPR_cell) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(am251_female_PPR_plot_data$mean_PPR_cell) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")
+
+am251_female_PPR_plot
+
+# ggsave(am251_female_PPR_plot, path = here("Figures"), file = "am251_female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+repeated_female_PPR_plot_data <- wide_female_paired_PPR_cell_df %>%
+  filter(group == "repeated") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "mean_PPR_cell")
+
+# plot
+repeated_female_PPR_plot <- ggplot(repeated_female_PPR_plot_data, aes(x = state, y = mean_PPR_cell, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#005b96", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#005b96", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(repeated_female_PPR_plot_data$mean_PPR_cell) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(repeated_female_PPR_plot_data$mean_PPR_cell) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "PPR", title = NULL) +
+  theme(legend.position = "none")
+
+repeated_female_PPR_plot
+
+# ggsave(repeated_female_PPR_plot, path = here("Figures"), file = "repeated_female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
 
 female vs male acute PPR HFS
 ```{r eval=FALSE}
@@ -1460,107 +1718,6 @@ female_PPR_plot
 # ggsave(female_PPR_plot, path = here("Figures"), file = "female_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
-### PPR female plot
-```{r eval=FALSE}
-#1 facet labels
-  facet_labels <- c(
-    "1.Control.Female" = "Naive",
-    "2.Control.Female" = "Acute",
-    "2.AM251.Female" = "Acute with AM251",
-    "1.Cort.Female" = "Naive with Corticosterone")
-
-#2 making the data frame for individual cells
-female_acute_PPR_plot_df <- PPR_df %>%
-  filter(state %in% c("Baseline", "Post-modification")) %>% 
-  filter(sex == "Female") %>% 
-  filter(category %in% c(1,2,3)) %>% # excluding category 3 (repeated), could use category %in% c(1,2) or exclude using filter(category != 3)
-  mutate(
-    state = ifelse(state == "Post-modification", "HFS", state)) %>% # rename to HFS
- mutate(facet_group = factor(interaction(category, treatment, sex),
-                              levels = names(facet_labels))) %>%
-  group_by(letter, state, category, treatment, sex, facet_group) %>%
-  summarize(mean_PPR_cell = mean(PPR, na.rm = TRUE), .groups = "drop")  
-   
-#3 plot
-female_acute_PPR_plot <- female_acute_PPR_plot_df %>%
-  ggplot(aes(x = state, y = mean_PPR_cell)) + 
-
-# individual  cells  
-  geom_point(aes(shape = sex),size = 1, colour = "lightgrey") + 
-  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) + 
-  
-# group mean
-  stat_summary(aes(group = 1, colour = interaction(category, treatment)),
-               fun.data = mean_se,
-               geom = "line",
-               linewidth = 1.2) +
-  
-  stat_summary(aes(group = 1,shape = sex,colour = interaction(category, treatment)),
-    fun.data = mean_se,
-    geom = "point",
-    size = 2.5
-  ) +   
- 
-# colours and shapes
-  scale_colour_manual(values = c(
-    "1.Control" = "#f5e0b3", # or "darkgrey"
-    "2.Control" = "#f19cac",
-    "2.AM251" = "#FFADFF",
-    "3.Control" = "#6497b1",
-    "1.Cort" = "#93c47d"
-  )) +
-scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
-  
-# facet with labels and order
-  facet_wrap(~ facet_group, labeller = as_labeller(facet_labels), nrow = 1) + # nrow = 1 makes it all on one line
-  
-# add significance brackets
-  geom_signif(
-    comparisons = list(c("Baseline", "HFS")),
-    test = "t.test",
-    test.args = list(paired = TRUE),
-    map_signif_level = function(p)
-        if (p <= 0.0001) {
-          return("****")
-        } else {
-          if (p <= 0.001) {
-            return("***")
-          } else {
-            if (p <= 0.01) {
-              return("**")
-            } else {
-              if (p <= 0.05) {
-                return("*")
-              } else {
-                if (p < 0.1 & p > 0.05) {
-                  return(signif(p, 3))
-                } else {
-                  return("ns")
-                }
-              }
-            }
-          }
-        }
-, # or TRUE for stars, # FALSE for values
-    vjust = -0.3,
-    textsize = 5,
-    size = 0.5,
-    margin_top = 0.1,
-    extend_line = 0.03
-  ) +
-  
-# expand y-axis so the brackets don't overlap with labels
-  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
-  
-# theme and titles
-  patchclampplotteR_theme() +
-  labs(x = NULL, y = "PPR", title = NULL) +
-  theme(legend.position = "none")  # remove legend
-
-female_acute_PPR_plot
-
-#ggsave(female_acute_PPR_plot, path = here("Figures"), file = "female_acute_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
-```
 
 ### PPR with ALL SEXES AND TREATMENTS
 ```{r eval=FALSE}
@@ -2506,7 +2663,7 @@ variance_3_df
 
 
 Variance Comparisons for ACUTE (Control)
-```{r}
+```{r eval=FALSE}
 cv_comparison_control_plot <- plot_variance_comparison_data(
   data = variance_2_df,
   plot_category = 2, # acute
@@ -2550,7 +2707,7 @@ vmr_comparison_control_plot
 # if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
 ```
 Variance Comparisons for ACUTE (AM251)
-```{r}
+```{r eval=FALSE}
 cv_comparison_AM251_plot <- plot_variance_comparison_data(
   data = variance_2_df,
   plot_category = 2, # acute
@@ -2594,7 +2751,7 @@ vmr_comparison_AM251_plot
 # if it was significant, since there is no change in 1/CV2, it would be a presynaptic change in Q
 ```
 Variance Comparisons for REPEATED (Control)
-```{r}
+```{r eval=FALSE}
 cv_comparison_repeated_plot <- plot_variance_comparison_data(
   data = variance_3_df,
   plot_category = 3, # repeated
@@ -2640,7 +2797,7 @@ vmr_comparison_repeated_plot
 ```
 
 Variance Comparisons for NAIVE
-```{r}
+```{r eval=FALSE}
 cv_comparison_naive_plot <- plot_variance_comparison_data(
   data = variance_1_df,
   plot_category = 1, 
@@ -2679,7 +2836,7 @@ cv_comparison_naive_plot
 vmr_comparison_naive_plot
 ```
 
-```{r}
+```{r eval=FALSE}
 cv_comparison_cort_plot <- plot_variance_comparison_data(
   data = variance_1_df,
   plot_category = 1, 
@@ -2717,6 +2874,257 @@ vmr_comparison_cort_plot <- plot_variance_comparison_data(
 cv_comparison_cort_plot
 vmr_comparison_cort_plot
 ```
+
+### Thesis
+```{r}
+variance_df_list <- list(variance_1_df, variance_2_df, variance_3_df) 
+
+variance_df <- bind_rows(variance_df_list) %>% ungroup()
+
+# adding group column
+variance_df <- variance_df %>%
+  mutate(
+    group = case_when(
+      category == 1 & treatment == "Control" ~ "naive",
+      category == 2 & treatment == "Control" ~ "acute",
+      category == 2 & treatment == "AM251"   ~ "AM251",
+      category == 3 & treatment == "Control" ~ "repeated",
+       category == 1 & treatment == "Cort" ~ "cort",
+    )
+  )
+
+# renaming to HFS
+variance_df <- variance_df %>%
+  mutate(state = recode_factor(state,
+                        "Post-modification" = "HFS"))
+
+# removing unpaired neurons (that are only baselines)
+variance_df <- variance_df %>%
+  group_by(group, letter) %>%
+  filter(n_distinct(state) == 2) %>%  
+  ungroup()
+
+# converting to wide format
+wide_variance_df <- variance_df %>%
+  select(group, sex, letter, state, cv_inverse_square) %>%
+  pivot_wider(names_from = state, values_from = cv_inverse_square)
+
+
+# adding difference column (for cv_inverse_square) to test for normality
+wide_variance_df <- wide_variance_df %>%
+  mutate(diff = HFS - Baseline)
+
+# filtering for only females
+wide_female_variance_df <- wide_variance_df %>%
+  filter(sex == "Female")
+
+
+# testing for normality
+shapiro.test(wide_female_variance_df$diff[wide_female_variance_df$group == "naive"])
+qqnorm(wide_female_variance_df$diff[wide_female_variance_df$group == "naive"])
+qqline(wide_female_variance_df$diff[wide_female_variance_df$group == "naive"])
+
+shapiro.test(wide_female_variance_df$diff[wide_female_variance_df$group == "acute"])
+qqnorm(wide_female_variance_df$diff[wide_female_variance_df$group == "acute"])
+qqline(wide_female_variance_df$diff[wide_female_variance_df$group == "acute"])
+
+shapiro.test(wide_female_variance_df$diff[wide_female_variance_df$group == "AM251"])
+qqnorm(wide_female_variance_df$diff[wide_female_variance_df$group == "AM251"])
+qqline(wide_female_variance_df$diff[wide_female_variance_df$group == "AM251"])
+
+shapiro.test(wide_female_variance_df$diff[wide_female_variance_df$group == "repeated"]) # shaprio borderline (0.04591) but I say it looks good enough
+qqnorm(wide_female_variance_df$diff[wide_female_variance_df$group == "repeated"])
+qqline(wide_female_variance_df$diff[wide_female_variance_df$group == "repeated"])
+
+
+# running the t-tests
+# naive 
+t.test(wide_female_variance_df$HFS[wide_female_variance_df$group == "naive"],
+            wide_female_variance_df$Baseline[wide_female_variance_df$group == "naive"],
+            paired = TRUE)
+
+# acute
+t.test(wide_female_variance_df$HFS[wide_female_variance_df$group == "acute"],
+       wide_female_variance_df$Baseline[wide_female_variance_df$group == "acute"],
+       paired = TRUE)
+
+# AM251 
+t.test(wide_female_variance_df$HFS[wide_female_variance_df$group == "AM251"],
+       wide_female_variance_df$Baseline[wide_female_variance_df$group == "AM251"],
+       paired = TRUE)
+
+# repeated 
+t.test(wide_female_variance_df$HFS[wide_female_variance_df$group == "repeated"],
+       wide_female_variance_df$Baseline[wide_female_variance_df$group == "repeated"],
+       paired = TRUE)
+```
+
+```{r}
+naive_female_cv_plot_data <- wide_female_variance_df %>%
+  filter(group == "naive") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "cv_inverse_square")
+
+# plot
+naive_female_cv_plot <- ggplot(naive_female_cv_plot_data, aes(x = state, y = cv_inverse_square, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#ecc479", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#ecc479", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(naive_female_cv_plot_data$cv_inverse_square) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(naive_female_cv_plot_data$cv_inverse_square) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "1/CV²", title = NULL) +
+  theme(legend.position = "none")
+
+naive_female_cv_plot
+
+# ggsave(naive_female_cv_plot, path = here("Figures"), file = "naive_female_cv_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+acute_female_cv_plot_data <- wide_female_variance_df %>%
+  filter(group == "acute") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "cv_inverse_square")
+
+# plot
+acute_female_cv_plot <- ggplot(acute_female_cv_plot_data, aes(x = state, y = cv_inverse_square, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#eb647e", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#eb647e", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(acute_female_cv_plot_data$cv_inverse_square) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(acute_female_cv_plot_data$cv_inverse_square) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "1/CV²", title = NULL) +
+  theme(legend.position = "none")
+
+acute_female_cv_plot
+
+# ggsave(acute_female_cv_plot, path = here("Figures"), file = "acute_female_cv_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+am251_female_cv_plot_data <- wide_female_variance_df %>%
+    filter(group == "AM251") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "cv_inverse_square")
+
+# plot
+am251_female_cv_plot <- ggplot(am251_female_cv_plot_data, aes(x = state, y = cv_inverse_square, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#C11C84", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#C11C84", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(am251_female_cv_plot_data$cv_inverse_square) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(am251_female_cv_plot_data$cv_inverse_square) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "1/CV²", title = NULL) +
+  theme(legend.position = "none")
+
+am251_female_cv_plot
+
+# ggsave(am251_female_cv_plot, path = here("Figures"), file = "am251_female_cv_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+repeated_female_cv_plot_data <- wide_female_variance_df %>%
+    filter(group == "AM251") %>%
+  pivot_longer(cols = c(Baseline, HFS),
+               names_to = "state",
+               values_to = "cv_inverse_square")
+
+# plot
+repeated_female_cv_plot <- ggplot(repeated_female_cv_plot_data, aes(x = state, y = cv_inverse_square, group = letter)) +
+  
+# individual cells
+  geom_point(size = 1, colour = "lightgrey") +
+  geom_line(colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "line", colour = "#005b96", linewidth = 1.2) +
+  stat_summary(aes(group = 1), fun.data = mean_se, geom = "point", colour = "#005b96", size = 2.5) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(repeated_female_cv_plot_data$cv_inverse_square) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+# y-axis
+  scale_y_continuous(limits = c(0, max(repeated_female_cv_plot_data$cv_inverse_square) * 1.2)) +
+  
+# theme
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "1/CV²", title = NULL) +
+  theme(legend.position = "none")
+
+repeated_female_cv_plot
+
+# ggsave(repeated_female_cv_plot, path = here("Figures"), file = "repeated_female_cv_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+
+
 
 ## ANOVA for Baseline eEPSC
 ```{r}
