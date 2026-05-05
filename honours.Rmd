@@ -11,6 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r eval=FALSE}
 pak::pak("christelinda-laureijs/patchclampplotteR")
+
+# work around for when ^ wasn't working
+install.packages("remotes")  
+remotes::install_github("christelinda-laureijs/patchclampplotteR")
 ```
 ## Libraries
 libraries I might need
@@ -387,6 +391,13 @@ pruned_eEPSC_acute_plots <- plot_raw_current_data(
 )
 
 pruned_eEPSC_acute_plots
+
+RMA1_pruned_plot <- pruned_eEPSC_acute_plots$RMA1 + theme(plot.subtitle = element_blank(), plot.title = element_blank())
+
+RMA1_pruned_plot
+
+# saving as png to figure folder
+# ggsave(RMA1_pruned_plot, path = here("Figures"), file = "RMA1_pruned_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 
@@ -629,7 +640,7 @@ female_acute_summary_plot
 
 FEMALE TREATMENT 1 COMBINED (only FULL)
 ```{r}
-female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
+female_acute_naive_summary_plot <- pruned_eEPSC_df$all_cells %>%
   filter(sex == "Female" & category %in% c(1,2) & treatment == "Control") %>%
   ggplot(aes(x = time, y = mean_P1_all_cells, ymin = mean_P1_all_cells - se_P1_all_cells, ymax = mean_P1_all_cells + se_P1_all_cells, colour = category)) +
   geom_pointrange(size = 0.9, shape = 16) +
@@ -657,6 +668,16 @@ female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
         yend = 190,
         arrow = grid::arrow(type = "closed", length = grid::unit(0.02, "npc"))
       ) +
+  
+# significance stars
+  geom_text(
+    data = female_acute_summary_sig_df,
+    aes(x = time, y = y, label = label),
+    inherit.aes = FALSE,
+    colour = "black",
+    size = 8
+  ) +
+  
   patchclampplotteR_theme() +
   theme(
     legend.position = "inside",
@@ -664,9 +685,60 @@ female_treatment1_plot <- pruned_eEPSC_df$all_cells %>%
     legend.justification = c(0, 0)
   )
 
-female_treatment1_plot
+female_acute_naive_summary_plot
 
-# ggsave(female_treatment1_plot, path = here("Figures"), file = "female_treatment1_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+ggsave(female_acute_naive_summary_plot, path = here("Figures"), file = "female_acute_naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+female_naive_summary_plot <- pruned_eEPSC_df$all_cells %>%
+  filter(sex == "Female",
+         category == 1,
+         treatment == "Control") %>%
+  ggplot(aes(x = time,
+             y = mean_P1_all_cells,
+             ymin = mean_P1_all_cells - se_P1_all_cells,
+             ymax = mean_P1_all_cells + se_P1_all_cells,
+             colour = "Naive")) +
+  
+  geom_pointrange(size = 0.9, shape = 16) +
+  ylim(0, 230) +
+  labs(x = "Time (min)", y = "eEPSC Amplitude (% Baseline)", colour = NULL) +
+  geom_hline(yintercept = 100, linetype = "dashed") +
+  
+  scale_colour_manual(
+    values = c("Naive" = "#f5e0b3"),
+    labels = c("Naive" = "Naive, n = 10")
+  ) +
+  
+  annotate(
+    geom = "text",
+    x = 5,
+    y = 220,
+    label = "HFS",
+    size = 4,
+    hjust = 0.5
+  ) +
+  
+  annotate(
+    geom = "segment",
+    x = 5,
+    y = 210,
+    xend = 5,
+    yend = 190,
+    arrow = grid::arrow(type = "closed", length = grid::unit(0.02, "npc"))
+  ) +
+  
+  patchclampplotteR_theme() +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.025, 0.05),
+    legend.justification = c(0, 0)
+  )
+
+female_naive_summary_plot
+
+ggsave(female_naive_summary_plot, path = here("Figures"), file = "female_naive_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 ```{r}
@@ -812,6 +884,7 @@ am251_acute_summary_plot
 
 # ggsave(am251_acute_summary_plot, path = here("Figures"), file = "am251_acute_summary_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
+
 ```{r}
 female_am251_summary_plot <- pruned_eEPSC_df$all_cells %>%
   filter(sex == "Female",
@@ -1108,7 +1181,77 @@ female_HFS_eEPSC_summary <- summary_eEPSC_df$percent_change_data %>%
 female_HFS_eEPSC_summary
 ```
 
+
+
 ## Baseline eEPSC
+### baseline naive and acute eEPSC only
+```{r}
+# data
+female_acute_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1,2) & treatment %in% c("Control")) %>% 
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control")
+  )) %>%
+  
+  ggplot(aes(x = cat_treat, y = t0to5)) +
+  
+  patchclampplotteR_theme() +
+  
+# axis labels
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+  patchclampplotteR_theme() +
+  
+# the boxes
+  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
+               alpha = 0.6, 
+               color = "black", # get rid of if want the dark colour to be the outline
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE)  +
+  
+  # the dots/scatter plot
+  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +
+  
+   # significance bracket
+  geom_signif(
+    comparisons = list(c("1.Control", "2.Control")),
+    map_signif_level = TRUE,
+    annotations = "*", 
+    y_position = 120,
+    tip_length = 0.02,
+    textsize = 7
+  ) +
+
+  # colours
+  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
+                               "2.Control" = "#f19cac")) +
+  
+  scale_color_manual(values = c("1.Control" = "#ecc479", 
+                                "2.Control" = "#eb647e")) +
+  
+  # x-axis labels  
+scale_x_discrete(labels = c("Naive", "Acute")) +
+  
+# x-axis subtitles  
+  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
+  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+
+  guides(fill = "none", color = "none")
+
+female_acute_baseline_amp_plot
+
+# ggsave(female_acute_baseline_amp_plot, path = here("Figures"), file = "female_acute_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
 ```{r}
 # data
 female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
@@ -1170,7 +1313,67 @@ scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated", "N
 female_baseline_amp_plot
 
 # ggsave(female_baseline_amp_plot, path = here("Figures"), file = "female_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+THESIS
+```{r}
+# data
+thesis_female_baseline_amp_plot <- summary_eEPSC_df$percent_change_data %>%
+  filter(sex == "Female" & category %in% c(1,2, 3) & treatment %in% c("Control","AM251")) %>% 
+  mutate(cat_treat = factor(
+    interaction(category, treatment),
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
+  )) %>%
+  
+  ggplot(aes(x = cat_treat, y = t0to5)) +
+  
+  patchclampplotteR_theme() +
+  
+# axis labels
+  labs(x = NULL, y = "Baseline eEPSC Amplitude (pA)") +
+  patchclampplotteR_theme() +
+  
+# the boxes
+  geom_boxplot(aes(fill = interaction(category, treatment), color = interaction(category, treatment)), 
+               alpha = 0.6, 
+               color = "black", # get rid of if want the dark colour to be the outline
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE)  +
+  
+  # the dots/scatter plot
+  geom_sina(aes(x = interaction(category, treatment), color = interaction(category, treatment)), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +
 
+  # colours
+  scale_fill_manual(values = c("1.Control" = "#f5e0b3",
+                               "2.Control" = "#f19cac",
+                               "2.AM251" = "#ffadff",
+                               "3.Control" = "#6497b1")) +
+  
+  scale_color_manual(values = c("1.Control" = "#ecc479", 
+                                "2.Control" = "#eb647e", 
+                                "2.AM251" = "#c11c84",
+                                "3.Control" = "#005b96")) +
+  
+  # x-axis labels  
+scale_x_discrete(labels = c("Naive", "Acute", "Acute with AM251", "Repeated")) +
+  
+# x-axis subtitles  
+  #annotate("text", x = 1, y = -0.2, label = "n = 10", size = 4, hjust = 0.4) + 
+  #annotate("text", x = 2, y = -0.2, label = "n = 8", size = 4, hjust = 0.5) + 
+  #annotate("text", x = 3, y = -0.2, label = "n = 10", size = 4, hjust = 0.5) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+
+  guides(fill = "none", color = "none")
+
+thesis_female_baseline_amp_plot
+
+ggsave(thesis_female_baseline_amp_plot, path = here("Figures"), file = "thesis_female_baseline_amp_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 
@@ -1819,6 +2022,70 @@ scale_shape_manual(values = c("Female" = 16, "Male" = 17)) +
 PPR_plot
 ```
 
+### thesis baseline naive and acute only
+```{r}
+# specific group order
+group_order <- c("naive", "acute")
+
+# colours for groups
+light_group_colors <- c(
+  "naive" = "#f5e0b3",
+  "acute" = "#f19cac"
+)
+
+group_colors <- c(
+  "naive" = "#ecc479",
+  "acute" = "#eb647e"
+)
+
+
+# plot baseline PPR for female groups
+female_acute_baseline_group_PPR_plot <- female_baseline_PPR_df %>%
+  filter(group %in% group_order) %>%
+  mutate(group = factor(group, levels = group_order)) %>%
+  ggplot(aes(x = group, y = mean_PPR_cell)) +
+
+# boxes
+  geom_boxplot(aes(fill = group), alpha = 0.6,
+               outlier.shape = NA, width = 0.5, show.legend = FALSE,
+               color = "black") +
+
+# individual cells as dots (sina plot)
+  geom_sina(aes(color = group), max_width = 0.2,
+            shape = 16, size = 2, show.legend = FALSE) +
+
+# axis labels
+  labs(x = NULL, y = "Baseline Paired Pulse Ratio") +
+
+# group color mapping for boxplot and dots
+  scale_fill_manual(values = light_group_colors) +
+  scale_color_manual(values = group_colors) +
+  
+# significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(female_baseline_PPR_df$mean_PPR_cell)*1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+
+  # x-axis labels
+  scale_x_discrete(labels = c("naive" = "Naive", 
+                              "acute" = "Acute")) +
+  # y-axis
+    scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0, 0.05))) +
+
+  patchclampplotteR_theme() +
+  theme(legend.position = "none") 
+
+  
+female_acute_baseline_group_PPR_plot
+
+# ggsave(female_acute_baseline_group_PPR_plot, path = here("Figures"), file = "female_acute_baseline_group_PPR_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
 ### PPR baseline visualization
 ```{r}
 # specific group order
@@ -2000,12 +2267,13 @@ plot_AP_frequencies_multiple_treatments(
 # data prep: adding group column
 AP_freq_df <- AP_count_data %>%
   mutate(group = case_when(
+    sex == "Female" & category == 1 & treatment == "Control" ~ "naive",
     sex == "Female" & category == 2 & treatment == "Control" ~ "acute",
     sex == "Female" & category == 2 & treatment == "AM251" ~ "AM251",
     sex == "Female" & category == 3 & treatment == "Control" ~ "repeated",
     sex == "Female" & category == 1 & treatment == "Cort" ~ "cort",
   )) %>%
-  mutate(group = factor(group, levels = c("acute", "AM251", "repeated", "cort")))
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
 
 # letter and state need to be factors
 AP_freq_df$state <- factor(AP_freq_df$state)
@@ -2030,44 +2298,58 @@ library(nlme)
 # starting it off with imposed compound symmetry (assumes sphericity)
 AP_freq_model.cs = lme(AP_frequency ~ group*state, data = AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
 anova(AP_freq_model.cs) 
+
+
+df_female_AP_freq_naive <- AP_freq_df %>% filter(group == "naive")
+df_female_AP_freq_acute <- AP_freq_df %>% filter(group == "acute")
+df_female_AP_freq_AM251 <- AP_freq_df %>% filter(group == "AM251")
+df_female_AP_freq_repeated <- AP_freq_df %>% filter(group == "repeated")
+
+# naive
+naive_AP_freq_model.cs <- lme(
+  AP_frequency ~ state,
+  random = ~1 | letter,
+  data = df_female_AP_freq_naive,
+  correlation = corCompSymm(form = ~1|letter)
+)
+anova(naive_AP_freq_model.cs)
+# no effect of state on naive AP frequency
+
+# acute
+acute_AP_freq_model.cs <- lme(
+  AP_frequency ~ state,
+  random = ~1 | letter,
+  data = df_female_AP_freq_acute,
+  correlation = corCompSymm(form = ~1|letter)
+)
+anova(acute_AP_freq_model.cs)
+# effect of state on AP frequency
+
+# am251
+am251_AP_freq_model.cs <- lme(
+  AP_frequency ~ state,
+  random = ~1 | letter,
+  data = df_female_AP_freq_AM251,
+  correlation = corCompSymm(form = ~1|letter)
+)
+anova(am251_AP_freq_model.cs)
+# no effect of state on AP frequency
+
+# repeated
+repeated_AP_freq_model.cs <- lme(
+  AP_frequency ~ state,
+  random = ~1 | letter,
+  data = df_female_AP_freq_repeated,
+  correlation = corCompSymm(form = ~1|letter)
+)
+anova(repeated_AP_freq_model.cs)
+# no effect of state on AP frequency
 ```
 ```{r, fig.width = 12, fig.height = 10}
 library(sjPlot) 
 plot_grid(plot_model(AP_freq_model.cs, type = "diag")) 
-# bad
+# going with it because log was also horrible, sqrt, negative binomial still had significant deviation
 ```
-
-```{r}
-# log + 1 transform
-AP_freq_df$log_AP_frequency <- log(AP_freq_df$AP_frequency + 1)
-
-# new model
-log_AP_freq_model.cs = lme(log_AP_frequency ~ group*state, data = AP_freq_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
-anova(log_AP_freq_model.cs) 
-
-# retest assumptions
-plot_grid(plot_model(log_AP_freq_model.cs, type = "diag")) # looks horrible, this is technically count data so maybe want to use negative binomial
-```
-
-```{r}
-# negative binomial
-
-library(glmmTMB)
-library(lme4)
-library(car)
-library(DHARMa)
-
-AP_freq_model.nb <- glmer.nb(AP_frequency ~ group*state + (1|letter), data=AP_freq_df)
-Anova(AP_freq_model.nb, type="III", component="cond")
-summary(AP_freq_model.nb)
-
-
-AP_freq_model.res.nb <- simulateResiduals(AP_freq_model.nb, n = 1000)
-plot(AP_freq_model.res.nb)
-testUniformity(AP_freq_model.res.nb)
-testDispersion(AP_freq_model.res.nb)
-```
-
 
 ### Christelinda's
 ```{r eval=FALSE}
@@ -2134,26 +2416,100 @@ plot_AP_frequencies_single_treatment(
   save_plot_png = "no"
 )
 ```
+```{r eval=FALSE}
+plot_AP_frequencies_single_treatment(
+  data = AP_count_data,  
+  plot_treatment = "Control",
+  plot_category = 1, 
+  included_sexes = "female",
+  baseline_label = "Baseline",
+  hormone_added = "HFS",
+  significance_display_method = "stars", # could be "p-values" or "stars"
+  treatment_colour_theme = my_theme_colours,
+  large_axis_text = "no",
+  test_type = "wilcox.test", # need to test assumptions
+  theme_options = my_theme_options,
+  save_plot_png = "yes"
+)
+```
+
 
 
 
 ## AP Amplitude
 ### Mine
+
+#### Naive Females 
 ```{r}
-library(lme4)
-library(lmerTest)
-library(sciplot)
+# data
+naive_females <- c("RMN3", "RMN4", "RMN5") # all fire some APs
+naive_female_AP_data <- subset(AP_data, letter %in% naive_females)
 
-# can't have neurons that didn't fire any dragging it down
-no_zeros_female_AP_amp <- subset(AP_data, letter %in% c("RMA1", "RMA3", "RMA8", "RMA9", "RMA10", "RMA2A", "RMA3A", "RMA4A", "RMA5A", "RMA6A", "RMA10A", "RMR1", "RMR2", "RMR3", "RMR4", "RMR5", "RMR6", "RMR8", "RMR9", "RMR10", "RMC1", "RMC2", "RMC3", "RMC4", "RMC5", "RMC6", "RMC7"))
 
-lineplot.CI(x.factor = state, response = peak_amplitude, group = group, xlab="State", ylab="AP Amplitude (pA)", data = no_zeros_female_AP_amp) 
-# looks like there will be an interaction
+naive_female_baseline_AP_data <- subset(naive_female_AP_data, state == "Baseline")$peak_amplitude
+naive_female_HFS_AP_data <- subset(naive_female_AP_data, state == "HFS")$peak_amplitude
 
-# starting it off with imposed compound symmetry (assumes sphericity)
-no_zeros_female_AP_amp.cs = lme(peak_amplitude ~ group*state, data = no_zeros_female_AP_amp, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
-anova(no_zeros_female_AP_amp.cs) 
+naive_female_AP_data_diff <- naive_female_baseline_AP_data-naive_female_HFS_AP_data
 
+
+# normality
+qqnorm(naive_female_AP_data_diff) 
+qqline(naive_female_AP_data_diff) 
+shapiro.test(naive_female_AP_data_diff) # normality test of difference variable
+# normal (when the cells with 0 amplitude are removed)
+
+t.test(naive_female_baseline_AP_data, naive_female_HFS_AP_data, paired = TRUE)
+```
+```{r}
+# visualize
+
+naive_female_AP_plot <- naive_female_AP_data[, c("letter", "state", "peak_amplitude")]
+
+# plot
+naive_female_AP_plot <- naive_female_AP_data %>%
+  ggplot(aes(x = state, y = peak_amplitude, group = letter)) +
+  
+# individual cells
+  geom_point(aes(state), size = 1, colour = "lightgrey") + # or #f19cac
+  geom_line(aes(group = letter), colour = "lightgrey", alpha = 0.9) +
+  
+# mean point
+  stat_summary(aes(group = 1),
+               fun.data = mean_se,
+               geom = "line",
+               colour = "#ecc479",
+               linewidth = 1.2) +
+  
+  stat_summary(aes(group = 1),
+    fun.data = mean_se,
+    geom = "point",
+    colour = "#ecc479",
+    size = 2.5
+  ) + 
+
+# bracket
+  geom_signif(
+    comparisons = list(c("Baseline", "HFS")),
+    map_signif_level = TRUE,  
+    annotations = "ns",  
+    vjust = -0.3,
+    textsize = 5,# 5 when ns, 7 when *s
+    size = 0.5,
+    margin_top = 0.1,
+    extend_line = 0.03
+  ) +
+
+# y-axis
+  scale_y_continuous(limits = c(0, 100)) +
+  
+# theme and titles
+  patchclampplotteR_theme() +
+  labs(x = NULL, y = "Peak Amplitude (pA)", title = NULL) +
+  theme(legend.position = "none")  # remove legend
+
+naive_female_AP_plot
+
+# ggsave(naive_female_AP_plot, path = here("Figures"), file = "naive_female_AP_plot.png", width = 7, height = 5, units = "in", dpi = 300)
 ```
 
 
@@ -2177,8 +2533,6 @@ shapiro.test(acute_female_AP_data_diff) # normality test of difference variable
 # normal (when the cells with 0 amplitude are removed)
 
 t.test(acute_female_baseline_AP_data, acute_female_HFS_AP_data, paired = TRUE)
-
-acute_female_AP_t.test_pvalue <- 0.01216
 ```
 ```{r}
 # visualize
@@ -2211,9 +2565,9 @@ acute_female_AP_plot <- acute_female_AP_data %>%
   geom_signif(
     comparisons = list(c("Baseline", "HFS")),
     map_signif_level = TRUE,  
-    annotations = acute_female_AP_t.test_pvalue,  
+    annotations = "*",  
     vjust = -0.3,
-    textsize = 5,
+    textsize = 7,
     size = 0.5,
     margin_top = 0.1,
     extend_line = 0.03
@@ -2252,8 +2606,6 @@ shapiro.test(AM251_female_AP_data_diff)
 # normal (when the cells with 0 amplitude are removed)
 
 t.test(AM251_female_baseline_AP_data, AM251_female_HFS_AP_data, paired = TRUE)
-
-AM251_female_AP_t.test_pvalue <- 0.1024
 ```
 
 ```{r}
@@ -2288,7 +2640,7 @@ AM251_female_AP_plot <- AM251_female_AP_data %>%
   geom_signif(
     comparisons = list(c("Baseline", "HFS")),
     map_signif_level = TRUE,  
-    annotations = AM251_female_AP_t.test_pvalue,  
+    annotations = "ns",  
     vjust = -0.3,
     textsize = 5,
     size = 0.5,
@@ -2331,8 +2683,6 @@ shapiro.test(repeated_female_AP_data_diff)
 # normal (when the cells with 0 amplitude are removed)
 
 t.test(repeated_female_baseline_AP_data, repeated_female_HFS_AP_data, paired = TRUE)
-
-repeated_female_AP_t.test_pvalue <- 0.004368
 ```
 
 ```{r}
@@ -2366,9 +2716,9 @@ repeated_female_AP_plot <- repeated_female_AP_data %>%
   geom_signif(
     comparisons = list(c("Baseline", "HFS")),
     map_signif_level = TRUE,  
-    annotations = repeated_female_AP_t.test_pvalue,  
+    annotations = "**",  
     vjust = -0.3,
-    textsize = 5,
+    textsize = 7,
     size = 0.5,
     margin_top = 0.1,
     extend_line = 0.03
@@ -2407,8 +2757,6 @@ shapiro.test(cort_female_AP_data_diff) # normality test of difference variable
 # normal (when the cells with 0 amplitude are removed)
 
 t.test(cort_female_baseline_AP_data, cort_female_HFS_AP_data, paired = TRUE)
-
-cort_female_AP_t.test_pvalue <- 0.1261
 ```
 
 ```{r}
@@ -2442,7 +2790,7 @@ cort_female_AP_plot <- cort_female_AP_data %>%
   geom_signif(
     comparisons = list(c("Baseline", "HFS")),
     map_signif_level = TRUE,  
-    annotations = cort_female_AP_t.test_pvalue,  
+    annotations = "ns",  
     vjust = -0.3,
     textsize = 5,
     size = 0.5,
@@ -2612,7 +2960,8 @@ Creating Variance dataset for variance analysis (category 2)
 ```{r}
 variance_2_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
-  df_category = 2,
+  include_all_categories = "no",
+  list_of_categories = 2,
   include_all_treatments = "yes",
   list_of_treatments = NULL,
   baseline_interval = "t0to5",
@@ -2634,7 +2983,8 @@ variance_2_df
 ```{r}
 variance_1_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
-  df_category = 1,
+  include_all_categories = "no",
+  list_of_categories = 1,
   include_all_treatments = "yes",
   list_of_treatments = NULL,
   baseline_interval = "t0to5",
@@ -2649,7 +2999,8 @@ variance_1_df
 ```{r}
 variance_3_df <- make_variance_data(
   data = summary_eEPSC_df$summary_data,
-  df_category = 3,
+  include_all_categories = "no",
+  list_of_categories = 3,
   include_all_treatments = "yes",
   list_of_treatments = NULL,
   baseline_interval = "t0to5",
@@ -3130,10 +3481,10 @@ repeated_female_cv_plot
 ```{r}
 # data frame
 female_amp_df <- summary_eEPSC_df$percent_change_data %>%
-  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251", "Cort")) %>% 
+  filter(sex == "Female" & category %in% c(1,2,3) & treatment %in% c("Control","AM251")) %>% 
   mutate(cat_treat = factor(
     interaction(category, treatment),
-    levels = c("1.Control", "2.Control", "2.AM251", "3.Control", "1.Cort")
+    levels = c("1.Control", "2.Control", "2.AM251", "3.Control")
   ))
 
 female_amp_df
@@ -3571,3 +3922,743 @@ anova(ar1.project_cort.fit) # significant effect of time (p = 0.1603) -> need po
 p-values evaluated against p = 0.01 to account for multiple (5) comparisons
 bonferroni correction
 0.05/5 = 0.01 (corrected alpha level)
+
+## t-test between naive and acute baseline eEPSC
+```{r}
+# adding group column
+female_amp_df <- female_amp_df %>%
+  mutate(
+    group = case_when(
+      category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251" ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort" ~ "cort" ))
+
+# already has cell means (t0to5)
+
+# normality
+shapiro.test(female_amp_df$t0to5[female_amp_df$group == "naive"])
+qqnorm(female_amp_df$t0to5[female_amp_df$group == "naive"])
+qqline(female_amp_df$t0to5[female_amp_df$group == "naive"]) # passes
+
+shapiro.test(female_amp_df$t0to5[female_amp_df$group == "acute"])
+qqnorm(female_amp_df$t0to5[female_amp_df$group == "acute"])
+qqline(female_amp_df$t0to5[female_amp_df$group == "acute"]) # passes
+
+# HoV
+leveneTest(t0to5 ~ group, data = female_amp_df) # passes
+
+# running the t-test
+t.test(female_amp_df$t0to5[female_amp_df$group == "naive"],
+            female_amp_df$t0to5[female_amp_df$group == "acute"],
+            paired = FALSE,
+       var.equal = TRUE)
+# significantly different (p = 0.03426)
+```
+
+## t-test between naive and acute baseline PPR
+```{r}
+# female filter
+female_PPR_cell_df <- PPR_cell_df %>% filter(sex == "Female")
+
+# normality
+shapiro.test(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "naive"])
+qqnorm(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "naive"])
+qqline(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "naive"]) # passes
+
+shapiro.test(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "acute"])
+qqnorm(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "acute"])
+qqline(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "acute"]) # passes
+
+# HoV
+leveneTest(mean_PPR_cell ~ group, data = female_PPR_cell_df) # passes
+
+# running the t-test
+t.test(female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "naive"],
+            female_PPR_cell_df$mean_PPR_cell[female_PPR_cell_df$group == "acute"],
+            paired = FALSE,
+       var.equal = TRUE)
+# NOT significantly different (p = 0.09049)
+```
+
+## other baseline parameters
+```{r}
+baseline_parameters <- read.csv("Data/baseline_parameters.csv")
+```
+```{r}
+# Cm
+# normality
+shapiro.test(baseline_parameters$Cm[baseline_parameters$group == "naive"])
+qqnorm(baseline_parameters$Cm[baseline_parameters$group == "naive"])
+qqline(baseline_parameters$Cm[baseline_parameters$group == "naive"]) # passes
+
+shapiro.test(baseline_parameters$Cm[baseline_parameters$group == "acute"])
+qqnorm(baseline_parameters$Cm[baseline_parameters$group == "acute"])
+qqline(baseline_parameters$Cm[baseline_parameters$group == "acute"]) # passes
+
+# HoV
+leveneTest(Cm ~ group, data = baseline_parameters) # passes
+
+# t-test
+t.test(baseline_parameters$Cm[baseline_parameters$group == "naive"],
+            baseline_parameters$Cm[baseline_parameters$group == "acute"],
+            paired = FALSE,
+       var.equal = TRUE) # not different (p = 0.6262)
+
+# Vm
+# normality
+shapiro.test(baseline_parameters$Vm[baseline_parameters$group == "naive"])
+qqnorm(baseline_parameters$Vm[baseline_parameters$group == "naive"])
+qqline(baseline_parameters$Vm[baseline_parameters$group == "naive"]) # passes
+
+shapiro.test(baseline_parameters$Vm[baseline_parameters$group == "acute"])
+qqnorm(baseline_parameters$Vm[baseline_parameters$group == "acute"])
+qqline(baseline_parameters$Vm[baseline_parameters$group == "acute"]) # passes
+
+# HoV
+leveneTest(Vm ~ group, data = baseline_parameters) # passes
+
+# t-test
+t.test(baseline_parameters$Vm[baseline_parameters$group == "naive"],
+           baseline_parameters$Vm[baseline_parameters$group == "acute"],
+            paired = FALSE,
+       var.equal = TRUE) # not different (p = 0.08435)
+```
+Cm Plot
+```{r}
+# data
+
+female_acute_baseline_Cm_plot <- baseline_parameters %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+
+ggplot(aes(x = group, y = Cm)) +
+
+
+patchclampplotteR_theme() +
+  
+# axis labels
+  labs(x = NULL, y = "Baseline Membrane Capacitance (pF)") +
+  patchclampplotteR_theme() +
+  
+# the boxes
+  geom_boxplot(aes(fill = group), 
+               alpha = 0.6, 
+               color = "black", # get rid of if want the dark colour to be the outline
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE)  +
+  
+  # the dots/scatter plot
+  geom_sina(aes(x = group, color = group), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(baseline_parameters$Cm) * 1.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3",
+                               "acute" = "#f19cac")) +
+  
+  scale_color_manual(values = c("naive" = "#ecc479", 
+                                "acute" = "#eb647e")) +
+  
+  # x-axis labels  
+scale_x_discrete(labels = c("naive" = "Naive",
+                            "acute" = "Acute")) +
+  
+
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+
+  guides(fill = "none", color = "none")
+
+female_acute_baseline_Cm_plot
+
+# ggsave(female_acute_baseline_Cm_plot, path = here("Figures"), file = "female_acute_baseline_Cm_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+Vm Plot
+```{r}
+# data
+
+female_acute_baseline_Vm_plot <- baseline_parameters %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+
+ggplot(aes(x = group, y = Vm)) +
+
+
+patchclampplotteR_theme() +
+  
+# axis labels
+  labs(x = NULL, y = "Resting Membrane Potential (mV)") +
+  patchclampplotteR_theme() +
+  
+# the boxes
+  geom_boxplot(aes(fill = group), 
+               alpha = 0.6, 
+               color = "black", # get rid of if want the dark colour to be the outline
+# outlier.shape = NA stops the box plot from plotting outliers. BUT because the sina plot is a different layer, all outliers are still shown as dots from that.
+               outlier.shape = NA, 
+               width = 0.5, 
+               show.legend = FALSE)  +
+  
+  # the dots/scatter plot
+  geom_sina(aes(x = group, color = group), 
+            max_width = 0.2, 
+            shape = 16, 
+            size = 2, 
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns", 
+    y_position = max(baseline_parameters$Vm) * 0.05,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3",
+                               "acute" = "#f19cac")) +
+  
+  scale_color_manual(values = c("naive" = "#ecc479", 
+                                "acute" = "#eb647e")) +
+  
+  # x-axis labels  
+scale_x_discrete(labels = c("naive" = "Naive",
+                            "acute" = "Acute")) +
+  
+
+  scale_y_continuous(expand = expansion(mult = c(0.2, .2))) +
+
+  guides(fill = "none", color = "none")
+
+female_acute_baseline_Vm_plot
+
+# ggsave(female_acute_baseline_Vm_plot, path = here("Figures"), file = "female_acute_baseline_Vm_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+
+```{r}
+project_group_colours <- c(
+  "cort" = "#ecc479",
+  "acute" = "#eb647e"
+)
+
+project_group_fill_colours <- c(
+  "cort" = "#f5e0b3",
+  "acute" = "#f19cac"
+)
+
+AP_freq_df$sweep <- as.factor(AP_freq_df$sweep)
+
+# filter to only cort (naive) and acute and "Baseline" state
+# and summarize the data by calculating the average AP_frequency per group and sweep
+baseline_acute_AP_freq_df <- AP_freq_df %>%
+  filter(state == "Baseline" & group %in% c("cort", "acute")) %>%
+  group_by(group, sweep) %>%
+  summarise(
+    mean_AP_frequency = mean(AP_frequency, na.rm = TRUE),
+    se_AP_freq = sd(AP_frequency, na.rm = TRUE) / sqrt(n()),  # Standard Error
+    .groups = "drop"
+  )
+
+# create error bar colour column (same logic as your other plot)
+baseline_acute_AP_freq_df$errorbar_colour <- 
+  project_group_fill_colours[as.character(baseline_acute_AP_freq_df$group)]
+
+# correct order in the plot
+baseline_acute_AP_freq_df <- baseline_acute_AP_freq_df %>%
+  mutate(group = factor(group, levels = c("cort", "acute")))
+
+# plot
+baseline_acute_AP_freq_plot <- ggplot(baseline_acute_AP_freq_df, aes(x = sweep, y = mean_AP_frequency, group = group)) +
+  patchclampplotteR_theme() + 
+  
+# axis labels
+  labs(x = "Sweep", y = "Action Potential Frequency (Hz)") +
+  
+# line plot to show the trend of mean AP frequency per sweep for each group
+  geom_line(aes(color = group), linewidth = 1.2) +
+
+# points on the lines for each sweep
+  geom_point(aes(color = group), size = 2) +
+
+# error bars for SE
+  geom_errorbar(
+    aes(
+      ymin = mean_AP_frequency - se_AP_freq,
+      ymax = mean_AP_frequency + se_AP_freq,
+      color = baseline_acute_AP_freq_df$errorbar_colour
+    ),
+    width = 0.2,
+    linewidth = 0.85
+  ) +
+  
+# colours
+  scale_color_manual(values = project_group_colours) +
+
+  
+# significance
+  geom_signif(
+    comparisons = list(c("cort", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns",  
+    y_position = max(baseline_acute_AP_freq_df$mean_AP_frequency) * 0.1,
+    tip_length = 0.02,
+    textsize = 5
+  ) +
+  
+  
+# y-axis scaling and limits
+  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
+  
+# hide legends for fill and color
+  guides(fill = "none", color = "none")
+
+# Print the plot
+baseline_acute_AP_freq_plot
+
+# Optionally save the plot
+# ggsave(AP_freq_plot, path = here("Figures"), filename = "AP_freq_plot.png", width = 7, height = 5, units = "in", dpi = 300)
+```
+stats on the baseline AP freq:
+```{r eval=FALSE}
+baseline_acute_AP_freq_df # data frame is already in long format
+
+# eyeball interaction plot
+baseline_acute_AP_freq_df$sweep <- factor(baseline_acute_AP_freq_df$sweep, levels=c("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")) # telling it what order
+lineplot.CI(x.factor=sweep, response=mean_AP_frequency, group=group, xlab="Sweep", ylab="AP Frequency (Hz)", data=baseline_acute_AP_freq_df) # maybe interaction
+
+# to keep the random factor of letter in the df
+baseline_acute_AP_freq_stats_df <- AP_freq_df %>%
+  filter(state == "Baseline" & group %in% c("cort", "acute")) 
+baseline_acute_AP_freq_stats_df
+
+
+# starting it off with imposed compound symmetry (assumes sphericity)
+baseline_acute_AP_freq_stats.cs = lme(AP_frequency ~ group*sweep, data = baseline_acute_AP_freq_stats_df, random = ~1|letter, correlation = corCompSymm(form = ~1|letter)) 
+
+plot_grid(plot_model(baseline_acute_AP_freq_stats.cs, type = "diag")) # good enough
+
+acf(resid(baseline_acute_AP_freq_stats.cs)) # looks autocorrelated
+
+# trying with autoregressive (ar1) structure
+baseline_acute_AP_freq_stats.ar1 = lme(AP_frequency ~ group*sweep, data = baseline_acute_AP_freq_stats_df, random = ~1|letter, correlation=corAR1(form= ~1|letter))
+
+# which model is better
+anova(baseline_acute_AP_freq_stats.cs, baseline_acute_AP_freq_stats.ar1)
+# autoregressive structure is a better fit
+
+# actually running
+anova(baseline_acute_AP_freq_stats.ar1) 
+# effect of sweep, and effect of interaction
+# biologically, of course the higher sweep has more AP... so I want to see the difference between groups -> do one way anova for the effect of group at each sweep
+
+# subset
+sweep_1 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "1")
+sweep_1
+sweep_2 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "2")
+sweep_3 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "3")
+sweep_4 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "4")
+sweep_5 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "5")
+sweep_6 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "6")
+sweep_7 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "7")
+sweep_8 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "8")
+sweep_9 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "9")
+sweep_10 <- baseline_acute_AP_freq_stats_df %>% filter(sweep %in% "10")
+
+# HoV for t-tests
+leveneTest(AP_frequency ~ group, data = baseline_acute_AP_freq_stats_df) # passes
+
+# p-values evaluated against p = 0.001 to account for multiple (10) comparisons
+
+t.test(sweep_1$AP_frequency[sweep_1$AP_frequency$letter %in% c("RMC1", "RMC2", "RMC3", "RMC4", "RMC5", "RMC6", "RMC7")],
+       sweep_1$AP_frequency[sweep_1$AP_frequency$letter %in% c("RMA1", "RMA2", "RMA3", "RMA4", "RMA6", "RMA8", "RMA9", "RMA10")],
+       paired = FALSE,
+       var.equal = TRUE)
+```
+# Spontaneous Currents
+```{r eval=FALSE}
+# FOR FIRST TIME ONLY
+first_time_df <- add_new_cells(
+  new_raw_data_csv = "Data/new_raw_sEPSC.csv",
+  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
+  old_raw_data_csv = "Data/raw_sEPSC_df.csv",
+  data_type = "sEPSC",
+  software = "MiniAnalysis",
+  bin_width = 5,
+  write_new_csv = "yes",
+  new_file_name = "Data/raw_sEPSC_df.csv",
+  decimal_places = 2,
+)
+```
+To Append New Data onto the EXISTING SHEET (raw_sEPSC_df.csv) after first time
+```{r eval=FALSE}
+# will not run if there is nothing new in "new_raw_sEPSC.csv" so if you put new data directly into "raw_sEPSC_df.csv", it won't run
+add_new_cells(
+  new_raw_data_csv = "Data/new_raw_sEPSC.csv", # should ONLY have the new data you want
+  cell_characteristics_csv = "Data/Cell-Characteristics.csv",
+  old_raw_data_csv = "Data/raw_sEPSC_df.csv",
+  data_type = "sEPSC",
+  software = "MiniAnalysis",
+  write_new_csv = "yes",
+  new_file_name = "Data/raw_sEPSC_df.csv", # will overwrite the current version of this file
+  decimal_places = 2
+)
+
+# once successful, go delete the data from "new_raw_eEPSC.csv" so that you don't get a duplication error the next time you are adding data to the raw_eEPSC_df.
+```
+
+```{r}
+raw_sEPSC_df <- read.csv("Data/raw_sEPSC_df.csv")
+```
+
+
+Normalizing Data:
+```{r}
+normalized_raw_sEPSC_df <- make_normalized_EPSC_data(
+  filename = "Data/raw_sEPSC_df.csv",
+  current_type = "sEPSC",
+  min_time_value = 0,
+  max_time_value = 30,
+  interval_length = 5,
+  baseline_length = 5,
+  negative_transform_currents = "yes" # because the raw amplitudes are negative
+)
+```
+
+Pruning:
+```{r}
+pruned_sEPSC_df <- make_pruned_EPSC_data(
+  data = normalized_raw_sEPSC_df,
+  current_type = "sEPSC",
+  software = "MiniAnalysis",
+  min_time_value = 0,
+  max_time_value = 30,
+  baseline_length = 5,
+  interval_length = 1,
+  decimal_places = 2
+)
+```
+
+Summary Data:
+```{r}
+summary_sEPSC_df <- make_summary_EPSC_data(
+  data = pruned_sEPSC_df$individual_cells, 
+  current_type = "sEPSC",
+  save_output_as_RDS = "no",
+  baseline_interval = "t0to5",
+  ending_interval = "t25to30"
+)
+```
+
+```{r}
+# adding group column
+
+summary_sEPSC_df$percent_change_amplitude <- summary_sEPSC_df$percent_change_amplitude %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251"   ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort"    ~ "cort"
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
+
+summary_sEPSC_df$percent_change_frequency <- summary_sEPSC_df$percent_change_frequency %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251"   ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort"    ~ "cort"
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
+
+summary_sEPSC_df$summary_data <- summary_sEPSC_df$summary_data %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251"   ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort"    ~ "cort"
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
+
+summary_sEPSC_df$mean_SE_amplitude <- summary_sEPSC_df$mean_SE_amplitude %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251"   ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort"    ~ "cort"
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
+
+summary_sEPSC_df$mean_SE_frequency <- summary_sEPSC_df$mean_SE_frequency %>%
+  mutate(group = case_when(
+    category == 1 & treatment == "Control" ~ "naive",
+    category == 2 & treatment == "Control" ~ "acute",
+    category == 2 & treatment == "AM251"   ~ "AM251",
+    category == 3 & treatment == "Control" ~ "repeated",
+    category == 1 & treatment == "Cort"    ~ "cort"
+  )) %>%
+  mutate(group = factor(group, levels = c("naive", "acute", "AM251", "repeated", "cort")))
+
+
+# add difference column
+summary_sEPSC_df$percent_change_amplitude <- summary_sEPSC_df$percent_change_amplitude %>%
+  mutate(diff = t25to30 - t0to5)
+
+# add difference column
+summary_sEPSC_df$percent_change_frequency <- summary_sEPSC_df$percent_change_frequency %>%
+  mutate(diff = t25to30 - t0to5)
+```
+
+
+
+## Amplitude t-test
+```{r}
+# normality
+
+shapiro.test(summary_sEPSC_df$percent_change_amplitude$t0to5[summary_sEPSC_df$percent_change_amplitude$group == "naive"]) # p = 0.1554
+shapiro.test(summary_sEPSC_df$percent_change_amplitude$t25to30[summary_sEPSC_df$percent_change_amplitude$group == "naive"]) # p = 0.5708
+
+shapiro.test(summary_sEPSC_df$percent_change_amplitude$t0to5[summary_sEPSC_df$percent_change_amplitude$group == "acute"]) # p = 0.8667
+shapiro.test(summary_sEPSC_df$percent_change_amplitude$t25to30[summary_sEPSC_df$percent_change_amplitude$group == "acute"]) # p = 0.8609
+
+
+# HoV
+leveneTest(t0to5 ~ group, data = summary_sEPSC_df$percent_change_amplitude) # p = 0.6267
+leveneTest(t25to30 ~ group, data = summary_sEPSC_df$percent_change_amplitude) # p = 0.6974
+
+# running the t-test
+t.test(summary_sEPSC_df$percent_change_amplitude$t0to5[summary_sEPSC_df$percent_change_amplitude$group == "naive"], summary_sEPSC_df$percent_change_amplitude$t0to5[summary_sEPSC_df$percent_change_amplitude$group == "acute"], paired = FALSE, var.equal = TRUE) # sEPSC amplitude does not significantly differ at baseline between naive and acute (p = 0.8456)
+
+t.test(summary_sEPSC_df$percent_change_amplitude$t25to30[summary_sEPSC_df$percent_change_amplitude$group == "naive"], summary_sEPSC_df$percent_change_amplitude$t25to30[summary_sEPSC_df$percent_change_amplitude$group == "acute"], paired = FALSE, var.equal = TRUE) # sEPSC amplitude does not significantly differ at baseline between naive and acute (p = 0.8892)
+```
+
+## Frequency t-test
+```{r}
+# normality
+
+shapiro.test(summary_sEPSC_df$percent_change_frequency$t0to5[summary_sEPSC_df$percent_change_frequency$group == "naive"]) # p = 0.2688
+shapiro.test(summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "naive"]) # p = 0.01193
+qqnorm(summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "naive"])
+qqline(summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "naive"]) # not THAT bad, gonna take it (still not significant with a very high p-value when I do a wilcoxon)
+
+shapiro.test(summary_sEPSC_df$percent_change_frequency$t0to5[summary_sEPSC_df$percent_change_frequency$group == "acute"]) # p = 0.3519
+shapiro.test(summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "acute"]) # p = 0.3697
+
+
+# HoV
+leveneTest(t0to5 ~ group, data = summary_sEPSC_df$percent_change_frequency) # p = 0.8587
+leveneTest(t25to30 ~ group, data = summary_sEPSC_df$percent_change_frequency) # p = 0.616
+
+# running the t-test
+t.test(summary_sEPSC_df$percent_change_frequency$t0to5[summary_sEPSC_df$percent_change_frequency$group == "naive"], summary_sEPSC_df$percent_change_frequency$t0to5[summary_sEPSC_df$percent_change_frequency$group == "acute"], paired = FALSE, var.equal = TRUE) # sEPSC amplitude does not significantly differ at baseline between naive and acute (p = 0.711)
+
+t.test(summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "naive"], summary_sEPSC_df$percent_change_frequency$t25to30[summary_sEPSC_df$percent_change_frequency$group == "acute"], paired = FALSE, var.equal = TRUE) # sEPSC amplitude does not significantly differ at baseline between naive and acute (p = 0.5186)
+```
+
+## Amplitude plots
+```{r}
+sEPSC_amp_baseline_plot <- summary_sEPSC_df$percent_change_amplitude %>%
+  filter(group %in% c("naive", "acute")) %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+  
+  ggplot(aes(x = group, y = t0to5)) +
+  
+  # boxplot
+  geom_boxplot(aes(fill = group),
+               alpha = 0.6, 
+               color = "black",
+               outlier.shape = NA,
+               width = 0.5,
+               show.legend = FALSE) +
+  
+  # sina 
+  geom_sina(aes(color = group),
+            max_width = 0.2,
+            shape = 16,
+            size = 2,
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns",  
+    y_position = max(summary_sEPSC_df$percent_change_amplitude$t0to5) * 1.05,
+    tip_length = 0.02,
+    textsize = 5 # 5 when ns, 7 when *
+  ) +
+  
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3", "acute" = "#f19cac")) +
+  scale_color_manual(values = c("naive" = "#ecc479", "acute" = "#eb647e")) +
+  
+  # axes labels
+  labs(x = NULL, y = "Baseline sEPSC Amplitude (pA)") +
+  scale_x_discrete(labels = c("naive" = "Naive", "acute" = "Acute")) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
+  
+  patchclampplotteR_theme()
+
+sEPSC_amp_baseline_plot
+```
+```{r}
+sEPSC_amp_HFS_plot <- summary_sEPSC_df$percent_change_amplitude %>%
+  filter(group %in% c("naive", "acute")) %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+  
+  ggplot(aes(x = group, y = t25to30)) +
+  
+  # boxplot
+  geom_boxplot(aes(fill = group),
+               alpha = 0.6, 
+               color = "black",
+               outlier.shape = NA,
+               width = 0.5,
+               show.legend = FALSE) +
+  
+  # sina 
+  geom_sina(aes(color = group),
+            max_width = 0.2,
+            shape = 16,
+            size = 2,
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns",  
+    y_position = max(summary_sEPSC_df$percent_change_amplitude$t25to30) * 1.05,
+    tip_length = 0.02,
+    textsize = 5 # 5 when ns, 7 when *
+  ) +
+  
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3", "acute" = "#f19cac")) +
+  scale_color_manual(values = c("naive" = "#ecc479", "acute" = "#eb647e")) +
+  
+  # axes labels
+  labs(x = NULL, y = "Final sEPSC Amplitude (pA)") +
+  scale_x_discrete(labels = c("naive" = "Naive", "acute" = "Acute")) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
+  
+  patchclampplotteR_theme()
+
+sEPSC_amp_HFS_plot
+```
+
+## Frequency plots
+```{r}
+sEPSC_freq_baseline_plot <- summary_sEPSC_df$percent_change_frequency %>%
+  filter(group %in% c("naive", "acute")) %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+  
+  ggplot(aes(x = group, y = t0to5)) +
+  
+  # boxplot
+  geom_boxplot(aes(fill = group),
+               alpha = 0.6, 
+               color = "black",
+               outlier.shape = NA,
+               width = 0.5,
+               show.legend = FALSE) +
+  
+  # sina 
+  geom_sina(aes(color = group),
+            max_width = 0.2,
+            shape = 16,
+            size = 2,
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns",  
+    y_position = max(summary_sEPSC_df$percent_change_frequency$t0to5) * 1.05,
+    tip_length = 0.02,
+    textsize = 5 # 5 when ns, 7 when *
+  ) +
+  
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3", "acute" = "#f19cac")) +
+  scale_color_manual(values = c("naive" = "#ecc479", "acute" = "#eb647e")) +
+  
+  # axes labels
+  labs(x = NULL, y = "Baseline sEPSC Frequency (Hz)") +
+  scale_x_discrete(labels = c("naive" = "Naive", "acute" = "Acute")) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
+  
+  patchclampplotteR_theme()
+
+sEPSC_freq_baseline_plot
+```
+
+```{r}
+sEPSC_freq_HFS_plot <- summary_sEPSC_df$percent_change_frequency %>%
+  filter(group %in% c("naive", "acute")) %>%
+  mutate(group = factor(group, levels = c("naive", "acute"))) %>%
+  
+  ggplot(aes(x = group, y = t25to30)) +
+  
+  # boxplot
+  geom_boxplot(aes(fill = group),
+               alpha = 0.6, 
+               color = "black",
+               outlier.shape = NA,
+               width = 0.5,
+               show.legend = FALSE) +
+  
+  # sina 
+  geom_sina(aes(color = group),
+            max_width = 0.2,
+            shape = 16,
+            size = 2,
+            show.legend = FALSE) +
+  
+  # significance bracket
+  geom_signif(
+    comparisons = list(c("naive", "acute")),
+    map_signif_level = TRUE,
+    annotations = "ns",  
+    y_position = max(summary_sEPSC_df$percent_change_frequency$t25to30) * 1.05,
+    tip_length = 0.02,
+    textsize = 5 # 5 when ns, 7 when *
+  ) +
+  
+  # colours
+  scale_fill_manual(values = c("naive" = "#f5e0b3", "acute" = "#f19cac")) +
+  scale_color_manual(values = c("naive" = "#ecc479", "acute" = "#eb647e")) +
+  
+  # axes labels
+  labs(x = NULL, y = "Final sEPSC Frequency (Hz)") +
+  scale_x_discrete(labels = c("naive" = "Naive", "acute" = "Acute")) +
+  
+  scale_y_continuous(expand = expansion(mult = c(0.2, 0.2))) +
+  
+  patchclampplotteR_theme()
+
+sEPSC_freq_HFS_plot
+```
